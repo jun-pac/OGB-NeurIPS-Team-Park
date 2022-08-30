@@ -2,6 +2,7 @@ from copy import copy
 import argparse
 from distutils.util import run_2to3
 from tqdm import tqdm
+import sys
 
 import torch
 import torch.nn.functional as F
@@ -15,17 +16,18 @@ from torch_geometric.nn import MessagePassing
 
 from ogb.nodeproppred import PygNodePropPredDataset, Evaluator
 
+sys.path.insert(0,'/home/oiocha/workspace/ogb_neurIPS/ogb/examples/nodeproppred/mag')
 from logger import Logger
 
 parser = argparse.ArgumentParser(description='OGBN-MAG (GraphSAINT)')
 parser.add_argument('--device', type=int, default=0)
 parser.add_argument('--num_layers', type=int, default=2)
-parser.add_argument('--hidden_channels', type=int, default=64)
+parser.add_argument('--hidden_channels', type=int, default=32) # Originally 64
 parser.add_argument('--dropout', type=float, default=0.5)
 parser.add_argument('--lr', type=float, default=0.005)
 parser.add_argument('--epochs', type=int, default=30)
 parser.add_argument('--runs', type=int, default=10)
-parser.add_argument('--batch_size', type=int, default=20000)
+parser.add_argument('--batch_size', type=int, default=5000) # Origially 20000
 parser.add_argument('--walk_length', type=int, default=2)
 parser.add_argument('--num_steps', type=int, default=30)
 args = parser.parse_args()
@@ -36,6 +38,23 @@ data = dataset[0]
 split_idx = dataset.get_idx_split()
 evaluator = Evaluator(name='ogbn-mag')
 logger = Logger(args.runs, args)
+
+'''
+edge_index_writes = dataset.edge_index('author', 'writes', 'paper') 
+edge_index_cites = dataset.edge_index('paper', 'paper')
+edge_index_affiliated_with = dataset.edge_index('author', 'institution')
+print("edge_index_writes :",edge_index_writes)
+print("edge_index_cites :",edge_index_cites)
+print("edge_index_affiliated_with :",edge_index_affiliated_with)
+
+print('split_idx :',split_idx.keys())
+train_idx = split_idx['train'] # numpy array storing indices of training paper nodes
+valid_idx = split_idx['valid'] # numpy array storing indices of validation paper nodes
+test_idx = split_idx['test'] # numpy array storing indices of test-dev paper nodes
+print("train_idx :",train_idx, train_idx['paper'].shape)
+print("valid_idx :",valid_idx, valid_idx['paper'].shape)
+print("test_idx :",test_idx, test_idx['paper'].shape)
+'''
 
 # We do not consider those attributes for now.
 data.node_year_dict = None
@@ -229,8 +248,9 @@ class RGCN(torch.nn.Module):
         print("Flag 2")
         for i, conv in enumerate(self.convs):
             out_dict = {}
-
+            print("Flag 2.1")
             for j, x in x_dict.items():
+                print("Flag 2.2", j)
                 out_dict[j] = conv.root_lins[j](x)
             print("Flag 3")
             for keys, adj_t in adj_t_dict.items():
@@ -247,11 +267,14 @@ class RGCN(torch.nn.Module):
                     F.relu_(out_dict[j])
             print("Flag 5")
             x_dict = out_dict
-
+            print("Flag 5.1")
+        print("Flag 5.2")
         return x_dict
 
 
 device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
+
+print("For debug :", args.hidden_channels, dataset.num_classes, args.batch_size)
 
 model = RGCN(128, args.hidden_channels, dataset.num_classes, args.num_layers,
              args.dropout, num_nodes_dict, list(x_dict.keys()),
@@ -295,7 +318,7 @@ def test():
     out = model.inference(x_dict, edge_index_dict, key2int)
     print("after inference")
     out = out[key2int['paper']]
-
+    
     y_pred = out.argmax(dim=-1, keepdim=True).cpu()
     y_true = data.y_dict['paper']
 
@@ -311,8 +334,15 @@ def test():
         'y_true': y_true[split_idx['test']['paper']],
         'y_pred': y_pred[split_idx['test']['paper']],
     })['acc']
-
+    print("Flag 6")
     return train_acc, valid_acc, test_acc
+
+'''
+print("# Params : ",sum(p.numel() for p in model.parameters() if p.requires_grad))
+for p in model.parameters():
+    if (p.requires_grad):
+        print(p, p.numel())
+'''
 
 print("Initial test")
 test()  # Test if inference on GPU succeeds.
