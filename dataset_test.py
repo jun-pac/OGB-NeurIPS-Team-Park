@@ -187,6 +187,7 @@ class RGCN(torch.nn.Module):
             f'{key}': Parameter(torch.Tensor(num_nodes_dict[key], in_channels))
             for key in set(node_types).difference(set(x_types))
         })
+        
 
         I, H, O = in_channels, hidden_channels, out_channels  # noqa
 
