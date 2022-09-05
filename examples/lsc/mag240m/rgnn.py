@@ -16,8 +16,8 @@ from ogb.lsc import MAG240MDataset, MAG240MEvaluator
 from pytorch_lightning import (LightningDataModule, LightningModule, Trainer,
                                seed_everything)
 from pytorch_lightning.callbacks import ModelCheckpoint
-#from pytorch_lightning.metrics import Accuracy
-from torchmetrics.functional import accuracy as Accuracy
+from pytorch_lightning.metrics import Accuracy
+#from torchmetrics.functional import accuracy as Accuracy
 from torch import Tensor
 from torch.nn import BatchNorm1d, Dropout, Linear, ModuleList, ReLU, Sequential
 from torch.optim.lr_scheduler import StepLR
@@ -27,7 +27,6 @@ from torch_sparse import SparseTensor
 from tqdm import tqdm
 
 from root import ROOT
-
 
 class Batch(NamedTuple):
     x: Tensor
@@ -89,13 +88,18 @@ class MAG240M(LightningDataModule):
         if not osp.exists(path):  # Will take approximately 5 minutes...
             t = time.perf_counter()
             print('Converting adjacency matrix...', end=' ', flush=True)
+            print("f1")
             edge_index = dataset.edge_index('paper', 'cites', 'paper')
+            print("f2")
             edge_index = torch.from_numpy(edge_index)
+            print("f3")
             adj_t = SparseTensor(
                 row=edge_index[0], col=edge_index[1],
                 sparse_sizes=(dataset.num_papers, dataset.num_papers),
                 is_sorted=True)
+            print("f4")
             torch.save(adj_t.to_symmetric(), path)
+            print("f5")
             print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
         path = f'{dataset.dir}/full_adj_t.pt'
@@ -162,18 +166,21 @@ class MAG240M(LightningDataModule):
             x = np.memmap(path, dtype=np.float16, mode='w+',
                           shape=(N, self.num_features))
 
-            print('Copying paper features...')
-            for i in tqdm(range(0, dataset.num_papers, node_chunk_size)):
+            print('Copying paper features...','commit -m delete tqdm')
+            for i in range(0, dataset.num_papers, node_chunk_size):
+                print("Debug :",i)
                 j = min(i + node_chunk_size, dataset.num_papers)
                 x[i:j] = paper_feat[i:j]
-
+            print("h1")
             edge_index = dataset.edge_index('author', 'writes', 'paper')
+            print("h2")
             row, col = torch.from_numpy(edge_index)
+            print("h3")
             adj_t = SparseTensor(
                 row=row, col=col,
                 sparse_sizes=(dataset.num_authors, dataset.num_papers),
                 is_sorted=True)
-
+            print("h4")
             # Processing 64-dim subfeatures at a time for memory efficiency.
             print('Generating author features...')
             for i in tqdm(range(0, self.num_features, dim_chunk_size)):
@@ -415,11 +422,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
-
+    print("ROOT :",ROOT,"asdf")
     seed_everything(42)
     datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.in_memory)
 
     if not args.evaluate:
+        device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         model = RGNN(args.model, datamodule.num_features,
                      datamodule.num_classes, args.hidden_channels,
                      datamodule.num_relations, num_layers=len(args.sizes),
@@ -427,12 +435,18 @@ if __name__ == '__main__':
         print(f'#Params {sum([p.numel() for p in model.parameters()])}')
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max',
                                               save_top_k=3)
+        trainer = Trainer(max_epochs=args.epochs,
+                          callbacks=[checkpoint_callback],
+                          default_root_dir=f'logs/{args.model}')
+        '''
         trainer = Trainer(gpus=args.device, max_epochs=args.epochs,
                           callbacks=[checkpoint_callback],
                           default_root_dir=f'logs/{args.model}')
+        '''
         trainer.fit(model, datamodule=datamodule)
 
     if args.evaluate:
+        device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         dirs = glob.glob(f'logs/{args.model}/lightning_logs/*')
         version = max([int(x.split(os.sep)[-1].split('_')[-1]) for x in dirs])
         logdir = f'logs/{args.model}/lightning_logs/version_{version}'

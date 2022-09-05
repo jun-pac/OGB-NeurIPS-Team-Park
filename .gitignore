@@ -28,5 +28,7 @@ dataset/
 **/pcqm4m-scaf/**
 **/logs/**
 **/lightning_logs/**
-
+cleora-*
 dataset
+*.pdf
+LICENSE
