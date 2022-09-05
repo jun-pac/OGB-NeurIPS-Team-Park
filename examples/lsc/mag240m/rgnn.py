@@ -44,8 +44,11 @@ class Batch(NamedTuple):
 def get_col_slice(x, start_row_idx, end_row_idx, start_col_idx, end_col_idx):
     outs = []
     chunk = 100000
-    for i in tqdm(range(start_row_idx, end_row_idx, chunk)):
+    print("get_col_slice")
+    t0=time.time()
+    for i in range(start_row_idx, end_row_idx, chunk):
         j = min(i + chunk, end_row_idx)
+        print("GET - Sub routine progress...",i, "/",(end_row_idx - start_row_idx),"| time :",time.time()-t0)
         outs.append(x[i:j, start_col_idx:end_col_idx].copy())
     return np.concatenate(outs, axis=0)
 
@@ -55,7 +58,10 @@ def save_col_slice(x_src, x_dst, start_row_idx, end_row_idx, start_col_idx,
     assert x_src.shape[0] == end_row_idx - start_row_idx
     assert x_src.shape[1] == end_col_idx - start_col_idx
     chunk, offset = 100000, start_row_idx
-    for i in tqdm(range(0, end_row_idx - start_row_idx, chunk)):
+    print("save_col_slice")
+    t0=time.time()
+    for i in range(0, end_row_idx - start_row_idx, chunk):
+        print("SAVE - Sub routine progress...",i, "/",(end_row_idx - start_row_idx),"| time :",time.time()-t0)
         j = min(i + chunk, end_row_idx - start_row_idx)
         x_dst[offset + i:offset + j, start_col_idx:end_col_idx] = x_src[i:j]
 
@@ -166,9 +172,11 @@ class MAG240M(LightningDataModule):
             x = np.memmap(path, dtype=np.float16, mode='w+',
                           shape=(N, self.num_features))
 
-            print('Copying paper features...','commit -m delete tqdm')
+            t0=time.time()
+            print('Copying paper features...','commit -m 1010 UPD')
             for i in range(0, dataset.num_papers, node_chunk_size):
-                print("Debug :",i)
+                if ((i/node_chunk_size)%10==0):
+                    print("COPY - Progress... :",i,"/",dataset.num_papers,"Consumed time :",time.time()-t0)
                 j = min(i + node_chunk_size, dataset.num_papers)
                 x[i:j] = paper_feat[i:j]
             print("h1")
@@ -183,7 +191,10 @@ class MAG240M(LightningDataModule):
             print("h4")
             # Processing 64-dim subfeatures at a time for memory efficiency.
             print('Generating author features...')
-            for i in tqdm(range(0, self.num_features, dim_chunk_size)):
+            t0=time.time()
+            for i in range(0, self.num_features, dim_chunk_size):
+                if((i/dim_chunk_size)%10==0):
+                    print("GEN - Progress... ",i,"/",self.num_features,"Consumed time :",time.time()-t0)
                 j = min(i + dim_chunk_size, self.num_features)
                 inputs = get_col_slice(paper_feat, start_row_idx=0,
                                        end_row_idx=dataset.num_papers,
@@ -196,17 +207,20 @@ class MAG240M(LightningDataModule):
                     end_row_idx=dataset.num_papers + dataset.num_authors,
                     start_col_idx=i, end_col_idx=j)
                 del outputs
-
+            print("h5")
             edge_index = dataset.edge_index('author', 'institution')
             row, col = torch.from_numpy(edge_index)
             adj_t = SparseTensor(
                 row=col, col=row,
                 sparse_sizes=(dataset.num_institutions, dataset.num_authors),
                 is_sorted=False)
-
+            
             print('Generating institution features...')
+            t0=time.time()
             # Processing 64-dim subfeatures at a time for memory efficiency.
-            for i in tqdm(range(0, self.num_features, dim_chunk_size)):
+            for i in range(0, self.num_features, dim_chunk_size):
+                if((i/dim_chunk_size)%10==0):
+                    print("Progress... ",i,"/",self.num_features,"Consumed time :",time.time()-t0)
                 j = min(i + dim_chunk_size, self.num_features)
                 inputs = get_col_slice(
                     x, start_row_idx=dataset.num_papers,
@@ -220,7 +234,7 @@ class MAG240M(LightningDataModule):
                     start_row_idx=dataset.num_papers + dataset.num_authors,
                     end_row_idx=N, start_col_idx=i, end_col_idx=j)
                 del outputs
-
+            print("h6")
             x.flush()
             del x
             print(f'Done! [{time.perf_counter() - t:.2f}s]')
