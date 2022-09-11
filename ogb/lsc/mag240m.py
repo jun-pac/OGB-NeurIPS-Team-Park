@@ -30,18 +30,19 @@ class MAG240MDataset(object):
             root = osp.expanduser(osp.normpath(root))
         self.root = root
         self.dir = osp.join(root, 'mag240m_kddcup2021')
-        
+        self.dir_ess = '/fs/ess/PAS1289/mag240m_kddcup2021'
         #print("ROOT :",self.root)
 
+        '''
         if osp.isdir(self.dir) and (not osp.exists(
                 osp.join(self.dir, f'RELEASE_v{self.version}.txt'))):
             print('MAG240M dataset has been updated.')
             if input('Will you update the dataset now? (y/N)\n') == 'y':
                 shutil.rmtree(osp.join(self.dir))
-
+        '''
         #self.download()
-        self.__meta__ = torch.load(osp.join(self.dir, 'meta.pt'))
-        self.__split__ = torch.load(osp.join(self.dir, 'split_dict.pt'))
+        self.__meta__ = torch.load(osp.join(self.dir_ess, 'meta.pt'))
+        self.__split__ = torch.load(osp.join(self.dir_ess, 'split_dict.pt'))
 
         split_test(self.__split__)
 
@@ -82,32 +83,32 @@ class MAG240MDataset(object):
 
     @property
     def paper_feat(self) -> np.ndarray:
-        path = osp.join(self.dir, 'processed', 'paper', 'node_feat.npy')
+        path = osp.join(self.dir_ess, 'processed', 'paper', 'node_feat.npy')
         return np.load(path, mmap_mode='r')
 
     @property
     def all_paper_feat(self) -> np.ndarray:
-        path = osp.join(self.dir, 'processed', 'paper', 'node_feat.npy')
+        path = osp.join(self.dir_ess, 'processed', 'paper', 'node_feat.npy')
         return np.load(path)
 
     @property
     def paper_label(self) -> np.ndarray:
-        path = osp.join(self.dir, 'processed', 'paper', 'node_label.npy')
+        path = osp.join(self.dir_ess, 'processed', 'paper', 'node_label.npy')
         return np.load(path, mmap_mode='r')
 
     @property
     def all_paper_label(self) -> np.ndarray:
-        path = osp.join(self.dir, 'processed', 'paper', 'node_label.npy')
+        path = osp.join(self.dir_ess, 'processed', 'paper', 'node_label.npy')
         return np.load(path)
 
     @property
     def paper_year(self) -> np.ndarray:
-        path = osp.join(self.dir, 'processed', 'paper', 'node_year.npy')
+        path = osp.join(self.dir_ess, 'processed', 'paper', 'node_year.npy')
         return np.load(path, mmap_mode='r')
 
     @property
     def all_paper_year(self) -> np.ndarray:
-        path = osp.join(self.dir, 'processed', 'paper', 'node_year.npy')
+        path = osp.join(self.dir_ess, 'processed', 'paper', 'node_year.npy')
         return np.load(path)
 
     def edge_index(self, id1: str, id2: str,
@@ -116,7 +117,7 @@ class MAG240MDataset(object):
         rel, dst = (id3, id2) if id3 is None else (id2, id3)
         rel = self.__rels__[(src, dst)] if rel is None else rel
         name = f'{src}___{rel}___{dst}'
-        path = osp.join(self.dir, 'processed', name, 'edge_index.npy')
+        path = osp.join(self.dir_ess, 'processed', name, 'edge_index.npy')
         return np.load(path)
 
     def __repr__(self) -> str:

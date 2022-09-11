@@ -26,7 +26,13 @@ from torch_geometric.nn import GATConv, SAGEConv
 from torch_sparse import SparseTensor
 from tqdm import tqdm
 
-from root import ROOT
+# ROOT='/fs/ess/PAS1289'
+#ROOT='/tmp' # Copy to tmp : 9:04~9:47
+ROOT='/fs/ess/PAS1289'
+NROOT='/fs/scratch/PAS1289/data' # log file's root.
+path_log = NROOT+'/rgnn_log_largemem.txt'
+f_log=open(path_log,'w+')
+start_t=time.time()
 
 class Batch(NamedTuple):
     x: Tensor
@@ -39,45 +45,6 @@ class Batch(NamedTuple):
             y=self.y.to(*args, **kwargs),
             adjs_t=[adj_t.to(*args, **kwargs) for adj_t in self.adjs_t],
         )
-
-
-def get_col_slice(fl, x, start_row_idx, end_row_idx, start_col_idx, end_col_idx):
-    outs = []
-    chunk = 100000
-    print("get_col_slice")
-    fl.write("get_col_slice")
-    fl.write('\n')
-    fl.flush()
-    t0=time.time()
-    for i in range(start_row_idx, end_row_idx, chunk):
-        j = min(i + chunk, end_row_idx)
-        outs.append(x[i:j, start_col_idx:end_col_idx].copy())
-    return np.concatenate(outs, axis=0)
-
-
-def save_col_slice(fl, x_src, x_dst, start_row_idx, end_row_idx, start_col_idx,
-                   end_col_idx):
-    assert x_src.shape[0] == end_row_idx - start_row_idx
-    assert x_src.shape[1] == end_col_idx - start_col_idx
-    chunk, offset = 100000, start_row_idx
-    print("save_col_slice")
-    fl.write("save_col_slice")
-    fl.write('\n')
-    fl.flush()
-    t0=time.time()
-    for i in range(0, end_row_idx - start_row_idx, chunk):
-        if((i/chunk)%10==0):
-            print("SAVE - Sub routine...",i, "/",(end_row_idx - start_row_idx),"| time :",time.time()-t0)
-            fl.write("SAVE - Sub routine..."+str(i)+"/"+str(end_row_idx - start_row_idx)+"| time :"+str(time.time()-t0))
-            fl.write('\n')
-            fl.flush()
-        j = min(i + chunk, end_row_idx - start_row_idx)
-        x_dst[offset + i:offset + j, start_col_idx:end_col_idx] = x_src[i:j]
-
-NROOT='/fs/scratch/PAS1289/data'
-path_log = NROOT+'/rgnn_log.txt'
-f_log=open(path_log,'w')
-start_t=time.time()
 
 class MAG240M(LightningDataModule):
     def __init__(self, data_dir: str, batch_size: int, sizes: List[int],
@@ -101,188 +68,8 @@ class MAG240M(LightningDataModule):
         return 5
 
     def prepare_data(self):
-        dataset = MAG240MDataset(self.data_dir)
-
-        path = f'{dataset.dir}/paper_to_paper_symmetric.pt'
-        if not osp.exists(path):  # Will take approximately 5 minutes...
-            t = time.perf_counter()
-            print('Converting adjacency matrix...', end=' ', flush=True)
-            print("f1")
-            edge_index = dataset.edge_index('paper', 'cites', 'paper')
-            print("f2")
-            edge_index = torch.from_numpy(edge_index)
-            print("f3")
-            adj_t = SparseTensor(
-                row=edge_index[0], col=edge_index[1],
-                sparse_sizes=(dataset.num_papers, dataset.num_papers),
-                is_sorted=True)
-            print("f4")
-            torch.save(adj_t.to_symmetric(), path)
-            print("f5")
-            print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-        path = f'{dataset.dir}/full_adj_t.pt'
-        if not osp.exists(path):  # Will take approximately 16 minutes...
-            t = time.perf_counter()
-            print('Merging adjacency matrices...', end=' ', flush=True)
-
-            row, col, _ = torch.load(
-                f'{dataset.dir}/paper_to_paper_symmetric.pt').coo()
-            rows, cols = [row], [col]
-
-            edge_index = dataset.edge_index('author', 'writes', 'paper')
-            row, col = torch.from_numpy(edge_index)
-            row += dataset.num_papers
-            rows += [row, col]
-            cols += [col, row]
-
-            edge_index = dataset.edge_index('author', 'institution')
-            row, col = torch.from_numpy(edge_index)
-            row += dataset.num_papers
-            col += dataset.num_papers + dataset.num_authors
-            rows += [row, col]
-            cols += [col, row]
-
-            edge_types = [
-                torch.full(x.size(), i, dtype=torch.int8)
-                for i, x in enumerate(rows)
-            ]
-
-            row = torch.cat(rows, dim=0)
-            del rows
-            col = torch.cat(cols, dim=0)
-            del cols
-
-            N = (dataset.num_papers + dataset.num_authors +
-                 dataset.num_institutions)
-
-            perm = (N * row).add_(col).numpy().argsort()
-            perm = torch.from_numpy(perm)
-            row = row[perm]
-            col = col[perm]
-
-            edge_type = torch.cat(edge_types, dim=0)[perm]
-            del edge_types
-
-            full_adj_t = SparseTensor(row=row, col=col, value=edge_type,
-                                      sparse_sizes=(N, N), is_sorted=True)
-
-            torch.save(full_adj_t, path)
-            print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-        #path = f'{dataset.dir}/full_feat.npy'
-        #done_flag_path = f'{dataset.dir}/full_feat_done.txt'
-        #log_path = f'{dataset.dir}/rgnn_log.txt'
-        NEWROOT='/fs/scratch/PAS1289/data'
-        path = NEWROOT+'/full_feat.npy'
-        done_flag_path = NEWROOT+'/full_feat_done.txt'
-        log_path = NEWROOT+'/rgnn_log.txt'
-
-        if not osp.exists(done_flag_path):  # Will take ~3 hours...
-            t = time.perf_counter()
-            fl=open(log_path,'w')
-
-            print('Generating full feature matrix...')
-            fl.write('Generating full feature matrix...')
-            fl.write('\n')
-            fl.flush()
-            node_chunk_size = 100000
-            dim_chunk_size = 64
-            N = (dataset.num_papers + dataset.num_authors +
-                 dataset.num_institutions)
-
-            paper_feat = dataset.paper_feat
-            x = np.memmap(path, dtype=np.float16, mode='w+',
-                          shape=(N, self.num_features))
-
-            t0=time.time()
-            print('Copying paper features...','commit -m 1010 UPD')
-            fl.write('Copying paper features...')
-            fl.write('\n')
-            fl.flush()
-            for i in range(0, dataset.num_papers, node_chunk_size):
-                if ((i/node_chunk_size)%10==0):
-                    print("COPY - Progress... :",i,"/",dataset.num_papers,"Consumed time :",time.time()-t0)
-                    fl.write("COPY - Progress... :"+str(i)+"/"+str(dataset.num_papers)+"| Consumed time :"+str(time.time()-t0))
-                    fl.write('\n')
-                    fl.flush()
-                j = min(i + node_chunk_size, dataset.num_papers)
-                x[i:j] = paper_feat[i:j]
-            print("h1")
-            edge_index = dataset.edge_index('author', 'writes', 'paper')
-            print("h2")
-            row, col = torch.from_numpy(edge_index)
-            print("h3")
-            adj_t = SparseTensor(
-                row=row, col=col,
-                sparse_sizes=(dataset.num_authors, dataset.num_papers),
-                is_sorted=True)
-            print("h4")
-            # Processing 64-dim subfeatures at a time for memory efficiency.
-            print('Generating author features...')
-            fl.write('Generating author features...')
-            fl.write('\n')
-            fl.flush()
-            t0=time.time()
-            for i in range(0, self.num_features, dim_chunk_size):
-                print("GEN_author Progress... ",i,"/",self.num_features/dim_chunk_size,"Consumed time :",time.time()-t0)
-                fl.write("GEN_author Progress... "+str(i)+"/"+str(self.num_features/dim_chunk_size)+"| Consumed time :"+str(time.time()-t0))
-                fl.write('\n')
-                fl.flush()
-                j = min(i + dim_chunk_size, self.num_features)
-                inputs = get_col_slice(fl, paper_feat, start_row_idx=0,
-                                       end_row_idx=dataset.num_papers,
-                                       start_col_idx=i, end_col_idx=j)
-                inputs = torch.from_numpy(inputs)
-                outputs = adj_t.matmul(inputs, reduce='mean').numpy()
-                del inputs
-                save_col_slice(
-                    fl, x_src=outputs, x_dst=x, start_row_idx=dataset.num_papers,
-                    end_row_idx=dataset.num_papers + dataset.num_authors,
-                    start_col_idx=i, end_col_idx=j)
-                del outputs
-            print("h5")
-            edge_index = dataset.edge_index('author', 'institution')
-            row, col = torch.from_numpy(edge_index)
-            adj_t = SparseTensor(
-                row=col, col=row,
-                sparse_sizes=(dataset.num_institutions, dataset.num_authors),
-                is_sorted=False)
-            
-            print('Generating institution features...')
-            fl.write('Generating institution features...')
-            fl.write('\n')
-            fl.flush()
-            t0=time.time()
-            # Processing 64-dim subfeatures at a time for memory efficiency.
-            for i in range(0, self.num_features, dim_chunk_size):
-                print("GEN_IN Progress... ",i,"/",self.num_features/dim_chunk_size,"Consumed time :",time.time()-t0)
-                fl.write("GEN_IN Progress... "+str(i)+"/"+str(self.num_features/dim_chunk_size)+"| Consumed time :"+str(time.time()-t0))
-                fl.write('\n')
-                fl.flush()
-                j = min(i + dim_chunk_size, self.num_features)
-                inputs = get_col_slice(
-                    fl, x, start_row_idx=dataset.num_papers,
-                    end_row_idx=dataset.num_papers + dataset.num_authors,
-                    start_col_idx=i, end_col_idx=j)
-                inputs = torch.from_numpy(inputs)
-                outputs = adj_t.matmul(inputs, reduce='mean').numpy()
-                del inputs
-                save_col_slice(
-                    fl, x_src=outputs, x_dst=x,
-                    start_row_idx=dataset.num_papers + dataset.num_authors,
-                    end_row_idx=N, start_col_idx=i, end_col_idx=j)
-                del outputs
-            print("h6")
-            x.flush()
-            del x
-            print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-            with open(done_flag_path, 'w') as f:
-                f.write('done')
-            fl.close()
-        path = f'{dataset.dir}/full_feat.npy'
-
+        pass
+    
     def setup(self, stage: Optional[str] = None):
         t = time.perf_counter()
         print('Reading dataset...', end=' ', flush=True)
@@ -310,7 +97,8 @@ class MAG240M(LightningDataModule):
 
         self.y = torch.from_numpy(dataset.all_paper_label)
 
-        path = f'{dataset.dir}/full_adj_t.pt'
+        #path = f'{dataset.dir}/full_adj_t.pt'
+        path='/fs/ess/PAS1289/mag240m_kddcup2021/full_adj_t.pt'
         self.adj_t = torch.load(path)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
@@ -340,11 +128,16 @@ class MAG240M(LightningDataModule):
                                batch_size=self.batch_size, num_workers=3)
 
     def convert_batch(self, batch_size, n_id, adjs):
+        time0=time.time()
         if self.in_memory:
             x = self.x[n_id].to(torch.float)
         else:
             x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
+        print("Convert batch : "+str(time.time()-time0))
+        f_log.write("Convert batch : "+str(time.time()-time0))
+        f_log.write('\n')
+        f_log.flush()
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
@@ -412,6 +205,7 @@ class RGNN(LightningModule):
         self.test_acc = Accuracy()
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
+        time0=time.time()
         for i, adj_t in enumerate(adjs_t):
             # adj_t may contain specific layer's sampled neighbors [Sparse tensor]
             # So adjs_t is num_layers*[N*N sparse tensors]
@@ -433,7 +227,10 @@ class RGNN(LightningModule):
             x = self.norms[i](out)
             x = F.elu(x) if self.model == 'rgat' else F.relu(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
-
+        print("FORWARD TIME : "+str(time.time()-time0))
+        f_log.write("FORWARD TIME : "+str(time.time()-time0))
+        f_log.write('\n')
+        f_log.flush()
         return self.mlp(x)
 
     def training_step(self, batch, batch_idx: int):
@@ -468,7 +265,6 @@ class RGNN(LightningModule):
         f_log.write('\n')
         f_log.flush()
 
-
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
         scheduler = StepLR(optimizer, step_size=25, gamma=0.25)
@@ -480,11 +276,11 @@ if __name__ == '__main__':
     parser.add_argument('--hidden_channels', type=int, default=1024)
     parser.add_argument('--batch_size', type=int, default=1024)
     parser.add_argument('--dropout', type=float, default=0.5)
-    parser.add_argument('--epochs', type=int, default=100)
+    parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--model', type=str, default='rgat',
                         choices=['rgat', 'rgraphsage'])
     parser.add_argument('--sizes', type=str, default='25-15')
-    parser.add_argument('--in-memory', action='store_true')
+    parser.add_argument('--in-memory', default=True) # action='store_true'
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--evaluate', action='store_true')
     args = parser.parse_args()
@@ -504,14 +300,10 @@ if __name__ == '__main__':
         print(f'#Params {sum([p.numel() for p in model.parameters()])}')
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max',
                                            save_top_k=3)
-        '''
+        
         trainer = Trainer(max_epochs=args.epochs,
                           callbacks=[checkpoint_callback],
-                          default_root_dir=f'logs/{args.model}')
-        '''
-        trainer = Trainer(gpus=args.device, max_epochs=args.epochs,
-                          callbacks=[checkpoint_callback],
-                          default_root_dir=f'logs/{args.model}')
+                          default_root_dir=f'logs/{args.model}') # gpus=args.device,
         
         trainer.fit(model, datamodule=datamodule)
 
@@ -523,6 +315,7 @@ if __name__ == '__main__':
         print(f'Evaluating saved model in {logdir}...')
         ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
 
+        # About 1000s... (Without data copying, which consume 2400s)    
         trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
         model = RGNN.load_from_checkpoint(
             checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
