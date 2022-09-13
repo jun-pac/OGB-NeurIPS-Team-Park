@@ -30,7 +30,8 @@ from tqdm import tqdm
 #ROOT='/tmp' # Copy to tmp : 9:04~9:47
 ROOT='/fs/ess/PAS1289'
 NROOT='/fs/scratch/PAS1289/data' # log file's root.
-path_log = NROOT+'/rgnn_log_largemem.txt'
+#path_log = NROOT+'/rgnn_log_largemem.txt'
+path_log = NROOT+'/rgnn_log_largemem_test.txt'
 f_log=open(path_log,'w+')
 start_t=time.time()
 
@@ -134,10 +135,10 @@ class MAG240M(LightningDataModule):
         else:
             x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
-        print("Convert batch : "+str(time.time()-time0))
+        '''print("Convert batch : "+str(time.time()-time0))
         f_log.write("Convert batch : "+str(time.time()-time0))
         f_log.write('\n')
-        f_log.flush()
+        f_log.flush()'''
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
@@ -203,6 +204,12 @@ class RGNN(LightningModule):
         self.train_acc = Accuracy()
         self.val_acc = Accuracy()
         self.test_acc = Accuracy()
+        self.train_acc_sum=0
+        self.train_cnt=0
+        self.val_acc_sum=0
+        self.val_cnt=0
+        self.test_acc_sum=0
+        self.test_cnt=0
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
         time0=time.time()
@@ -227,43 +234,77 @@ class RGNN(LightningModule):
             x = self.norms[i](out)
             x = F.elu(x) if self.model == 'rgat' else F.relu(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
-        print("FORWARD TIME : "+str(time.time()-time0))
+        '''print("FORWARD TIME : "+str(time.time()-time0))
         f_log.write("FORWARD TIME : "+str(time.time()-time0))
         f_log.write('\n')
-        f_log.flush()
+        f_log.flush()'''
         return self.mlp(x)
 
     def training_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
         train_loss = F.cross_entropy(y_hat, batch.y)
-        self.train_acc(y_hat.softmax(dim=-1), batch.y) # What is the type of this value?
+        tmp_acc=self.train_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
+        self.train_acc_sum+=batch.x.shape[0]*tmp_acc
+        self.train_cnt+=batch.x.shape[0]
         # dictionary?
         # What side effect previous code has??
         # I think train_acc is just Accuracy type. But how logger detect its class and print meaningful information automatically?
         self.log('train_acc', self.train_acc, prog_bar=True, on_step=False, on_epoch=True)
-        print('train_acc : '+str(self.train_acc(y_hat.softmax(dim=-1), batch.y))+' | loss : '+str(train_loss)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/1024')
-        f_log.write('train_acc : '+str(self.train_acc(y_hat.softmax(dim=-1), batch.y))+' | loss : '+str(train_loss)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/1024')
-        f_log.write('\n')
-        f_log.flush()
+        if(batch_idx%10==0):
+            print('train_acc : '+str(self.train_acc(y_hat.softmax(dim=-1), batch.y))+' | loss : '+str(train_loss)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(1112392//1024))
+            f_log.write('train_acc : '+str(self.train_acc(y_hat.softmax(dim=-1), batch.y))+' | loss : '+str(train_loss)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(1112392//1024))
+            f_log.write('\n')
+            #f_log.flush()
         return train_loss
 
     def validation_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
-        self.val_acc(y_hat.softmax(dim=-1), batch.y)
+        tmp_acc=self.val_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
+        self.val_acc_sum+=batch.x.shape[0]*tmp_acc
+        self.val_cnt+=batch.x.shape[0]
         self.log('val_acc', self.val_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
-        print('val_acc : '+str(self.val_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/1024')
-        f_log.write('val_acc : '+str(self.val_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/1024')
-        f_log.write('\n')
-        f_log.flush()
+        if(batch_idx%10==0):
+            print('val_acc : '+str(self.val_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(138949//1024))
+            f_log.write('val_acc : '+str(self.val_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(138949//1024))
+            f_log.write('\n')
+            #f_log.flush()
 
     def test_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
         self.test_acc(y_hat.softmax(dim=-1), batch.y)
+        tmp_acc=self.test_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
+        self.test_acc_sum+=batch.x.shape[0]*tmp_acc
+        self.test_cnt+=batch.x.shape[0]
         self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
-        print('test_acc : '+str(self.test_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/1024')
-        f_log.write('test_acc : '+str(self.test_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/1024')
+        if(batch_idx%10==0):
+            print('test_acc : '+str(self.test_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
+            f_log.write('test_acc : '+str(self.test_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
+            f_log.write('\n')
+            #f_log.flush()
+    
+    def training_epoch_end(self, outputs) -> None:
+        print("Epoch end... Accuracy : "+str(self.train_acc_sum/self.train_cnt))
+        f_log.write("Epoch end... Accuracy : "+str(self.train_acc_sum/self.train_cnt))
         f_log.write('\n')
         f_log.flush()
+        self.train_acc_sum=0
+        self.train_cnt=0
+
+    def validation_epoch_end(self, outputs) -> None:
+        print("Epoch end... Accuracy : "+str(self.val_acc_sum/self.val_cnt))
+        f_log.write("Epoch end... Accuracy : "+str(self.val_acc_sum/self.val_cnt))
+        f_log.write('\n')
+        f_log.flush()
+        self.val_acc_sum=0
+        self.val_cnt=0
+
+    def test_epoch_end(self, outputs) -> None:
+        print("Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
+        f_log.write("Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
+        f_log.write('\n')
+        f_log.flush()
+        self.test_acc_sum=0
+        self.test_cnt=0
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
@@ -300,27 +341,35 @@ if __name__ == '__main__':
         print(f'#Params {sum([p.numel() for p in model.parameters()])}')
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max',
                                            save_top_k=3)
-        
+        # tensorboard --logdir=/users/PAS1289/oiocha/logs/rgat/lightning_logs
+        # About 1000s... (Without data copying, which consume 2400s)  
         trainer = Trainer(max_epochs=args.epochs,
                           callbacks=[checkpoint_callback],
-                          default_root_dir=f'logs/{args.model}') # gpus=args.device,
+                          default_root_dir=f'logs/{args.model}',
+                          progress_bar_refresh_rate=0) # gpus=args.device,
         
         trainer.fit(model, datamodule=datamodule)
 
     if args.evaluate:
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
+        '''
         dirs = glob.glob(f'logs/{args.model}/lightning_logs/*')
+        print("dirs :",dirs)
         version = max([int(x.split(os.sep)[-1].split('_')[-1]) for x in dirs])
         logdir = f'logs/{args.model}/lightning_logs/version_{version}'
         print(f'Evaluating saved model in {logdir}...')
         ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
-
-        # About 1000s... (Without data copying, which consume 2400s)    
-        trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
+        print("ckpt :",ckpt)
+        '''
+        # Ignore previous code
+        ckpt='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365/checkpoints/epoch=2-step=3260.ckpt'
+        logdir='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365'
+        trainer = Trainer(resume_from_checkpoint=ckpt,
+                          progress_bar_refresh_rate=0) # gpus=args.device,
         model = RGNN.load_from_checkpoint(
             checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
 
-        datamodule.batch_size = 16
+        datamodule.batch_size = 16*8 # initially 16
         datamodule.sizes = [160] * len(args.sizes)  # (Almost) no sampling...
 
         trainer.test(model=model, datamodule=datamodule)

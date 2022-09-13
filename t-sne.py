@@ -53,7 +53,12 @@ np.save("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/tsne_pos"+str(sample_sz),ts
 np.save("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/tsne_label"+str(sample_sz),paper_label)
 print("h2",time.time()-t0) 
 '''
-
+val_idx=dataset.get_idx_split('valid')
+test_idx=dataset.get_idx_split('test-dev')
+test_challenge_idx=dataset.get_idx_split('test-challenge')
+print("val :",val_idx.shape[0]) 
+print("test-dev :",test_idx.shape[0])
+print("test-challenge :",test_challenge_idx.shape[0])
 
 t_pos=np.transpose(np.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/tsne_pos"+str(sample_sz)+".npy"))
 paper_label=np.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/tsne_label"+str(sample_sz)+".npy")
@@ -64,3 +69,14 @@ for i in range(10,25): #[5,10,15,20,25,30,40,50,60,70,80,90]: #dataset.num_class
 print("h3",time.time()-t0)
 plt.savefig(osp.join("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park","TSNE-"+str(sample_sz)+".png"))
 
+'''
+num papers : 121751666
+num authors : 122383112
+num institution : 25721
+num paper features : 768
+num classes : 153
+train : 1112392
+val : 138949
+test-dev : 88092
+test-challenge : 58726
+'''
