@@ -33,7 +33,7 @@ NROOT='/fs/scratch/PAS1289/data' # log file's root.
 
 start_t=time.time()
 Batch_size=1000
-max_epoch=50
+max_epoch=100
 DROOT='/fs/ess/PAS1289/mag240m_kddcup2021'
 dataset = MAG240MDataset(root = DROOT)
 
@@ -76,6 +76,7 @@ class LinearModel(LightningModule):
         self.acc_sum+=x.shape[0]*tmp_acc
         self.cnt+=x.shape[0]
         loss = F.cross_entropy(y_hat, y)
+        self.log('train_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
         if(batch_idx%1000==500):
             print("Train accuracy : "+str(self.acc_sum/self.cnt)+"(Loss:"+str(loss.item())+") | Idx : "+str(batch_idx*x.shape[0])+" / 1112392 | Time : "+str(time.time()-t0))
             f_log.write("Train accuracy : "+str(self.acc_sum/self.cnt)+"(Loss:"+str(loss.item())+") | Idx : "+str(batch_idx*x.shape[0])+" / 1112392 | Time : "+str(time.time()-t0))
@@ -90,6 +91,7 @@ class LinearModel(LightningModule):
         tmp_acc=self.acc(y_hat, y).item()
         self.acc_sum+=x.shape[0]*tmp_acc
         self.cnt+=x.shape[0]
+        self.log('val_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
         if(batch_idx%200==100):
             print("Validation accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 138949 | Time : "+str(time.time()-t0))
             f_log.write("Validation accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 138949 | Time : "+str(time.time()-t0))
@@ -103,6 +105,7 @@ class LinearModel(LightningModule):
         tmp_acc=self.acc(y_hat, y).item()
         self.acc_sum+=x.shape[0]*tmp_acc
         self.cnt+=x.shape[0]
+        self.log('test_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
         if(batch_idx%100==0):
             print("Test accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 88092 | Time : "+str(time.time()-t0))
             f_log.write("Test accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 88092 | Time : "+str(time.time()-t0))
@@ -143,14 +146,16 @@ class Linear_Dropout_Model(LightningModule):
     def __init__(self, input=768, hidden_layer=2048, output=153):
         super().__init__()
         self.l1 = Linear(input, hidden_layer)
-        self.dropout = Dropout(0.5)
-        self.l2 = Linear(hidden_layer, output)
+        self.dropout1 = Dropout(0.5)
+        self.l3 = Linear(hidden_layer, output)
         self.acc=Accuracy()
         self.acc_sum=0
         self.cnt=0
     
     def forward(self, x):
-        return F.softmax((self.l2(self.dropout(torch.relu(self.l1(x))))),dim=-1)
+        y=self.dropout1(torch.relu(self.l1(x)))
+        y=F.softmax(self.l3(y),dim=-1)
+        return y
 
     def training_step(self, batch, batch_idx):
         x, y = batch
@@ -160,6 +165,7 @@ class Linear_Dropout_Model(LightningModule):
         self.acc_sum+=x.shape[0]*tmp_acc
         self.cnt+=x.shape[0]
         loss = F.cross_entropy(y_hat, y)
+        self.log('train_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
         if(batch_idx%1000==500):
             print("Train accuracy : "+str(self.acc_sum/self.cnt)+"(Loss:"+str(loss.item())+") | Idx : "+str(batch_idx*x.shape[0])+" / 1112392 | Time : "+str(time.time()-t0))
             f_log.write("Train accuracy : "+str(self.acc_sum/self.cnt)+"(Loss:"+str(loss.item())+") | Idx : "+str(batch_idx*x.shape[0])+" / 1112392 | Time : "+str(time.time()-t0))
@@ -174,6 +180,7 @@ class Linear_Dropout_Model(LightningModule):
         tmp_acc=self.acc(y_hat, y).item()
         self.acc_sum+=x.shape[0]*tmp_acc
         self.cnt+=x.shape[0]
+        self.log('val_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
         if(batch_idx%200==100):
             print("Validation accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 138949 | Time : "+str(time.time()-t0))
             f_log.write("Validation accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 138949 | Time : "+str(time.time()-t0))
@@ -187,6 +194,7 @@ class Linear_Dropout_Model(LightningModule):
         tmp_acc=self.acc(y_hat, y).item()
         self.acc_sum+=x.shape[0]*tmp_acc
         self.cnt+=x.shape[0]
+        self.log('test_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
         if(batch_idx%100==0):
             print("Test accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 88092 | Time : "+str(time.time()-t0))
             f_log.write("Test accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 88092 | Time : "+str(time.time()-t0))
@@ -249,6 +257,7 @@ class Linear_BN_Model(LightningModule):
         self.acc_sum+=x.shape[0]*tmp_acc
         self.cnt+=x.shape[0]
         loss = F.cross_entropy(y_hat, y)
+        self.log('train_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
         if(batch_idx%1000==500):
             print("Train accuracy : "+str(self.acc_sum/self.cnt)+"(Loss:"+str(loss.item())+") | Idx : "+str(batch_idx*x.shape[0])+" / 1112392 | Time : "+str(time.time()-t0))
             f_log.write("Train accuracy : "+str(self.acc_sum/self.cnt)+"(Loss:"+str(loss.item())+") | Idx : "+str(batch_idx*x.shape[0])+" / 1112392 | Time : "+str(time.time()-t0))
@@ -263,6 +272,7 @@ class Linear_BN_Model(LightningModule):
         tmp_acc=self.acc(y_hat, y).item()
         self.acc_sum+=x.shape[0]*tmp_acc
         self.cnt+=x.shape[0]
+        self.log('val_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
         if(batch_idx%200==100):
             print("Validation accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 138949 | Time : "+str(time.time()-t0))
             f_log.write("Validation accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 138949 | Time : "+str(time.time()-t0))
@@ -276,6 +286,7 @@ class Linear_BN_Model(LightningModule):
         tmp_acc=self.acc(y_hat, y).item()
         self.acc_sum+=x.shape[0]*tmp_acc
         self.cnt+=x.shape[0]
+        self.log('test_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
         if(batch_idx%100==0):
             print("Test accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 88092 | Time : "+str(time.time()-t0))
             f_log.write("Test accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 88092 | Time : "+str(time.time()-t0))
@@ -312,17 +323,111 @@ class Linear_BN_Model(LightningModule):
         return [optimizer], [scheduler]
 
 
-# Total []GB of memory needed.
+class Linear_Deep_BN_Model(LightningModule):
+    def __init__(self, input=768, hidden_layer=1500, output=153):
+        super().__init__()
+        self.l1 = Linear(input, hidden_layer)
+        self.bn1 = BatchNorm1d(hidden_layer)
+        self.l2 = Linear(hidden_layer, hidden_layer)
+        self.bn2 = BatchNorm1d(hidden_layer)
+        self.l3 = Linear(hidden_layer, hidden_layer)
+        self.bn3 = BatchNorm1d(hidden_layer)
+        self.l4 = Linear(hidden_layer, output)
+        self.acc=Accuracy()
+        self.acc_sum=0
+        self.cnt=0
+    
+    def forward(self, x):
+        y=torch.relu(self.bn1(self.l1(x)))
+        y=torch.relu(self.bn2(self.l2(y)))
+        y=torch.relu(self.bn3(self.l3(y)))
+        y=F.softmax(self.l3(y),dim=-1)
+        return y
+
+    def training_step(self, batch, batch_idx):
+        x, y = batch
+        x,y=x.float(),y.type(torch.LongTensor)
+        y_hat=self(x)
+        tmp_acc=self.acc(y_hat, y).item()
+        self.acc_sum+=x.shape[0]*tmp_acc
+        self.cnt+=x.shape[0]
+        loss = F.cross_entropy(y_hat, y)
+        self.log('train_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
+        if(batch_idx%1000==500):
+            print("Train accuracy : "+str(self.acc_sum/self.cnt)+"(Loss:"+str(loss.item())+") | Idx : "+str(batch_idx*x.shape[0])+" / 1112392 | Time : "+str(time.time()-t0))
+            f_log.write("Train accuracy : "+str(self.acc_sum/self.cnt)+"(Loss:"+str(loss.item())+") | Idx : "+str(batch_idx*x.shape[0])+" / 1112392 | Time : "+str(time.time()-t0))
+            f_log.write('\n')
+            f_log.flush()
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        x,y=x.float(),y.type(torch.LongTensor)
+        y_hat=self(x)
+        tmp_acc=self.acc(y_hat, y).item()
+        self.acc_sum+=x.shape[0]*tmp_acc
+        self.cnt+=x.shape[0]
+        self.log('val_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
+        if(batch_idx%200==100):
+            print("Validation accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 138949 | Time : "+str(time.time()-t0))
+            f_log.write("Validation accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 138949 | Time : "+str(time.time()-t0))
+            f_log.write('\n')
+            f_log.flush()
+    
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        x,y=x.float(),y.type(torch.LongTensor)
+        y_hat=self(x)
+        tmp_acc=self.acc(y_hat, y).item()
+        self.acc_sum+=x.shape[0]*tmp_acc
+        self.cnt+=x.shape[0]
+        self.log('test_acc', self.acc_sum/self.cnt, on_step=False, on_epoch=True,prog_bar=False, sync_dist=True)
+        if(batch_idx%100==0):
+            print("Test accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 88092 | Time : "+str(time.time()-t0))
+            f_log.write("Test accuracy : "+str(self.acc_sum/self.cnt)+" | Idx : "+str(batch_idx*x.shape[0])+" / 88092 | Time : "+str(time.time()-t0))
+            f_log.write('\n')
+            f_log.flush()
+
+    def training_epoch_end(self, outputs) -> None:
+        print("Training epoch end... Accuracy : "+str(self.acc_sum/self.cnt))
+        f_log.write("Training end... Accuracy : "+str(self.acc_sum/self.cnt))
+        f_log.write('\n')
+        f_log.flush()
+        self.acc_sum=0
+        self.cnt=0
+
+    def validation_epoch_end(self, outputs) -> None:
+        print("Validation epoch end... Accuracy : "+str(self.acc_sum/self.cnt))
+        f_log.write("Validation epoch end... Accuracy : "+str(self.acc_sum/self.cnt))
+        f_log.write('\n')
+        f_log.flush()
+        self.acc_sum=0
+        self.cnt=0
+
+    def test_epoch_end(self, outputs) -> None:
+        print("Test epoch end... Accuracy : "+str(self.acc_sum/self.cnt))
+        f_log.write("Test epoch end... Accuracy : "+str(self.acc_sum/self.cnt))
+        f_log.write('\n')
+        f_log.flush()
+        self.acc_sum=0
+        self.cnt=0
+
+    def configure_optimizers(self):
+        optimizer = torch.optim.Adam(self.parameters(), lr=0.001) #0.001
+        scheduler = StepLR(optimizer, step_size=25, gamma=0.25)
+        return [optimizer], [scheduler]
+
+
+# Total [25]GB of memory needed.
 # Start!
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, default='linear',
-                        choices=['linear', 'linear_Dropout', 'linear_Deep_BN'])
+                        choices=['linear', 'linear_Dropout', 'linear_Deep_BN', 'linear_DeepDeep_BN'])
 parser.add_argument('--evaluate', action='store_true')
+parser.add_argument('--ckpt', type=str, default=None)
 
 args = parser.parse_args()
 MODEL_NAME=args.model
-# MODEL_NAME='linear_Dropout'
-# MODEL_NAME='linear_Deep_BN'
 path_log = NROOT+f'/rgnn_log_{MODEL_NAME}.txt'
 f_log=open(path_log,'w+')
 
@@ -336,8 +441,8 @@ print("Reading dataset...")
 
 # Init DataLoader from MNIST Dataset 
 train_loader = DataLoader(ArxivSet(mode='train'),batch_size=Batch_size,shuffle=True,num_workers=4)
-val_loader = DataLoader(ArxivSet(mode='valid'),batch_size=Batch_size,shuffle=True,num_workers=4)
-test_loader = DataLoader(ArxivSet(mode='test-dev'),batch_size=Batch_size,shuffle=True,num_workers=4)
+val_loader = DataLoader(ArxivSet(mode='valid'),batch_size=Batch_size,shuffle=False,num_workers=4)
+test_loader = DataLoader(ArxivSet(mode='test-dev'),batch_size=Batch_size,shuffle=False,num_workers=4)
 print("Done! : [",time.time()-t0,"]s")
 
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
@@ -351,6 +456,13 @@ if not args.evaluate:
         linear_model=Linear_Dropout_Model()
     elif(args.model=='linear_Deep_BN'):
         linear_model=Linear_BN_Model()
+    elif(args.model=='linear_DeepDeep_BN'):
+        linear_model=Linear_Deep_BN_Model()
+        
+    if(args.ckpt is not None):
+        checkpoint = torch.load(args.ckpt)
+        linear_model.load_state_dict(checkpoint['state_dict'])
+        
     checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max', save_top_k=3)
     trainer = Trainer(max_epochs=max_epoch,
         callbacks=[checkpoint_callback],
@@ -361,13 +473,13 @@ if not args.evaluate:
 
     # Evaluate
     linear_model.eval()
-    trainer.test(linear_model, test_loader)
+    #trainer.test(linear_model, test_loader) # Target dosen't exist. So its useless.
 
     # Submit file
     evaluator = MAG240MEvaluator()
     y_preds = []
     for batch in tqdm(test_loader):
-        batch = batch.to(device)
+        batch = np.array(batch).to(device)
         with torch.no_grad():
             x, y = batch
             x,y=x.float(),y.type(torch.LongTensor)
@@ -395,6 +507,9 @@ if args.evaluate:
         checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
     elif(args.model=='linear_Deep_BN'):
         model=Linear_BN_Model().load_from_checkpoint(
+        checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
+    elif(args.model=='linear_DeepDeep_BN'):
+        model=Linear_Deep_BN_Model().load_from_checkpoint(
         checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
     model.eval()
     trainer.test(model, test_loader)

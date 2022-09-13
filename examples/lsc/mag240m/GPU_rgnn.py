@@ -31,7 +31,7 @@ from tqdm import tqdm
 ROOT='/fs/ess/PAS1289'
 NROOT='/fs/scratch/PAS1289/data' # log file's root.
 #path_log = NROOT+'/rgnn_log_largemem.txt'
-path_log = NROOT+'/rgnn_log_largemem_test.txt'
+path_log = NROOT+'/rgnn_log_largemem_15h.txt'
 f_log=open(path_log,'w+')
 start_t=time.time()
 
@@ -324,10 +324,13 @@ if __name__ == '__main__':
     parser.add_argument('--in-memory', default=True) # action='store_true'
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--evaluate', action='store_true')
+    parser.add_argument('--ckpt', type=str, default=None)
+    # --ckpt = "/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12871851/checkpoints/epoch=0-step=1086.ckpt"
+    # Val accuracy : 0.6410
+     
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
-    #print("ROOT :",ROOT,"asdf")
     seed_everything(42)
     datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.in_memory)
 
@@ -335,9 +338,13 @@ if __name__ == '__main__':
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         print("Device :",device)
         model = RGNN(args.model, datamodule.num_features,
-                     datamodule.num_classes, args.hidden_channels,
-                     datamodule.num_relations, num_layers=len(args.sizes),
-                     dropout=args.dropout)
+                    datamodule.num_classes, args.hidden_channels,
+                    datamodule.num_relations, num_layers=len(args.sizes),
+                    dropout=args.dropout)
+        if args.ckpt is not None:
+            checkpoint = torch.load(args.ckpt)
+            model.load_state_dict(checkpoint['state_dict'])
+
         print(f'#Params {sum([p.numel() for p in model.parameters()])}')
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max',
                                            save_top_k=3)
@@ -389,3 +396,13 @@ if __name__ == '__main__':
         res = {'y_pred': torch.cat(y_preds, dim=0)}
         evaluator.save_test_submission(res, f'results/{args.model}',
                                        mode='test-dev')
+
+
+'''
+In Largemem node...
+Memory usage : 510GB
+Prepare : 1300s
+100*1024 forward : 700s
+1 epoch : 8000s (2h 20m) (With validation)
+'''
+
