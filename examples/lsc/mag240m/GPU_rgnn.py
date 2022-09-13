@@ -250,7 +250,7 @@ class RGNN(LightningModule):
         # What side effect previous code has??
         # I think train_acc is just Accuracy type. But how logger detect its class and print meaningful information automatically?
         self.log('train_acc', self.train_acc, prog_bar=True, on_step=False, on_epoch=True)
-        if(batch_idx%10==0):
+        if(batch_idx%100==0):
             print('train_acc : '+str(self.train_acc(y_hat.softmax(dim=-1), batch.y))+' | loss : '+str(train_loss)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(1112392//1024))
             f_log.write('train_acc : '+str(self.train_acc(y_hat.softmax(dim=-1), batch.y))+' | loss : '+str(train_loss)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(1112392//1024))
             f_log.write('\n')
@@ -263,7 +263,7 @@ class RGNN(LightningModule):
         self.val_acc_sum+=batch.x.shape[0]*tmp_acc
         self.val_cnt+=batch.x.shape[0]
         self.log('val_acc', self.val_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
-        if(batch_idx%10==0):
+        if(batch_idx%50==0):
             print('val_acc : '+str(self.val_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(138949//1024))
             f_log.write('val_acc : '+str(self.val_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(138949//1024))
             f_log.write('\n')
@@ -276,31 +276,31 @@ class RGNN(LightningModule):
         self.test_acc_sum+=batch.x.shape[0]*tmp_acc
         self.test_cnt+=batch.x.shape[0]
         self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
-        if(batch_idx%10==0):
+        if(batch_idx%30==0):
             print('test_acc : '+str(self.test_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
             f_log.write('test_acc : '+str(self.test_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
             f_log.write('\n')
             #f_log.flush()
     
     def training_epoch_end(self, outputs) -> None:
-        print("Epoch end... Accuracy : "+str(self.train_acc_sum/self.train_cnt))
-        f_log.write("Epoch end... Accuracy : "+str(self.train_acc_sum/self.train_cnt))
+        print("Train Epoch end... Accuracy : "+str(self.train_acc_sum/self.train_cnt))
+        f_log.write("Train Epoch end... Accuracy : "+str(self.train_acc_sum/self.train_cnt))
         f_log.write('\n')
         f_log.flush()
         self.train_acc_sum=0
         self.train_cnt=0
 
     def validation_epoch_end(self, outputs) -> None:
-        print("Epoch end... Accuracy : "+str(self.val_acc_sum/self.val_cnt))
-        f_log.write("Epoch end... Accuracy : "+str(self.val_acc_sum/self.val_cnt))
+        print("Validation Epoch end... Accuracy : "+str(self.val_acc_sum/self.val_cnt))
+        f_log.write("Validation Epoch end... Accuracy : "+str(self.val_acc_sum/self.val_cnt))
         f_log.write('\n')
         f_log.flush()
         self.val_acc_sum=0
         self.val_cnt=0
 
     def test_epoch_end(self, outputs) -> None:
-        print("Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
-        f_log.write("Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
+        print("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
+        f_log.write("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
         f_log.write('\n')
         f_log.flush()
         self.test_acc_sum=0
