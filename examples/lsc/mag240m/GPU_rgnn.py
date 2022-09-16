@@ -31,7 +31,7 @@ from tqdm import tqdm
 ROOT='/fs/ess/PAS1289'
 NROOT='/fs/scratch/PAS1289/data' # log file's root.
 #path_log = NROOT+'/rgnn_log_largemem.txt'
-path_log = NROOT+'/rgnn_log_largemem_15h.txt'
+path_log = NROOT+'/rgnn_log_largemem_1400.txt'
 f_log=open(path_log,'w+')
 start_t=time.time()
 
@@ -77,7 +77,6 @@ class MAG240M(LightningDataModule):
         dataset = MAG240MDataset(self.data_dir)
 
         self.train_idx = torch.from_numpy(dataset.get_idx_split('train'))
-        self.train_idx = self.train_idx
         self.train_idx.share_memory_()
         self.val_idx = torch.from_numpy(dataset.get_idx_split('valid'))
         self.val_idx.share_memory_()
@@ -116,13 +115,13 @@ class MAG240M(LightningDataModule):
                                transform=self.convert_batch,
                                batch_size=self.batch_size, num_workers=2)
 
-    def test_dataloader(self):  # Test best validation model once again.
+    def test_dataloader(self):  # Node_idx=self.val_idx??
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
                                batch_size=self.batch_size, num_workers=2)
 
-    def hidden_test_dataloader(self):
+    def hidden_test_dataloader(self): # This is test-dev. Not test-challenge
         return NeighborSampler(self.adj_t, node_idx=self.test_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
@@ -140,7 +139,6 @@ class MAG240M(LightningDataModule):
         f_log.write('\n')
         f_log.flush()'''
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
-
 
 class RGNN(LightningModule):
     def __init__(self, model: str, in_channels: int, out_channels: int,
@@ -193,12 +191,21 @@ class RGNN(LightningModule):
         for _ in range(num_layers - 1):
             self.skips.append(Linear(hidden_channels, hidden_channels))
 
+        '''
         self.mlp = Sequential(
             Linear(hidden_channels, hidden_channels),
             BatchNorm1d(hidden_channels),
             ReLU(inplace=True),
             Dropout(p=self.dropout),
             Linear(hidden_channels, out_channels),
+        )
+        '''
+        self.mlp = Sequential(
+            Linear(hidden_channels, 1400),
+            BatchNorm1d(1400),
+            ReLU(inplace=True),
+            Dropout(p=self.dropout),
+            Linear(1400, out_channels),
         )
 
         self.train_acc = Accuracy()
@@ -212,7 +219,7 @@ class RGNN(LightningModule):
         self.test_cnt=0
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
-        time0=time.time()
+        #time0=time.time()
         for i, adj_t in enumerate(adjs_t):
             # adj_t may contain specific layer's sampled neighbors [Sparse tensor]
             # So adjs_t is num_layers*[N*N sparse tensors]
@@ -246,13 +253,13 @@ class RGNN(LightningModule):
         tmp_acc=self.train_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
         self.train_acc_sum+=batch.x.shape[0]*tmp_acc
         self.train_cnt+=batch.x.shape[0]
-        # dictionary?
         # What side effect previous code has??
         # I think train_acc is just Accuracy type. But how logger detect its class and print meaningful information automatically?
-        self.log('train_acc', self.train_acc, prog_bar=True, on_step=False, on_epoch=True)
+        #self.log('train_acc', self.train_acc, prog_bar=True, on_step=False, on_epoch=True)
+        self.log('train_acc', tmp_acc, prog_bar=True, on_step=False, on_epoch=True)
         if(batch_idx%100==0):
-            print('train_acc : '+str(self.train_acc(y_hat.softmax(dim=-1), batch.y))+' | loss : '+str(train_loss)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(1112392//1024))
-            f_log.write('train_acc : '+str(self.train_acc(y_hat.softmax(dim=-1), batch.y))+' | loss : '+str(train_loss)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(1112392//1024))
+            print('train_acc : '+str(tmp_acc)+' | loss : '+str(train_loss)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(1112392//1024))
+            f_log.write('train_acc : '+str(tmp_acc)+' | loss : '+str(train_loss)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(1112392//1024))
             f_log.write('\n')
             #f_log.flush()
         return train_loss
@@ -262,10 +269,11 @@ class RGNN(LightningModule):
         tmp_acc=self.val_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
         self.val_acc_sum+=batch.x.shape[0]*tmp_acc
         self.val_cnt+=batch.x.shape[0]
-        self.log('val_acc', self.val_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
+        #self.log('val_acc', self.val_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
+        self.log('val_acc', tmp_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         if(batch_idx%50==0):
-            print('val_acc : '+str(self.val_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(138949//1024))
-            f_log.write('val_acc : '+str(self.val_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(138949//1024))
+            print('val_acc : '+str(tmp_acc)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(138949//1024))
+            f_log.write('val_acc : '+str(tmp_acc)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(138949//1024))
             f_log.write('\n')
             #f_log.flush()
 
@@ -275,10 +283,11 @@ class RGNN(LightningModule):
         tmp_acc=self.test_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
         self.test_acc_sum+=batch.x.shape[0]*tmp_acc
         self.test_cnt+=batch.x.shape[0]
-        self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
+        #self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
+        self.log('test_acc', tmp_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         if(batch_idx%30==0):
-            print('test_acc : '+str(self.test_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
-            f_log.write('test_acc : '+str(self.test_acc(y_hat.softmax(dim=-1), batch.y))+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
+            print('test_acc : '+str(tmp_acc)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
+            f_log.write('test_acc : '+str(tmp_acc)+' | time : '+str(time.time()-start_t)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
             f_log.write('\n')
             #f_log.flush()
     
@@ -313,9 +322,10 @@ class RGNN(LightningModule):
 
 
 if __name__ == '__main__':
+    # Change everything envolved with 1400
     parser = argparse.ArgumentParser()
     parser.add_argument('--hidden_channels', type=int, default=1024)
-    parser.add_argument('--batch_size', type=int, default=1024)
+    parser.add_argument('--batch_size', type=int, default=1024) # Is it optimal??
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--model', type=str, default='rgat',
@@ -325,14 +335,19 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--evaluate', action='store_true')
     parser.add_argument('--ckpt', type=str, default=None)
-    # --ckpt = "/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12871851/checkpoints/epoch=0-step=1086.ckpt"
-    # Val accuracy : 0.6410
+    # --ckpt = "/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12888082/checkpoints/epoch=11-step=13043.ckpt"
+    # Val accuracy : 0.6806
      
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
     seed_everything(42)
     datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.in_memory)
+    
+    # Use multicore
+    # Observe some efficiency?
+    torch.set_num_threads(8)
+    #torch.set_num_interop_threads(8) # Difference?
 
     if not args.evaluate:
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
@@ -352,7 +367,7 @@ if __name__ == '__main__':
         # About 1000s... (Without data copying, which consume 2400s)  
         trainer = Trainer(max_epochs=args.epochs,
                           callbacks=[checkpoint_callback],
-                          default_root_dir=f'logs/{args.model}',
+                          default_root_dir=f'logs/{args.model}_1400',
                           progress_bar_refresh_rate=0) # gpus=args.device,
         
         trainer.fit(model, datamodule=datamodule)
@@ -369,7 +384,7 @@ if __name__ == '__main__':
         print("ckpt :",ckpt)
         '''
         # Ignore previous code
-        ckpt='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365/checkpoints/epoch=2-step=3260.ckpt'
+        ckpt="/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12888082/checkpoints/epoch=11-step=13043.ckpt"
         logdir='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365'
         trainer = Trainer(resume_from_checkpoint=ckpt,
                           progress_bar_refresh_rate=0) # gpus=args.device,
@@ -394,7 +409,7 @@ if __name__ == '__main__':
                 out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
                 y_preds.append(out)
         res = {'y_pred': torch.cat(y_preds, dim=0)}
-        evaluator.save_test_submission(res, f'results/{args.model}',
+        evaluator.save_test_submission(res, f'results_1400_/{args.model}',
                                        mode='test-dev')
 
 

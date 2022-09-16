@@ -30,7 +30,12 @@ print("num classes :",dataset.num_classes) # number of subject area classes
 sample_sz=40000
 np.random.seed(42)
 
-
+train_idx=list(dataset.get_idx_split('train'))
+valid_idx=list(dataset.get_idx_split('valid'))
+pca_train_idx=train_idx+valid_idx
+pca_train_idx.sort()
+print(len(pca_train_idx))
+print(print(pca_train_idx[0:10]))
 '''
 train_idx=dataset.get_idx_split('train') # (1112392, 768). Loading all feature takes 80s. 
 origin_idx=np.random.randint(0,1112392,sample_sz)

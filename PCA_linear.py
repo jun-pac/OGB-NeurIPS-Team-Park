@@ -1,3 +1,6 @@
+# Size of input dimension should be vary.
+# Everything else is same.
+
 import argparse
 import glob
 import os
@@ -23,6 +26,7 @@ from torch_geometric.data import NeighborSampler
 from torch_geometric.nn import GATConv, SAGEConv
 from torch_sparse import SparseTensor
 from tqdm import tqdm
+
 seed_everything(42)
 
 t0=time.time()
@@ -33,14 +37,17 @@ NROOT='/fs/scratch/PAS1289/data' # log file's root.
 
 start_t=time.time()
 Batch_size=1000
-max_epoch=100
+max_epoch=50
 DROOT='/fs/ess/PAS1289/mag240m_kddcup2021'
 dataset = MAG240MDataset(root = DROOT)
 
 class ArxivSet(Dataset):
-    def __init__(self,mode):
+    def __init__(self,mode,feat_dir):
         self.mode_idx=dataset.get_idx_split(mode)
-        self.paper_feat=dataset.paper_feat[self.mode_idx]
+        #self.paper_feat=dataset.paper_feat[self.mode_idx]
+        N = dataset.num_papers
+        self.feat_memmap=np.memmap(feat_dir, mode='r', shape=(N, input_dim)) # dtype=np.float16,
+        self.paper_feat=self.feat_memmap[self.mode_idx]
         self.paper_label=dataset.paper_label[self.mode_idx]
         self.len=self.mode_idx.shape[0]
         self.mode=mode
@@ -426,19 +433,22 @@ parser.add_argument('--model', type=str, default='linear_Deep_BN',
 parser.add_argument('--evaluate', action='store_true')
 parser.add_argument('--ckpt', type=str, default=None)
 parser.add_argument('--hidden', type=int, default=2000)
-
+parser.add_argument('--feat_dir', type=str, default='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/PCA_129.npy')
 args = parser.parse_args()
+
 MODEL_NAME=args.model
-path_log = NROOT+f'/log_{MODEL_NAME}_{str(args.hidden)}.txt'
+input_dim=int(args.feat_dir.split('_')[-1][:-4])
+print("input_dim :",input_dim)
+path_log = NROOT+f'/PCA_{MODEL_NAME}_{input_dim}.txt'
 f_log=open(path_log,'w+')
 
 
 print("Reading dataset...")
 
 # Init DataLoader from MNIST Dataset 
-train_loader = DataLoader(ArxivSet(mode='train'),batch_size=Batch_size,shuffle=True,num_workers=4)
-val_loader = DataLoader(ArxivSet(mode='valid'),batch_size=Batch_size,shuffle=False,num_workers=4)
-test_loader = DataLoader(ArxivSet(mode='test-dev'),batch_size=Batch_size,shuffle=False,num_workers=4)
+train_loader = DataLoader(ArxivSet(mode='train',feat_dir=args.feat_dir),batch_size=Batch_size,shuffle=True,num_workers=4)
+val_loader = DataLoader(ArxivSet(mode='valid',feat_dir=args.feat_dir),batch_size=Batch_size,shuffle=False,num_workers=4)
+test_loader = DataLoader(ArxivSet(mode='test-dev',feat_dir=args.feat_dir),batch_size=Batch_size,shuffle=False,num_workers=4)
 print("Done! : [",time.time()-t0,"]s")
 
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
@@ -449,13 +459,13 @@ print("Device :",device)
 # Command : python OGB-NeurIPS-Team-Park/linear.py --model=linear_Deep_BN
 if not args.evaluate:
     if(args.model=='linear'):
-        linear_model=LinearModel(hidden_layer=args.hidden)
+        linear_model=LinearModel(input=input_dim, hidden_layer=args.hidden)
     elif(args.model=='linear_Dropout'):
-        linear_model=Linear_Dropout_Model(hidden_layer=args.hidden)
+        linear_model=Linear_Dropout_Model(input=input_dim, hidden_layer=args.hidden)
     elif(args.model=='linear_Deep_BN'):
-        linear_model=Linear_BN_Model(hidden_layer=args.hidden)
+        linear_model=Linear_BN_Model(input=input_dim, hidden_layer=args.hidden)
     elif(args.model=='linear_DeepDeep_BN'):
-        linear_model=Linear_Deep_BN_Model(hidden_layer=args.hidden)
+        linear_model=Linear_Deep_BN_Model(input=input_dim, hidden_layer=args.hidden)
         
     if(args.ckpt is not None):
         checkpoint = torch.load(args.ckpt)
@@ -464,7 +474,7 @@ if not args.evaluate:
     checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max', save_top_k=3)
     trainer = Trainer(max_epochs=max_epoch,
         callbacks=[checkpoint_callback],
-        default_root_dir=f'/users/PAS1289/oiocha/logs/{MODEL_NAME}',
+        default_root_dir=f'/users/PAS1289/oiocha/logs/PCA_{MODEL_NAME}_{input_dim}',
         progress_bar_refresh_rate=0)
     # Train the model
     trainer.fit(linear_model, train_loader, val_loader)
@@ -484,16 +494,16 @@ if not args.evaluate:
             out = linear_model(x).argmax(dim=-1).cpu()
             y_preds.append(out)
     res = {'y_pred': torch.cat(y_preds, dim=0)}
-    evaluator.save_test_submission(res, f'results/{MODEL_NAME}',mode='test-dev')
+    evaluator.save_test_submission(res, f'results/PCA_{MODEL_NAME}_{input_dim}',mode='test-dev')
 
 
 
 # Evaluate
 # Command : python OGB-NeurIPS-Team-Park/linear.py --model=linear_DeepDeep_BN --evaluate
 if args.evaluate:
-    dirs = glob.glob(f'/users/PAS1289/oiocha/logs/{MODEL_NAME}/lightning_logs/*')
+    dirs = glob.glob(f'/users/PAS1289/oiocha/logs/PCA_{MODEL_NAME}_{input_dim}/lightning_logs/*')
     version = max([int(x.split(os.sep)[-1].split('_')[-1]) for x in dirs])
-    logdir = f'/users/PAS1289/oiocha/logs/{MODEL_NAME}/lightning_logs/version_{version}'
+    logdir = f'/users/PAS1289/oiocha/logs/PCA_{MODEL_NAME}_{input_dim}/lightning_logs/version_{version}'
     print(f'Evaluating saved model in {logdir}...')
     ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
     print("CKPT :",ckpt)
@@ -502,13 +512,13 @@ if args.evaluate:
                             progress_bar_refresh_rate=0) # gpus=args.device,
 
     if(args.model=='linear'):
-        linear_model=LinearModel(hidden_layer=args.hidden)
+        linear_model=LinearModel(input=input_dim, hidden_layer=args.hidden)
     elif(args.model=='linear_Dropout'):
-        linear_model=Linear_Dropout_Model(hidden_layer=args.hidden)
+        linear_model=Linear_Dropout_Model(input=input_dim, hidden_layer=args.hidden)
     elif(args.model=='linear_Deep_BN'):
-        linear_model=Linear_BN_Model(hidden_layer=args.hidden)
+        linear_model=Linear_BN_Model(input=input_dim, hidden_layer=args.hidden)
     elif(args.model=='linear_DeepDeep_BN'):
-        linear_model=Linear_Deep_BN_Model(hidden_layer=args.hidden)
+        linear_model=Linear_Deep_BN_Model(input=input_dim, hidden_layer=args.hidden)
         
     if(args.ckpt is not None):
         checkpoint = torch.load(ckpt)
@@ -526,4 +536,4 @@ if args.evaluate:
             out = linear_model(x).argmax(dim=-1).cpu()
             y_preds.append(out)
     res = {'y_pred': torch.cat(y_preds, dim=0)}
-    evaluator.save_test_submission(res, f'results/{MODEL_NAME}',mode='test-dev')
+    evaluator.save_test_submission(res, f'PCA_results/{MODEL_NAME}',mode='test-dev')
