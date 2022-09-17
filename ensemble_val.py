@@ -25,23 +25,39 @@ from torch_geometric.nn import GATConv, SAGEConv
 from torch_sparse import SparseTensor
 from tqdm import tqdm
 
-dir_list=[f"/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_0.npy"]
+dir_list=["/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_0.npy",
+"/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_1.npy",
+"/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_2.npy",
+"/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_3.npy"]
 num_ensemble=len(dir_list)
 
-summed_activation=np.load(dir_list[0]).astype(np.float16)
+summed_activation=np.zeros((138949,153)).astype(np.float16)
 
 # Shape : (138949,153)
-for i in range(1,num_ensemble):
+for i in range(num_ensemble):
     summed_activation = summed_activation + np.load(dir_list[i]).astype(np.float16)
 
 # Maximum prediction
-y_preds = []
-        for batch in tqdm(loader):
-            batch = batch.to(device)
-            with torch.no_grad():
-                out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
-                y_preds.append(out)
-        res = {'y_pred': torch.cat(y_preds, dim=0)}
-        evaluator.save_test_submission(res, f'results/{args.model}_label_{seed}',
-                                       mode='test-dev')
+evaluator = MAG240MEvaluator()
+y_preds = np.argmax(summed_activation, axis=1)
+y_pred = y_preds.astype(np.short)
+dir_path=f'results/rgat_label_ensemble'
+filename = osp.join(dir_path, 'y_pred_mag240m')
+np.savez_compressed(filename, y_pred=y_pred)
 
+
+# Calculate accuracy
+ROOT='/fs/ess/PAS1289/mag240m_kddcup2021'
+dataset = MAG240MDataset(root = ROOT)
+valid_idx=dataset.get_idx_split('valid')
+paper_label=dataset.paper_label[valid_idx]
+cnt=len(paper_label)
+acc_cnt=0
+for i in range(len(paper_label)):
+    if(y_preds[i]==paper_label[i]):
+        acc_cnt+=1
+print(acc_cnt/cnt)
+
+f_log=open('/fs/scratch/PAS1289/result/rgat_label_ensemble.txt','w+')
+f_log.write(f'Validation accuracy : {acc_cnt/cnt}\n')
+f_log.flush()

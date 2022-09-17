@@ -38,3 +38,14 @@ for i in range(3):
 for i in range(10):
     if i in dic:
         print(i, dic[i])
+
+c=np.array([6,3])
+a=np.array([1,2,3])
+b=np.array([1,2])
+d=[]
+d.append(b)
+d.append(a)
+d.append(c)
+d=np.concatenate(d)
+
+print(d)

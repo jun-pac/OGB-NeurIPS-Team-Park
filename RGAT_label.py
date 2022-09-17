@@ -83,6 +83,7 @@ class MAG240M(LightningDataModule):
         self.sizes = sizes
         self.in_memory = in_memory
         self.N_source=N_source
+        self.sample_dir=sample_dir
 
     @property
     def num_features(self) -> int:
@@ -285,7 +286,7 @@ class MAG240M(LightningDataModule):
         dataset = MAG240MDataset(self.data_dir)
 
         train_idx=dataset.get_idx_split('train')
-        if self.sample_idx is None:
+        if self.sample_dir == None:
             # Generate sampled idx
             source_sample_idx=np.random.randint(0,train_idx.shape[0],self.N_source)
             source_sample=train_idx[source_sample_idx]
@@ -457,7 +458,8 @@ class RGNN(LightningModule):
         self.val_cnt=0
         self.test_acc_sum=0
         self.test_cnt=0
-        self.test_res=np.array([])
+        self.val_res=[]
+        self.test_res=[]
         self.max_val_acc=0.
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
@@ -511,6 +513,8 @@ class RGNN(LightningModule):
         tmp_acc=self.val_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
         self.val_acc_sum+=batch.x.shape[0]*tmp_acc
         self.val_cnt+=batch.x.shape[0]
+        self.val_res.append(y_hat.softmax(dim=-1).cpu().numpy())
+
         #self.log('val_acc', self.val_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         self.log('val_acc', tmp_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         if(batch_idx%50==0):
@@ -521,11 +525,10 @@ class RGNN(LightningModule):
 
     def test_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
-        self.test_acc(y_hat.softmax(dim=-1), batch.y)
         tmp_acc=self.test_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
         self.test_acc_sum+=batch.x.shape[0]*tmp_acc
         self.test_cnt+=batch.x.shape[0]
-        self.test_res.extend(y_hat.softmax(dim=-1).cpu().numpy())
+        self.test_res.append(y_hat.softmax(dim=-1).cpu().numpy())
 
         #self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         self.log('test_acc', tmp_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
@@ -548,13 +551,17 @@ class RGNN(LightningModule):
         f_log.write("Validation Epoch end... Accuracy : "+str(self.val_acc_sum/self.val_cnt))
         if self.val_acc_sum/self.val_cnt>self.max_val_acc:
             self.max_val_acc=self.val_acc_sum/self.val_cnt
-            self.test_epoch_end(self,outputs)
+            self.val_res=np.concatenate(self.val_res)
+            np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/{args.model}_label_{seed}',self.val_res)
+            print("Succesfully saved!")
+            f_log.write("Succesfully saved!\n")
         f_log.write('\n')
         f_log.flush()
+        self.val_res=[]
         self.val_acc_sum=0
         self.val_cnt=0
 
-
+    '''
     def test_epoch_end(self, outputs) -> None:
         print("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
         f_log.write("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
@@ -562,12 +569,12 @@ class RGNN(LightningModule):
         f_log.flush()
         self.test_acc_sum=0
         self.test_cnt=0
-        np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/{args.model}_label_{seed}',self.test)
+        np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/{args.model}_label_{seed}',self.test_res)
         self.test_res=np.array([])
         print("Succesfully saved!")
         f_log.write("Succesfully saved!\n")
         f_log.flush()
-
+    '''
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
         scheduler = StepLR(optimizer, step_size=25, gamma=0.25)
