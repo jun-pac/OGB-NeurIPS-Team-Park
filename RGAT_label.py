@@ -586,7 +586,7 @@ if __name__ == '__main__':
     parser.add_argument('--hidden_channels', type=int, default=1024)
     parser.add_argument('--batch_size', type=int, default=1024)
     parser.add_argument('--dropout', type=float, default=0.5)
-    parser.add_argument('--epochs', type=int, default=20)
+    parser.add_argument('--epochs', type=int, default=50)
     parser.add_argument('--model', type=str, default='rgat',
                         choices=['rgat', 'rgraphsage'])
     parser.add_argument('--sizes', type=str, default='25-15')

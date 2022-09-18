@@ -28,7 +28,11 @@ from tqdm import tqdm
 dir_list=["/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_0.npy",
 "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_1.npy",
 "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_2.npy",
-"/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_3.npy"]
+"/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_3.npy",
+"/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_4.npy",
+"/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_5.npy",
+"/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_6.npy"]
+
 num_ensemble=len(dir_list)
 
 summed_activation=np.zeros((138949,153)).astype(np.float16)
@@ -56,7 +60,7 @@ acc_cnt=0
 for i in range(len(paper_label)):
     if(y_preds[i]==paper_label[i]):
         acc_cnt+=1
-print(acc_cnt/cnt)
+print(f'Validation accuracy : {acc_cnt/cnt}')
 
 f_log=open('/fs/scratch/PAS1289/result/rgat_label_ensemble.txt','w+')
 f_log.write(f'Validation accuracy : {acc_cnt/cnt}\n')
