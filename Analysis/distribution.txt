@@ -1,0 +1,75 @@
+Loading done! : 0.13680410385131836s
+num papers : 121751666
+num authors : 122383112
+num institution : 25721
+num paper features : 768
+num classes : 153
+Train label distribution
+Zero-cnt classes : 1
+1st class is 100 : 79386
+2nd class is 34 : 61031
+3rd class is 14 : 58425
+...
+Minimum class is 99 : 72
+Valid label distribution
+Zero-cnt classes : 4
+1st class is 140 : 9126
+2nd class is 0 : 8474
+3rd class is 141 : 4418
+...
+Minimum class is 96 : 16
+=======================================
+Loading symmetric datas...
+Loading symmetric datas...
+Row, col's length : 2593241212
+Done! 21.15077304840088s
+
+Total degree distribution
+Num_zeros : 49243005
+Num_valid : 72508661
+1st degree is 89226997 : 242655
+2nd degree is 55118718 : 190338
+3rd degree is 84092676 : 184460
+...
+Minimum degree is 17 : 1
+Done! 166.27183198928833s
+
+Train degree distribution
+Num_zeros : 701319
+Num_valid : 411073
+1st degree is 17107 : 1326
+2nd degree is 1346767 : 1137
+3rd degree is 5302615 : 991
+...
+Minimum degree is 7 : 1
+Done! 193.27420616149902s
+
+Valid degree distribution
+Num_zeros : 61435
+Num_valid : 77514
+1st degree is 17107 : 275
+2nd degree is 1346767 : 220
+3rd degree is 1980718 : 162
+...
+Minimum degree is 415 : 1
+Done! 193.53496408462524s
+
+Test-dev degree distribution
+Num_zeros : 27276
+Num_valid : 60816
+1st degree is 17107 : 76
+2nd degree is 2854768 : 72
+3rd degree is 1346767 : 71
+...
+Minimum degree is 3 : 1
+Done! 193.68312120437622s
+
+Test-challenge degree distribution
+Num_zeros : 14652
+Num_valid : 44074
+1st degree is 17107 : 50
+2nd degree is 2854768 : 48
+3rd degree is 1346767 : 48
+...
+Minimum degree is 478 : 1
+Done! 193.80322670936584s

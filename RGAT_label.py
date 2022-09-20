@@ -294,9 +294,11 @@ class MAG240M(LightningDataModule):
             # Save this for reconstruction
             np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/Sample_idx/{args.model}_label_{seed}',np.array([source_sample,target_sample]))
         else:
-            sample_idx=np.load(self.sample_dir)
+            sample_idx=np.load(self.sample_dir,allow_pickle=True)
             source_sample=sample_idx[0]
             target_sample=sample_idx[1]
+            self.N_source=source_sample.shape[0]
+            print("Load sample_idx :",source_sample.shape)
 
         self.train_source_idx = source_sample
         self.train_source_label=dataset.paper_label[self.train_source_idx]
@@ -461,6 +463,7 @@ class RGNN(LightningModule):
         self.val_res=[]
         self.test_res=[]
         self.max_val_acc=0.
+        self.batch_idx=0
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
         #time0=time.time()
@@ -516,6 +519,7 @@ class RGNN(LightningModule):
         self.val_res.append(y_hat.softmax(dim=-1).cpu().numpy())
 
         #self.log('val_acc', self.val_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
+        self.batch_idx=batch_idx
         self.log('val_acc', tmp_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         if(batch_idx%50==0):
             print('val_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(138949//1024))
@@ -549,17 +553,18 @@ class RGNN(LightningModule):
     def validation_epoch_end(self, outputs) -> None:
         print("Validation Epoch end... Accuracy : "+str(self.val_acc_sum/self.val_cnt))
         f_log.write("Validation Epoch end... Accuracy : "+str(self.val_acc_sum/self.val_cnt))
-        if self.val_acc_sum/self.val_cnt>self.max_val_acc:
+        f_log.write('\n')
+        if self.batch_idx>=100 and self.val_acc_sum/self.val_cnt>self.max_val_acc:
             self.max_val_acc=self.val_acc_sum/self.val_cnt
             self.val_res=np.concatenate(self.val_res)
             np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/{args.model}_label_{seed}',self.val_res)
             print("Succesfully saved!")
             f_log.write("Succesfully saved!\n")
-        f_log.write('\n')
         f_log.flush()
         self.val_res=[]
         self.val_acc_sum=0
         self.val_cnt=0
+        self.batch_idx=0
 
     '''
     def test_epoch_end(self, outputs) -> None:
@@ -596,9 +601,26 @@ if __name__ == '__main__':
     parser.add_argument('--ckpt', type=str, default=None)
     parser.add_argument('--seed', type=int, default=None)
     parser.add_argument('--N_source', type=int, default=600000)
+    parser.add_argument('--sample_dir', type=str, default=None)
     # Must specify seed everytime.
     # Batchsize, N_source need to be precisely selected, but don't change it for now.
     # python OGB-NeurIPS-Team-Park/RGAT_label.py --seed=1 
+
+    '''
+    Continue training
+    Validation accuracy for 0th model: 0.6755500219504998
+    Validation accuracy for 1th model: 0.6740314791758127
+    Validation accuracy for 2th model: 0.6753485091652333
+    Validation accuracy for 3th model: 0.6729015682012824
+    Validation accuracy for 4th model: 0.6651073415425803
+    Validation accuracy for 5th model: 0.6787526358592001
+    Validation accuracy for 6th model: 0.6828332697608475
+    Validation accuracy for 7th model: 0.6415447394367718
+    Validation accuracy for ensembled model: 0.6894256165931385
+    Should input seed as well because file identifier includes seed number
+    '''
+    # python OGB-NeurIPS-Team-Park/RGAT_label.py --seed=4 --ckpt=logs/rgat_label_4/lightning_logs/version_12935274/checkpoints/epoch=9-step=6339.ckpt --sample_dir=OGB-NeurIPS-Team-Park/Sample_idx/rgat_label_4.npy
+    # python OGB-NeurIPS-Team-Park/RGAT_label.py --seed=3 --ckpt=logs/rgat_label_3/lightning_logs/version_12935160/checkpoints/epoch=14-step=9509.ckpt --sample_dir=OGB-NeurIPS-Team-Park/Sample_idx/rgat_label_3.npy
 
     t0=time.time()
     args = parser.parse_args()
@@ -622,13 +644,17 @@ if __name__ == '__main__':
     # Initialize log directory
     NROOT='/fs/scratch/PAS1289/data' # log file's root.
     path_log = NROOT+f'/{args.model}_label_{seed}.txt'
-    f_log=open(path_log,'w+')
+    f_log=open(path_log,'a')
+    if args.ckpt!=None:
+        f_log.write(f"Continue from...{args.ckpt}\n")
+        f_log.flush()
 
 
-    # Loading data
-    print("Loading data...")
-    datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.in_memory, N_source=args.N_source)
-    print(f"Done! {time.time()-t0}")
+    # Dataloader
+    if args.sample_dir == None:
+        datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.in_memory, N_source=args.N_source)
+    else:
+        datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.in_memory, sample_dir=args.sample_dir)
 
 
     # Training
@@ -639,7 +665,7 @@ if __name__ == '__main__':
                     datamodule.num_classes, args.hidden_channels,
                     datamodule.num_relations, num_layers=len(args.sizes),
                     dropout=args.dropout)
-        if args.ckpt is not None:
+        if args.ckpt != None:
             checkpoint = torch.load(args.ckpt)
             model.load_state_dict(checkpoint['state_dict'])
 
