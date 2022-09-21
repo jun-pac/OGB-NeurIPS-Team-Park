@@ -371,9 +371,15 @@ class MAG240M(LightningDataModule):
         #f_log.write("Convert_batch : "+str(n_id.shape)+"\n")
         #f_log.write("Type n_id : "+str(type(n_id))+"\n")
         #start_t=time.time()
+        print(f"DEBUG_BATCH1 : {n_id}")
+        print(f"DEBUG_BATCH2 : {n_id.shape}")
+        print(f"DEBUG_BATCH2.5 : {adjs}")
 
         x = self.x[n_id]
-
+        for adj_t, a, b in adjs:
+            print(f"DEBUG_BATCH3 : {adj_t}")
+            print(f"DEBUG_BATCH4 : {a}")
+            print(f"DEBUG_BATCH5 : {b}")
         # append feature
         # Delete following segment if dim compression success.
         append_feat = np.zeros((len(n_id), 153),dtype=np.float16)
@@ -467,20 +473,29 @@ class RGNN(LightningModule):
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
         #time0=time.time()
+        print(f"DEBUG0 : {x.shape}") # x is tensor
         for i, adj_t in enumerate(adjs_t):
             # adj_t may contain specific layer's sampled neighbors [Sparse tensor]
             # So adjs_t is num_layers*[N*N sparse tensors]
             # But how to differenciate between different relations?
             # adj_t has masked_select method to automatically select different relations.
             # x is activation tensor
+            print(f"DEBUG1 : {i}") # 0 1
+            print(f"DEBUG2 : {adj_t.size(0)}") # 1**** value or 1024
             x_target = x[:adj_t.size(0)]
+            
+            print(f"DEBUG2.5 : {x_target.shape}") # feature tensor
 
             out = self.skips[i](x_target)
             # out tensor is initialized as skip connection of prev. layer(Just Linear layer)
             # And activations added calculated from different relations.
             for j in range(self.num_relations):
+                print(f"DEBUG3 : {adj_t.storage.value().shape}") # integer tensor
+                print(f"DEBUG3.5 : {torch.max(adj_t.storage.value())}")
                 edge_type = adj_t.storage.value() == j
+                print(f"DEBUG4 : {edge_type}") # boolean tensor
                 subadj_t = adj_t.masked_select_nnz(edge_type, layout='coo')
+                print(f"DEBUG5 : {subadj_t}")
                 subadj_t = subadj_t.set_value(None, layout=None)
                 if subadj_t.nnz() > 0:
                     out += self.convs[i][j]((x, x_target), subadj_t)
@@ -517,6 +532,10 @@ class RGNN(LightningModule):
         self.val_acc_sum+=batch.x.shape[0]*tmp_acc
         self.val_cnt+=batch.x.shape[0]
         self.val_res.append(y_hat.softmax(dim=-1).cpu().numpy())
+
+        # For debug,
+        if batch_idx>=1:
+            exit()
 
         #self.log('val_acc', self.val_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         self.batch_idx=batch_idx

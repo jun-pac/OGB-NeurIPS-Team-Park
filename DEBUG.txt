@@ -1,0 +1,400 @@
+Reading dataset... 
+  np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/Sample_idx/{args.model}_label_{seed}',np.array([source_sample,target_sample]))
+Done! [1832.45s]
+  | Name      | Type       | Params
+-----------------------------------------
+0 | convs     | ModuleList | 10.0 M
+1 | norms     | ModuleList | 4.1 K 
+2 | skips     | ModuleList | 2.0 M 
+3 | mlp       | Sequential | 1.2 M 
+4 | train_acc | Accuracy   | 0     
+5 | val_acc   | Accuracy   | 0     
+6 | test_acc  | Accuracy   | 0     
+-----------------------------------------
+13.2 M    Trainable params
+0         Non-trainable params
+13.2 M    Total params
+52.782    Total estimated model params size (MB)
+/users/PAS1289/oiocha/anaconda3/envs/ogb/lib/python3.8/site-packages/torch_geometric/deprecation.py:13: UserWarning: 'data.NeighborSampler' is deprecated, us
+e 'loader.NeighborSampler' instead
+  warnings.warn(out)
+             col=tensor([  1025,   1034,   1035,  ..., 229211, 229212, 229213]),
+/users/PAS1289/oiocha/anaconda3/envs/ogb/lib/python3.8/site-packages/pytorch_lightning/utilities/distributed.py:52: UserWarning: The dataloader, val dataloader 0, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 48 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  warnings.warn(*args, **kwargs)
+  
+DEBUG NS - batch_size : 1024
+DEBUG NS - batch_size : 1024
+DEBUG NS - adj_t : SparseTensor(row=tensor([   0,    1,    1,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19354, 19355, 19356]),
+             val=tensor([2, 2, 0,  ..., 0, 2, 0], dtype=torch.int8),
+             size=(1024, 19357), nnz=19189, density=0.10%)DEBUG NS - adj_t : SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19159, 19160, 19161]),
+             val=tensor([2, 0, 0,  ..., 2, 2, 2], dtype=torch.int8),
+             size=(1024, 19162), nnz=18925, density=0.10%)
+
+DEBUG NS - n_id.shape : torch.Size([19357])
+DEBUG NS - n_id.shape : torch.Size([19162])
+DEBUG NS - e_id : tensor([2, 2, 0,  ..., 0, 2, 0], dtype=torch.int8)
+DEBUG NS - size : (19357, 1024)
+DEBUG NS - e_id : tensor([2, 0, 0,  ..., 2, 2, 2], dtype=torch.int8)
+DEBUG NS - size : (19162, 1024)
+DEBUG NS - adj_t : SparseTensor(row=tensor([    0,     0,     0,  ..., 19161, 19161, 19161]),
+             col=tensor([  1025,   1034,   1035,  ..., 229211, 229212, 229213]),
+             val=tensor([0, 0, 0,  ..., 1, 1, 1], dtype=torch.int8),
+             size=(19162, 229214), nnz=271080, density=0.01%)
+DEBUG NS - n_id.shape : torch.Size([229214])
+DEBUG NS - e_id : tensor([0, 0, 0,  ..., 1, 1, 1], dtype=torch.int8)
+DEBUG NS - size : (229214, 19162)
+DEBUG_BATCH1 : tensor([    8016,     8596,     8665,  ..., 68383420, 85756426, 25571823])
+DEBUG_BATCH2 : torch.Size([229214])
+DEBUG_BATCH2.5 : [Adj(adj_t=SparseTensor(row=tensor([    0,     0,     0,  ..., 19161, 19161, 19161]),
+             col=tensor([  1025,   1034,   1035,  ..., 229211, 229212, 229213]),
+             val=tensor([0, 0, 0,  ..., 1, 1, 1], dtype=torch.int8),
+             size=(19162, 229214), nnz=271080, density=0.01%), e_id=tensor([0, 0, 0,  ..., 1, 1, 1], dtype=torch.int8), size=(229214, 19162)), Adj(adj_t=SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19159, 19160, 19161]),
+             val=tensor([2, 0, 0,  ..., 2, 2, 2], dtype=torch.int8),
+             size=(1024, 19162), nnz=18925, density=0.10%), e_id=tensor([2, 0, 0,  ..., 2, 2, 2], dtype=torch.int8), size=(19162, 1024))]
+DEBUG NS - adj_t : SparseTensor(row=tensor([    0,     1,     1,  ..., 19356, 19356, 19356]),
+             col=tensor([  1024,   1025,   1026,  ..., 233463, 233464, 233465]),
+             val=tensor([2, 2, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(19357, 233466), nnz=274622, density=0.01%)
+DEBUG NS - n_id.shape : torch.Size([233466])
+DEBUG NS - e_id : tensor([2, 2, 0,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG NS - size : (233466, 19357)
+DEBUG_BATCH1 : tensor([   813575,    817378,    821151,  ...,  28194647,  58914500,
+        101081588])
+DEBUG_BATCH2 : torch.Size([233466])
+DEBUG_BATCH2.5 : [Adj(adj_t=SparseTensor(row=tensor([    0,     1,     1,  ..., 19356, 19356, 19356]),
+             col=tensor([  1024,   1025,   1026,  ..., 233463, 233464, 233465]),
+             val=tensor([2, 2, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(19357, 233466), nnz=274622, density=0.01%), e_id=tensor([2, 2, 0,  ..., 0, 0, 0], dtype=torch.int8), size=(233466, 19357)), Adj(adj_t=SparseTensor(row=tensor([   0,    1,    1,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19354, 19355, 19356]),
+             val=tensor([2, 2, 0,  ..., 0, 2, 0], dtype=torch.int8),
+             size=(1024, 19357), nnz=19189, density=0.10%), e_id=tensor([2, 2, 0,  ..., 0, 2, 0], dtype=torch.int8), size=(19357, 1024))]
+DEBUG_BATCH3 : SparseTensor(row=tensor([    0,     1,     1,  ..., 19356, 19356, 19356]),
+             col=tensor([  1024,   1025,   1026,  ..., 233463, 233464, 233465]),
+             val=tensor([2, 2, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(19357, 233466), nnz=274622, density=0.01%)
+DEBUG_BATCH4 : tensor([2, 2, 0,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG_BATCH5 : (233466, 19357)
+DEBUG_BATCH3 : SparseTensor(row=tensor([   0,    1,    1,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19354, 19355, 19356]),
+             val=tensor([2, 2, 0,  ..., 0, 2, 0], dtype=torch.int8),
+             size=(1024, 19357), nnz=19189, density=0.10%)
+DEBUG_BATCH4 : tensor([2, 2, 0,  ..., 0, 2, 0], dtype=torch.int8)
+DEBUG_BATCH5 : (19357, 1024)
+DEBUG_BATCH3 : SparseTensor(row=tensor([    0,     0,     0,  ..., 19161, 19161, 19161]),
+             col=tensor([  1025,   1034,   1035,  ..., 229211, 229212, 229213]),
+             val=tensor([0, 0, 0,  ..., 1, 1, 1], dtype=torch.int8),
+             size=(19162, 229214), nnz=271080, density=0.01%)
+DEBUG_BATCH4 : tensor([0, 0, 0,  ..., 1, 1, 1], dtype=torch.int8)
+DEBUG_BATCH5 : (229214, 19162)
+DEBUG_BATCH3 : SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19159, 19160, 19161]),
+             val=tensor([2, 0, 0,  ..., 2, 2, 2], dtype=torch.int8),
+             size=(1024, 19162), nnz=18925, density=0.10%)
+DEBUG_BATCH4 : tensor([2, 0, 0,  ..., 2, 2, 2], dtype=torch.int8)
+DEBUG_BATCH5 : (19162, 1024)
+DEBUG NS - batch_size : 1024
+DEBUG NS - batch_size : 1024
+DEBUG NS - adj_t : SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 18489, 18490, 18491]),
+             val=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 18492), nnz=18268, density=0.10%)
+DEBUG NS - n_id.shape : torch.Size([18492])
+DEBUG NS - e_id : tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG NS - size : (18492, 1024)
+DEBUG NS - adj_t : SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 18935, 18936, 18937]),
+             val=tensor([0, 2, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 18938), nnz=18740, density=0.10%)
+DEBUG NS - n_id.shape : torch.Size([18938])
+DEBUG NS - e_id : tensor([0, 2, 0,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG NS - size : (18938, 1024)
+DEBUG0 : torch.Size([229214, 921])
+DEBUG1 : 0
+DEBUG2 : 19162
+DEBUG2.5 : torch.Size([19162, 921])
+DEBUG NS - adj_t : SparseTensor(row=tensor([    0,     0,     0,  ..., 18491, 18491, 18491]),
+             col=tensor([  1030,   1031,   1032,  ..., 222408, 222409, 222410]),
+             val=tensor([0, 0, 0,  ..., 2, 0, 0], dtype=torch.int8),
+             size=(18492, 222411), nnz=260424, density=0.01%)
+DEBUG NS - n_id.shape : torch.Size([222411])
+DEBUG NS - e_id : tensor([0, 0, 0,  ..., 2, 0, 0], dtype=torch.int8)
+DEBUG NS - size : (222411, 18492)
+DEBUG_BATCH1 : tensor([  1598530,   1600430,   1602376,  ..., 124610700,  87732673,
+         59242363])
+DEBUG_BATCH2 : torch.Size([222411])
+DEBUG_BATCH2.5 : [Adj(adj_t=SparseTensor(row=tensor([    0,     0,     0,  ..., 18491, 18491, 18491]),
+             col=tensor([  1030,   1031,   1032,  ..., 222408, 222409, 222410]),
+             val=tensor([0, 0, 0,  ..., 2, 0, 0], dtype=torch.int8),
+             size=(18492, 222411), nnz=260424, density=0.01%), e_id=tensor([0, 0, 0,  ..., 2, 0, 0], dtype=torch.int8), size=(222411, 18492)), Adj(adj_t=SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 18489, 18490, 18491]),
+             val=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 18492), nnz=18268, density=0.10%), e_id=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8), size=(18492, 1024))]
+DEBUG NS - adj_t : SparseTensor(row=tensor([    0,     0,     0,  ..., 18937, 18937, 18937]),
+             col=tensor([  1031,   1044,  18938,  ..., 227969, 227970, 227971]),
+             val=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(18938, 227972), nnz=266948, density=0.01%)
+DEBUG NS - n_id.shape : torch.Size([227972])
+DEBUG NS - e_id : tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG NS - size : (227972, 18938)
+DEBUG_BATCH1 : tensor([  2449587,   2449617,   2449634,  ...,  91059002,    727022,
+        118230886])
+DEBUG_BATCH2 : torch.Size([227972])
+DEBUG_BATCH2.5 : [Adj(adj_t=SparseTensor(row=tensor([    0,     0,     0,  ..., 18937, 18937, 18937]),
+             col=tensor([  1031,   1044,  18938,  ..., 227969, 227970, 227971]),
+             val=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(18938, 227972), nnz=266948, density=0.01%), e_id=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8), size=(227972, 18938)), Adj(adj_t=SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 18935, 18936, 18937]),
+             val=tensor([0, 2, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 18938), nnz=18740, density=0.10%), e_id=tensor([0, 2, 0,  ..., 0, 0, 0], dtype=torch.int8), size=(18938, 1024))]
+DEBUG3 : torch.Size([271080])
+DEBUG3.5 : 3
+DEBUG4 : tensor([ True,  True,  True,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([    0,     0,     0,  ..., 19156, 19156, 19156]),
+             col=tensor([  1025,   1034,   1035,  ..., 229144, 229146, 229147]),
+             val=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(19162, 229214), nnz=219769, density=0.01%)
+DEBUG_BATCH3 : SparseTensor(row=tensor([    0,     0,     0,  ..., 18491, 18491, 18491]),
+             col=tensor([  1030,   1031,   1032,  ..., 222408, 222409, 222410]),
+             val=tensor([0, 0, 0,  ..., 2, 0, 0], dtype=torch.int8),
+             size=(18492, 222411), nnz=260424, density=0.01%)
+DEBUG_BATCH4 : tensor([0, 0, 0,  ..., 2, 0, 0], dtype=torch.int8)
+DEBUG_BATCH5 : (222411, 18492)
+DEBUG_BATCH3 : SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 18489, 18490, 18491]),
+             val=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 18492), nnz=18268, density=0.10%)
+DEBUG_BATCH4 : tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG_BATCH5 : (18492, 1024)
+DEBUG_BATCH3 : SparseTensor(row=tensor([    0,     0,     0,  ..., 18937, 18937, 18937]),
+             col=tensor([  1031,   1044,  18938,  ..., 227969, 227970, 227971]),
+             val=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(18938, 227972), nnz=266948, density=0.01%)
+DEBUG_BATCH4 : tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG_BATCH5 : (227972, 18938)
+DEBUG_BATCH3 : SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 18935, 18936, 18937]),
+             val=tensor([0, 2, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 18938), nnz=18740, density=0.10%)
+DEBUG_BATCH4 : tensor([0, 2, 0,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG_BATCH5 : (18938, 1024)
+DEBUG3 : torch.Size([271080])
+DEBUG3.5 : 3
+DEBUG4 : tensor([False, False, False,  ...,  True,  True,  True])
+DEBUG5 : SparseTensor(row=tensor([ 1024,  1024,  1024,  ..., 19161, 19161, 19161]),
+             col=tensor([     0,  21856,  21857,  ..., 229211, 229212, 229213]),
+             val=tensor([1, 1, 1,  ..., 1, 1, 1], dtype=torch.int8),
+             size=(19162, 229214), nnz=33676, density=0.00%)
+DEBUG NS - batch_size : 1024
+DEBUG NS - adj_t : SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19226, 19227, 19228]),
+             val=tensor([2, 2, 2,  ..., 2, 2, 2], dtype=torch.int8),
+             size=(1024, 19229), nnz=18837, density=0.10%)
+DEBUG NS - n_id.shape : torch.Size([19229])
+DEBUG NS - e_id : tensor([2, 2, 2,  ..., 2, 2, 2], dtype=torch.int8)
+DEBUG NS - size : (19229, 1024)
+DEBUG NS - adj_t : SparseTensor(row=tensor([    0,     0,     0,  ..., 19228, 19228, 19228]),
+             col=tensor([  1024,   1025,   1026,  ..., 232096, 232097, 232098]),
+             val=tensor([2, 2, 2,  ..., 1, 1, 1], dtype=torch.int8),
+             size=(19229, 232099), nnz=271588, density=0.01%)
+DEBUG NS - n_id.shape : torch.Size([232099])
+DEBUG NS - e_id : tensor([2, 2, 2,  ..., 1, 1, 1], dtype=torch.int8)
+DEBUG NS - size : (232099, 19229)
+DEBUG_BATCH1 : tensor([  3422866,   3422868,   3422901,  ...,  40475965,  36283545,
+        109920595])
+DEBUG_BATCH2 : torch.Size([232099])
+DEBUG_BATCH2.5 : [Adj(adj_t=SparseTensor(row=tensor([    0,     0,     0,  ..., 19228, 19228, 19228]),
+             col=tensor([  1024,   1025,   1026,  ..., 232096, 232097, 232098]),
+             val=tensor([2, 2, 2,  ..., 1, 1, 1], dtype=torch.int8),
+             size=(19229, 232099), nnz=271588, density=0.01%), e_id=tensor([2, 2, 2,  ..., 1, 1, 1], dtype=torch.int8), size=(232099, 19229)), Adj(adj_t=SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19226, 19227, 19228]),
+             val=tensor([2, 2, 2,  ..., 2, 2, 2], dtype=torch.int8),
+             size=(1024, 19229), nnz=18837, density=0.10%), e_id=tensor([2, 2, 2,  ..., 2, 2, 2], dtype=torch.int8), size=(19229, 1024))]
+DEBUG3 : torch.Size([271080])
+DEBUG3.5 : 3
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([    0,     0,     0,  ..., 19144, 19146, 19156]),
+             col=tensor([  1042,   9481,  19163,  ..., 228991, 229016, 229145]),
+             val=tensor([2, 2, 2,  ..., 2, 2, 2], dtype=torch.int8),
+             size=(19162, 229214), nnz=15413, density=0.00%)
+DEBUG3 : torch.Size([271080])
+DEBUG3.5 : 3
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([ 1024,  1042,  1042,  ..., 19158, 19158, 19160]),
+             col=tensor([ 21855,  21855,  22105,  ...,  30778,  42067, 129792]),
+             val=tensor([3, 3, 3,  ..., 3, 3, 3], dtype=torch.int8),
+             size=(19162, 229214), nnz=2222, density=0.00%)
+DEBUG_BATCH3 : SparseTensor(row=tensor([    0,     0,     0,  ..., 19228, 19228, 19228]),
+             col=tensor([  1024,   1025,   1026,  ..., 232096, 232097, 232098]),
+             val=tensor([2, 2, 2,  ..., 1, 1, 1], dtype=torch.int8),
+             size=(19229, 232099), nnz=271588, density=0.01%)
+DEBUG_BATCH4 : tensor([2, 2, 2,  ..., 1, 1, 1], dtype=torch.int8)
+DEBUG_BATCH5 : (232099, 19229)
+DEBUG_BATCH3 : SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19226, 19227, 19228]),
+             val=tensor([2, 2, 2,  ..., 2, 2, 2], dtype=torch.int8),
+             size=(1024, 19229), nnz=18837, density=0.10%)
+DEBUG_BATCH4 : tensor([2, 2, 2,  ..., 2, 2, 2], dtype=torch.int8)
+DEBUG_BATCH5 : (19229, 1024)
+DEBUG3 : torch.Size([271080])
+DEBUG3.5 : 3
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([], dtype=torch.int64),
+             col=tensor([], dtype=torch.int64),
+             val=tensor([], dtype=torch.int8),
+             size=(19162, 229214), nnz=0, density=0.00%)
+DEBUG1 : 1
+DEBUG2 : 1024
+DEBUG2.5 : torch.Size([1024, 1024])
+DEBUG3 : torch.Size([18925])
+DEBUG3.5 : 2
+DEBUG4 : tensor([False,  True,  True,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([   0,    0,    0,  ..., 1021, 1021, 1022]),
+             col=tensor([ 1025,  1026,  1027,  ..., 19148, 19149, 19156]),
+             val=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 19162), nnz=15870, density=0.08%)
+DEBUG3 : torch.Size([18925])
+DEBUG3.5 : 2
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([], dtype=torch.int64),
+             col=tensor([], dtype=torch.int64),
+             val=tensor([], dtype=torch.int8),
+             size=(1024, 19162), nnz=0, density=0.00%)
+DEBUG3 : torch.Size([18925])
+DEBUG3.5 : 2
+DEBUG4 : tensor([ True, False, False,  ...,  True,  True,  True])
+DEBUG5 : SparseTensor(row=tensor([   0,    0,    1,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1042,  1049,  ..., 19159, 19160, 19161]),
+             val=tensor([2, 2, 2,  ..., 2, 2, 2], dtype=torch.int8),
+             size=(1024, 19162), nnz=3055, density=0.02%)
+DEBUG3 : torch.Size([18925])
+DEBUG3.5 : 2
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([], dtype=torch.int64),
+             col=tensor([], dtype=torch.int64),
+             val=tensor([], dtype=torch.int8),
+             size=(1024, 19162), nnz=0, density=0.00%)
+DEBUG3 : torch.Size([18925])
+DEBUG3.5 : 2
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([], dtype=torch.int64),
+             col=tensor([], dtype=torch.int64),
+             val=tensor([], dtype=torch.int8),
+             size=(1024, 19162), nnz=0, density=0.00%)
+val_acc : 0.0078125 | time : 1844.6384449005127 | batch : 0/135
+DEBUG NS - batch_size : 1024
+DEBUG NS - adj_t : SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19159, 19160, 19161]),
+             val=tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 19162), nnz=18900, density=0.10%)
+DEBUG NS - n_id.shape : torch.Size([19162])
+DEBUG NS - e_id : tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG NS - size : (19162, 1024)
+DEBUG0 : torch.Size([233466, 921])
+DEBUG1 : 0
+DEBUG2 : 19357
+DEBUG2.5 : torch.Size([19357, 921])
+DEBUG3 : torch.Size([274622])
+DEBUG3.5 : 3
+DEBUG4 : tensor([False, False,  True,  ...,  True,  True,  True])
+DEBUG5 : SparseTensor(row=tensor([    1,     1,     1,  ..., 19356, 19356, 19356]),
+             col=tensor([  1026,   1027,   1028,  ..., 233463, 233464, 233465]),
+             val=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(19357, 233466), nnz=226305, density=0.01%)
+DEBUG NS - adj_t : SparseTensor(row=tensor([    0,     0,     0,  ..., 19161, 19161, 19161]),
+             col=tensor([  1024,   1025,   1026,  ..., 229249, 229250, 229251]),
+             val=tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(19162, 229252), nnz=270647, density=0.01%)
+DEBUG NS - n_id.shape : torch.Size([229252])
+DEBUG NS - e_id : tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG NS - size : (229252, 19162)
+DEBUG_BATCH1 : tensor([  4393482,   4393515,   4393522,  ..., 103366339,  37986977,
+        100538296])
+DEBUG_BATCH2 : torch.Size([229252])
+DEBUG_BATCH2.5 : [Adj(adj_t=SparseTensor(row=tensor([    0,     0,     0,  ..., 19161, 19161, 19161]),
+             col=tensor([  1024,   1025,   1026,  ..., 229249, 229250, 229251]),
+             val=tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(19162, 229252), nnz=270647, density=0.01%), e_id=tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8), size=(229252, 19162)), Adj(adj_t=SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19159, 19160, 19161]),
+             val=tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 19162), nnz=18900, density=0.10%), e_id=tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8), size=(19162, 1024))]
+DEBUG3 : torch.Size([274622])
+DEBUG3.5 : 3
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([ 1024,  1024,  1025,  ..., 19355, 19355, 19355]),
+             col=tensor([     0,  22308,      1,  ..., 233458, 233459, 233460]),
+             val=tensor([1, 1, 1,  ..., 1, 1, 1], dtype=torch.int8),
+             size=(19357, 233466), nnz=31599, density=0.00%)
+DEBUG_BATCH3 : SparseTensor(row=tensor([    0,     0,     0,  ..., 19161, 19161, 19161]),
+             col=tensor([  1024,   1025,   1026,  ..., 229249, 229250, 229251]),
+             val=tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(19162, 229252), nnz=270647, density=0.01%)
+DEBUG_BATCH4 : tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG_BATCH5 : (229252, 19162)
+DEBUG_BATCH3 : SparseTensor(row=tensor([   0,    0,    0,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1024,  1025,  1026,  ..., 19159, 19160, 19161]),
+             val=tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 19162), nnz=18900, density=0.10%)
+DEBUG_BATCH4 : tensor([2, 2, 2,  ..., 0, 0, 0], dtype=torch.int8)
+DEBUG_BATCH5 : (19162, 1024)
+DEBUG3 : torch.Size([274622])
+DEBUG3.5 : 3
+DEBUG4 : tensor([ True,  True, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([    0,     1,     2,  ..., 19353, 19353, 19356]),
+             col=tensor([  1024,   1025,   1040,  ..., 233440, 233442, 233461]),
+             val=tensor([2, 2, 2,  ..., 2, 2, 2], dtype=torch.int8),
+             size=(19357, 233466), nnz=14700, density=0.00%)
+DEBUG3 : torch.Size([274622])
+DEBUG3.5 : 3
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([ 1045,  1045,  1049,  ..., 19320, 19322, 19324]),
+             col=tensor([ 22516,  22517,  22566,  ..., 179033,  70914,  55695]),
+             val=tensor([3, 3, 3,  ..., 3, 3, 3], dtype=torch.int8),
+             size=(19357, 233466), nnz=2018, density=0.00%)
+DEBUG3 : torch.Size([274622])
+DEBUG3.5 : 3
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([], dtype=torch.int64),
+             col=tensor([], dtype=torch.int64),
+             val=tensor([], dtype=torch.int8),
+             size=(19357, 233466), nnz=0, density=0.00%)
+DEBUG1 : 1
+DEBUG2 : 1024
+DEBUG2.5 : torch.Size([1024, 1024])
+DEBUG3 : torch.Size([19189])
+DEBUG3.5 : 2
+DEBUG4 : tensor([False, False,  True,  ...,  True, False,  True])
+DEBUG5 : SparseTensor(row=tensor([   1,    1,    1,  ..., 1023, 1023, 1023]),
+             col=tensor([ 1026,  1027,  1028,  ..., 19353, 19354, 19356]),
+             val=tensor([0, 0, 0,  ..., 0, 0, 0], dtype=torch.int8),
+             size=(1024, 19357), nnz=16344, density=0.08%)
+DEBUG3 : torch.Size([19189])
+DEBUG3.5 : 2
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([], dtype=torch.int64),
+             col=tensor([], dtype=torch.int64),
+             val=tensor([], dtype=torch.int8),
+             size=(1024, 19357), nnz=0, density=0.00%)
+DEBUG3 : torch.Size([19189])
+DEBUG3.5 : 2
+DEBUG4 : tensor([ True,  True, False,  ..., False,  True, False])
+DEBUG5 : SparseTensor(row=tensor([   0,    1,    2,  ..., 1021, 1022, 1023]),
+             col=tensor([ 1024,  1025,  1040,  ..., 19323, 19324, 19355]),
+             val=tensor([2, 2, 2,  ..., 2, 2, 2], dtype=torch.int8),
+             size=(1024, 19357), nnz=2845, density=0.01%)
+DEBUG3 : torch.Size([19189])
+DEBUG3.5 : 2
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([], dtype=torch.int64),
+             col=tensor([], dtype=torch.int64),
+             val=tensor([], dtype=torch.int8),
+             size=(1024, 19357), nnz=0, density=0.00%)
+DEBUG3 : torch.Size([19189])
+DEBUG3.5 : 2
+DEBUG4 : tensor([False, False, False,  ..., False, False, False])
+DEBUG5 : SparseTensor(row=tensor([], dtype=torch.int64),
+             col=tensor([], dtype=torch.int64),
+             val=tensor([], dtype=torch.int8),
+             size=(1024, 19357), nnz=0, density=0.00%)
