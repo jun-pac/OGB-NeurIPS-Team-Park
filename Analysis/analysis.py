@@ -53,7 +53,7 @@ print(f"2nd class is {int(tuple_list[-2][1])} : {int(tuple_list[-2][0])}")
 print(f"3rd class is {int(tuple_list[-3][1])} : {int(tuple_list[-3][0])}")
 print("...")
 print(f"Minimum class is {int(tuple_list[zero_cnt][1])} : {int(tuple_list[zero_cnt][0])}")
-plt.scatter(unique, counts)
+plt.plot(unique, counts, 'o', markersize=2)
 plt.savefig("Train_label_dist.png")
 plt.clf()
 print()
@@ -76,7 +76,7 @@ print(f"2nd class is {int(tuple_list[-2][1])} : {int(tuple_list[-2][0])}")
 print(f"3rd class is {int(tuple_list[-3][1])} : {int(tuple_list[-3][0])}")
 print("...")
 print(f"Minimum class is {int(tuple_list[zero_cnt][1])} : {int(tuple_list[zero_cnt][0])}")
-plt.scatter(unique, counts)
+plt.plot(unique, counts, 'o', markersize=2)
 plt.savefig("Valid_label_dist.png")
 plt.clf()
 print()
@@ -87,12 +87,14 @@ print()
 t0=time.time()
 print("Loading symmetric datas...")
 Adj=torch.load('/fs/ess/PAS1289/mag240m_kddcup2021/paper_to_paper_symmetric.pt').coo()
-row,col,_=Adj
+row,col,val=Adj
 print(f"Row, col's length : {row.shape[0]}")
 print(f"Done! {time.time()-t0}s")
 print()
 # You can actually sort whole array with code such as #row=row[:,np.argsort(row)] #col=col[:,np.argsort(row)] 
 # But that's unnecessary for now
+
+degree=np.zeros(dataset.num_papers)
 
 print("Total degree distribution")
 unique, counts = np.unique(row, return_counts=True)
@@ -101,6 +103,9 @@ print(f"Num_valid : {len(unique)}")
 tuple_list=[]
 for i in range(len(unique)):
     tuple_list.append((counts[i],unique[i]))
+    degree[unique[i]]=counts[i]
+np.save("paper_degree",degree)
+'''
 tuple_list.sort()
 counts.sort()
 plt.plot(counts[::-100],'ro',markersize=2)
@@ -193,6 +198,9 @@ print("...")
 print(f"Minimum degree is {int(tuple_list[0][1])} : {int(tuple_list[0][0])}")
 print(f"Done! {time.time()-t0}s")
 #print("=======================================")
+'''
+
+
 
 '''
 Loading done! : 0.13680410385131836s

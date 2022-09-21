@@ -75,6 +75,7 @@ y_preds = np.argmax(summed_activation, axis=1)
 y_pred = y_preds.astype(np.short)
 dir_path=f'results/rgat_label_ensemble'
 filename = osp.join(dir_path, 'y_pred_mag240m')
+np.save("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/ensemble_result",y_preds)
 np.savez_compressed(filename, y_pred=y_pred)
 total_acc=calculate_val_acc(y_preds)
 print(f'Total validation accuracy : {total_acc}')
