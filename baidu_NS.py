@@ -1,3 +1,6 @@
+# Experiment needed : --batch_size (as we don't use GPU), --label_disturb_p, sample_size
+# For sample_size : just follow 
+
 import argparse
 import glob
 import os
@@ -14,15 +17,13 @@ from pytorch_lightning import (LightningDataModule, LightningModule, Trainer,
                                seed_everything)
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.metrics import Accuracy
-#from torchmetrics.functional import accuracy as Accuracy
 from torch import Tensor
 from torch.nn import BatchNorm1d, Dropout, Linear, ModuleList, ReLU, Sequential
 from torch.optim.lr_scheduler import StepLR
-from torch_geometric.data import NeighborSampler
 from torch_geometric.nn import GATConv, SAGEConv
 from torch_sparse import SparseTensor
 from tqdm import tqdm
-
+from sampler.china_NS import NeighborSampler
 # Must be always in_memory setup
 
 ROOT='/fs/ess/PAS1289'
@@ -73,17 +74,15 @@ def save_col_slice(fl, x_src, x_dst, start_row_idx, end_row_idx, start_col_idx,
         x_dst[offset + i:offset + j, start_col_idx:end_col_idx] = x_src[i:j]
 
 
-
 class MAG240M(LightningDataModule):
     def __init__(self, data_dir: str, batch_size: int, sizes: List[int],
-                 in_memory: bool = False, N_source: int=600000, sample_dir:str=None):
+                 in_memory: bool = False, label_disturb_p: float = 0):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.sizes = sizes
         self.in_memory = in_memory
-        self.N_source=N_source
-        self.sample_dir=sample_dir
+        self.label_disturb_p=label_disturb_p
 
     @property
     def num_features(self) -> int:
@@ -104,18 +103,13 @@ class MAG240M(LightningDataModule):
         if not osp.exists(path):  # Will take approximately 5 minutes...
             t = time.perf_counter()
             print('Converting adjacency matrix...', end=' ', flush=True)
-            print("f1")
             edge_index = dataset.edge_index('paper', 'cites', 'paper')
-            print("f2")
             edge_index = torch.from_numpy(edge_index)
-            print("f3")
             adj_t = SparseTensor(
                 row=edge_index[0], col=edge_index[1],
                 sparse_sizes=(dataset.num_papers, dataset.num_papers),
                 is_sorted=True)
-            print("f4")
             torch.save(adj_t.to_symmetric(), path)
-            print("f5")
             print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
         path = f'{dataset.dir}/full_adj_t.pt'
@@ -161,8 +155,7 @@ class MAG240M(LightningDataModule):
             edge_type = torch.cat(edge_types, dim=0)[perm]
             del edge_types
 
-            full_adj_t = SparseTensor(row=row, col=col, value=edge_type,
-                                      sparse_sizes=(N, N), is_sorted=True)
+            full_adj_t = SparseTensor(row=row, col=col, value=edge_type, sparse_sizes=(N, N), is_sorted=True)
 
             torch.save(full_adj_t, path)
             print(f'Done! [{time.perf_counter() - t:.2f}s]')
@@ -205,16 +198,12 @@ class MAG240M(LightningDataModule):
                     fl.flush()
                 j = min(i + node_chunk_size, dataset.num_papers)
                 x[i:j] = paper_feat[i:j]
-            print("h1")
             edge_index = dataset.edge_index('author', 'writes', 'paper')
-            print("h2")
             row, col = torch.from_numpy(edge_index)
-            print("h3")
             adj_t = SparseTensor(
                 row=row, col=col,
                 sparse_sizes=(dataset.num_authors, dataset.num_papers),
                 is_sorted=True)
-            print("h4")
             # Processing 64-dim subfeatures at a time for memory efficiency.
             print('Generating author features...')
             fl.write('Generating author features...')
@@ -238,7 +227,6 @@ class MAG240M(LightningDataModule):
                     end_row_idx=dataset.num_papers + dataset.num_authors,
                     start_col_idx=i, end_col_idx=j)
                 del outputs
-            print("h5")
             edge_index = dataset.edge_index('author', 'institution')
             row, col = torch.from_numpy(edge_index)
             adj_t = SparseTensor(
@@ -270,7 +258,6 @@ class MAG240M(LightningDataModule):
                     start_row_idx=dataset.num_papers + dataset.num_authors,
                     end_row_idx=N, start_col_idx=i, end_col_idx=j)
                 del outputs
-            print("h6")
             x.flush()
             del x
             print(f'Done! [{time.perf_counter() - t:.2f}s]')
@@ -285,26 +272,9 @@ class MAG240M(LightningDataModule):
         print('Reading dataset...', end=' ', flush=True)
         dataset = MAG240MDataset(self.data_dir)
 
-        train_idx=dataset.get_idx_split('train')
-        if self.sample_dir == None:
-            # Generate sampled idx
-            source_sample_idx=np.random.randint(0,train_idx.shape[0],self.N_source)
-            source_sample=train_idx[source_sample_idx]
-            target_sample=np.setdiff1d(train_idx,source_sample)
-            # Save this for reconstruction
-            np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/Sample_idx/{args.model}_label_{seed}',np.array([source_sample,target_sample]))
-        else:
-            sample_idx=np.load(self.sample_dir,allow_pickle=True)
-            source_sample=sample_idx[0]
-            target_sample=sample_idx[1]
-            self.N_source=source_sample.shape[0]
-            print("Load sample_idx :",source_sample.shape)
-
-        self.train_source_idx = source_sample
-        self.train_source_label=dataset.paper_label[self.train_source_idx]
-
-        self.train_target_idx = torch.from_numpy(target_sample)
-        self.train_target_idx.share_memory_()
+        self.train_idx = torch.from_numpy(dataset.get_idx_split('train'))
+        self.train_idx.share_memory_()
+        self.train_label=dataset.paper_label[self.train_idx]
         self.val_idx = torch.from_numpy(dataset.get_idx_split('valid'))
         self.val_idx.share_memory_()
         self.test_idx = torch.from_numpy(dataset.get_idx_split('test-dev'))
@@ -315,88 +285,83 @@ class MAG240M(LightningDataModule):
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
                       mode='r', shape=(N, self.num_features))
 
-        # Add train_source's input label.
-        self.x = np.empty((N, self.num_features), dtype=np.float16)
-        self.x[:] = x
-        self.x = torch.from_numpy(self.x).share_memory_()
-        one_hot_encoding = np.eye(153)[[int(x) for x in self.train_source_label]].astype(np.float16)
-        self.one_hot_dict={}
-        for i in range(len(self.train_source_idx)):
-            self.one_hot_dict[self.train_source_idx[i]]=one_hot_encoding[i]
-        
-        '''
-        # Use this instead when dimension reduction completed.
-        append_feat = np.zeros((N, 153)).astype(np.float16)
-        append_feat[self.train_source_idx]=one_hot_encoding
-        self.x=np.concatenate((self.x, append_feat), axis=1)
-        self.x = torch.from_numpy(self.x).share_memory_()
-        '''
+        if self.in_memory:
+            self.x = np.empty((N, self.num_features), dtype=np.float16)
+            self.x[:] = x
+            self.x = torch.from_numpy(self.x).share_memory_()
+        else:
+            self.x = x
 
         self.y = torch.from_numpy(dataset.all_paper_label)
 
+        #path = f'{dataset.dir}/full_adj_t.pt'
         path='/fs/ess/PAS1289/mag240m_kddcup2021/full_adj_t.pt'
         self.adj_t = torch.load(path)
+        one_hot_encoding = np.eye(153)[[int(x) for x in self.train_label]].astype(np.float16)
+        self.one_hot_dict={}
+        for i in range(len(self.train_idx)):
+            self.one_hot_dict[self.train_idx[i]]=one_hot_encoding[i]
+
+        self.relation_ptr=np.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/relation_ptr.npy") 
+        # Implement this. # I think we should use another file.
+        # Ww have to build self.relation_ptr : Tensor(3*N+1,)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
 
     def train_dataloader(self):
         print("call_train_dataloader")
-        return NeighborSampler(self.adj_t, node_idx=self.train_target_idx,
+        return NeighborSampler(self.adj_t, node_idx=self.train_idx,
                                sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch,
+                               transform=self.convert_batch_train,
                                batch_size=self.batch_size, shuffle=True,
-                               num_workers=4)
+                               num_workers=4, relation_ptr=self.relation_ptr)
 
     def val_dataloader(self):
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
                                sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=2)
+                               transform=self.convert_batch_test,
+                               batch_size=self.batch_size, num_workers=2, relation_ptr=self.relation_ptr)
 
     def test_dataloader(self):  # Node_idx=self.val_idx??
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
                                sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=2)
+                               transform=self.convert_batch_test,
+                               batch_size=self.batch_size, num_workers=2, relation_ptr=self.relation_ptr)
 
     def hidden_test_dataloader(self): # This is test-dev. Not test-challenge
         return NeighborSampler(self.adj_t, node_idx=self.test_idx,
                                sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=3)
+                               transform=self.convert_batch_test,
+                               batch_size=self.batch_size, num_workers=3, relation_ptr=self.relation_ptr)
 
-    def convert_batch(self, batch_size, n_id, adjs):
-        # self.in_memory always True
-        #print("Convert_batch :",n_id.shape)
-        #print("Type n_id :",type(n_id))
-        #f_log.write("Convert_batch : "+str(n_id.shape)+"\n")
-        #f_log.write("Type n_id : "+str(type(n_id))+"\n")
-        #start_t=time.time()
-        print(f"DEBUG_BATCH1 : {n_id}")
-        print(f"DEBUG_BATCH2 : {n_id.shape}")
-        print(f"DEBUG_BATCH2.5 : {adjs}")
-
+    def convert_batch_train(self, batch_size, n_id, adjs, initial_batch):
         x = self.x[n_id]
-        for adj_t, a, b in adjs:
-            print(f"DEBUG_BATCH3 : {adj_t}")
-            print(f"DEBUG_BATCH4 : {a}")
-            print(f"DEBUG_BATCH5 : {b}")
-        # append feature
-        # Delete following segment if dim compression success.
         append_feat = np.zeros((len(n_id), 153),dtype=np.float16)
         for i in range(len(n_id)):
-            if n_id[i] in self.one_hot_dict:
+            if (n_id[i] in self.one_hot_dict) and (n_id[i] not in initial_batch):
+                append_feat[i]=self.one_hot_dict[n_id[i]]
+                # Random perturb.
+                if(torch.rand(1)<self.label_disturb_p):
+                    # Should be same label distribution
+                    append_feat[i]=self.one_hot_dict[n_id[int(torch.rand(1)*len(n_id))]] 
+
+        x=torch.from_numpy(np.concatenate((x, append_feat), axis=1)).to(torch.float)
+                
+        y = self.y[n_id[:batch_size]].to(torch.long)
+        return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
+
+    def convert_batch_test(self, batch_size, n_id, adjs, initial_batch):
+        #t0=time.time()
+        x = self.x[n_id]
+        append_feat = np.zeros((len(n_id), 153),dtype=np.float16)
+        for i in range(len(n_id)):
+            if (n_id[i] in self.one_hot_dict) and (n_id[i] not in initial_batch):
                 append_feat[i]=self.one_hot_dict[n_id[i]]
         x=torch.from_numpy(np.concatenate((x, append_feat), axis=1)).to(torch.float)
                 
         y = self.y[n_id[:batch_size]].to(torch.long)
-        #print("X shape :",x.shape)
-        #print("Convert batch time : "+str(time.time()-start_t))
-        #f_log.write("X shape : "+str(x.shape)+"\n")
-        #f_log.write("Convert batch time : "+str(time.time()-start_t)+"\n")
-        #f_log.flush()
+        #print(f"CONVERT TEST TIME : {time.time()-t0}")
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
-
-
 
 class RGNN(LightningModule):
     def __init__(self, model: str, in_channels: int, out_channels: int,
@@ -472,30 +437,14 @@ class RGNN(LightningModule):
         self.batch_idx=0
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
-        #time0=time.time()
-        print(f"DEBUG0 : {x.shape}") # x is tensor
         for i, adj_t in enumerate(adjs_t):
-            # adj_t may contain specific layer's sampled neighbors [Sparse tensor]
-            # So adjs_t is num_layers*[N*N sparse tensors]
-            # But how to differenciate between different relations?
-            # adj_t has masked_select method to automatically select different relations.
-            # x is activation tensor
-            print(f"DEBUG1 : {i}") # 0 1
-            print(f"DEBUG2 : {adj_t.size(0)}") # 1**** value or 1024
             x_target = x[:adj_t.size(0)]
-            
-            print(f"DEBUG2.5 : {x_target.shape}") # feature tensor
-
             out = self.skips[i](x_target)
             # out tensor is initialized as skip connection of prev. layer(Just Linear layer)
             # And activations added calculated from different relations.
             for j in range(self.num_relations):
-                print(f"DEBUG3 : {adj_t.storage.value().shape}") # integer tensor
-                print(f"DEBUG3.5 : {torch.max(adj_t.storage.value())}") # 3 or 2. is it possible?
                 edge_type = adj_t.storage.value() == j
-                print(f"DEBUG4 : {edge_type}") # boolean tensor
                 subadj_t = adj_t.masked_select_nnz(edge_type, layout='coo')
-                print(f"DEBUG5 : {subadj_t}") # (1024)*(19***) or (19***)*(20****) size sparse tensor with specific relation
                 subadj_t = subadj_t.set_value(None, layout=None)
                 if subadj_t.nnz() > 0:
                     out += self.convs[i][j]((x, x_target), subadj_t)
@@ -503,10 +452,6 @@ class RGNN(LightningModule):
             x = self.norms[i](out)
             x = F.elu(x) if self.model == 'rgat' else F.relu(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
-        '''print("FORWARD TIME : "+str(time.time()-time0))
-        f_log.write("FORWARD TIME : "+str(time.time()-time0))
-        f_log.write('\n')
-        f_log.flush()'''
         return self.mlp(x)
 
     def training_step(self, batch, batch_idx: int):
@@ -532,10 +477,6 @@ class RGNN(LightningModule):
         self.val_acc_sum+=batch.x.shape[0]*tmp_acc
         self.val_cnt+=batch.x.shape[0]
         self.val_res.append(y_hat.softmax(dim=-1).cpu().numpy())
-
-        # For debug,
-        if batch_idx>=1:
-            exit()
 
         #self.log('val_acc', self.val_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         self.batch_idx=batch_idx
@@ -576,7 +517,7 @@ class RGNN(LightningModule):
         if self.batch_idx>=100 and self.val_acc_sum/self.val_cnt>self.max_val_acc:
             self.max_val_acc=self.val_acc_sum/self.val_cnt
             self.val_res=np.concatenate(self.val_res)
-            np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/{args.model}_label_{seed}',self.val_res)
+            np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/baidu-NS_p={args.label_disturb_p}_batch={args.batch_size}',self.val_res)
             print("Succesfully saved!")
             f_log.write("Succesfully saved!\n")
         f_log.flush()
@@ -608,61 +549,41 @@ class RGNN(LightningModule):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--hidden_channels', type=int, default=1024)
-    parser.add_argument('--batch_size', type=int, default=1024)
+    parser.add_argument('--batch_size', type=int, default=512)
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=50)
     parser.add_argument('--model', type=str, default='rgat',
                         choices=['rgat', 'rgraphsage'])
-    parser.add_argument('--sizes', type=str, default='25-15')
+    parser.add_argument('--sizes', type=str, default='40-20')
     parser.add_argument('--in-memory', default=True) # Always have to be true in this code.
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--evaluate', action='store_true')
     parser.add_argument('--ckpt', type=str, default=None)
-    parser.add_argument('--seed', type=int, default=None)
-    parser.add_argument('--N_source', type=int, default=600000)
-    parser.add_argument('--sample_dir', type=str, default=None)
+    parser.add_argument('--ver', type=int, default=0) # Used in ensemble step.
+    parser.add_argument('--label_disturb_p', type=float, default=0.0)
     # Must specify seed everytime.
     # Batchsize, N_source need to be precisely selected, but don't change it for now.
-    # python OGB-NeurIPS-Team-Park/RGAT_label.py --seed=1 
 
-    '''
-    Continue training
-    Validation accuracy for 0th model: 0.6755500219504998
-    Validation accuracy for 1th model: 0.6740314791758127
-    Validation accuracy for 2th model: 0.6753485091652333
-    Validation accuracy for 3th model: 0.6729015682012824
-    Validation accuracy for 4th model: 0.6651073415425803
-    Validation accuracy for 5th model: 0.6787526358592001
-    Validation accuracy for 6th model: 0.6828332697608475
-    Validation accuracy for 7th model: 0.6415447394367718
-    Validation accuracy for ensembled model: 0.6894256165931385
-    Should input seed as well because file identifier includes seed number
-    '''
-    # python OGB-NeurIPS-Team-Park/RGAT_label.py --seed=4 --ckpt=logs/rgat_label_4/lightning_logs/version_12935274/checkpoints/epoch=9-step=6339.ckpt --sample_dir=OGB-NeurIPS-Team-Park/Sample_idx/rgat_label_4.npy
-    # python OGB-NeurIPS-Team-Park/RGAT_label.py --seed=3 --ckpt=logs/rgat_label_3/lightning_logs/version_12935160/checkpoints/epoch=14-step=9509.ckpt --sample_dir=OGB-NeurIPS-Team-Park/Sample_idx/rgat_label_3.npy
+    # python OGB-NeurIPS-Team-Park/baidu_NS.py --label_disturb_p=0.1 --batch_size=512
+    # python OGB-NeurIPS-Team-Park/baidu_NS.py --label_disturb_p=0.2 --batch_size=512
+    # python OGB-NeurIPS-Team-Park/baidu_NS.py --label_disturb_p=0.0 --batch_size=512
+    # python OGB-NeurIPS-Team-Park/baidu_NS.py --label_disturb_p=0.1 --batch_size=256
+    # python OGB-NeurIPS-Team-Park/baidu_NS.py --label_disturb_p=0.1 --batch_size=1024
+    # python OGB-NeurIPS-Team-Park/baidu_NS.py --label_disturb_p=0.0 --batch_size=1024
+
 
     t0=time.time()
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
-    
-
-    # Use multicore
-    #torch.set_num_threads(8)
-    #torch.set_num_interop_threads(8)
 
 
-    # Seeding is important here.
-    if args.seed==None:
-        seed=int(time.time())%100
-    else:
-        seed=args.seed
-    seed_everything(seed)
+    seed_everything(42)
 
 
     # Initialize log directory
     NROOT='/fs/scratch/PAS1289/data' # log file's root.
-    path_log = NROOT+f'/{args.model}_label_{seed}.txt'
+    path_log = NROOT+f'/baidu-NS_p={args.label_disturb_p}_batch={args.batch_size}.txt'
     f_log=open(path_log,'a')
     if args.ckpt!=None:
         f_log.write(f"Continue from...{args.ckpt}\n")
@@ -670,10 +591,7 @@ if __name__ == '__main__':
 
 
     # Dataloader
-    if args.sample_dir == None:
-        datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.in_memory, N_source=args.N_source)
-    else:
-        datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.in_memory, sample_dir=args.sample_dir)
+    datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.in_memory, args.label_disturb_p)
 
 
     # Training
@@ -695,7 +613,7 @@ if __name__ == '__main__':
         # About 1000s... (Without data copying, which consume 2400s)  
         trainer = Trainer(max_epochs=args.epochs,
                           callbacks=[checkpoint_callback],
-                          default_root_dir=f'logs/{args.model}_label_{seed}',
+                          default_root_dir=f'logs/baidu-NS_p={args.label_disturb_p}_batch={args.batch_size}',
                           progress_bar_refresh_rate=0) # gpus=args.device,
         
         trainer.fit(model, datamodule=datamodule)
@@ -704,15 +622,6 @@ if __name__ == '__main__':
     # Evaluate
     if args.evaluate:
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
-        '''
-        dirs = glob.glob(f'logs/{args.model}/lightning_logs/*')
-        print("dirs :",dirs)
-        version = max([int(x.split(os.sep)[-1].split('_')[-1]) for x in dirs])
-        logdir = f'logs/{args.model}/lightning_logs/version_{version}'
-        print(f'Evaluating saved model in {logdir}...')
-        ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
-        print("ckpt :",ckpt)
-        '''
         # Ignore previous code
         ckpt='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365/checkpoints/epoch=2-step=3260.ckpt'
         logdir='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365'
@@ -739,15 +648,4 @@ if __name__ == '__main__':
                 out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
                 y_preds.append(out)
         res = {'y_pred': torch.cat(y_preds, dim=0)}
-        evaluator.save_test_submission(res, f'results/{args.model}_label_{seed}',
-                                       mode='test-dev')
-# f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/{args.model}_label_{seed}'
-
-'''
-In Largemem node...
-Memory usage : 510GB
-Prepare : 1300s
-100*1024 forward : 700s
-1 epoch : 8000s (2h 20m) (With validation)
-'''
-
+        evaluator.save_test_submission(res, f'results/baidu-NS_p={args.label_disturb_p}_batch={args.batch_size}',mode='test-dev')
