@@ -21,130 +21,83 @@ from torch.optim.lr_scheduler import StepLR
 from torch_geometric.nn import GATConv, SAGEConv
 from torch_sparse import SparseTensor
 from tqdm import tqdm
-from sampler.china_NS import NeighborSampler
-# Must be always in_memory setup
+from multiprocessing import Pool, Process, Array
 
-def get_col_slice(**kw):
-    pass
-
-def save_col_slice(**kw):
-    pass
-
+t0=time.time()
 ROOT='/fs/ess/PAS1289'
-
 dataset = MAG240MDataset(ROOT)
-num_features=768
 
 N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
 nums=[dataset.num_papers, dataset.num_papers + dataset.num_authors, N]
-relation_ptr=torch.Tensor(3*N+1)
 
+print("Loading data...")
 path='/fs/ess/PAS1289/mag240m_kddcup2021/full_adj_t.pt'
 adj_t = torch.load(path)
 rowptr,col,_=adj_t.csr()
+print(f"Done! {time.time()-t0}")
 
-for i in range(rowptr):
+relation_ptr=torch.Tensor(3*N+1).to(torch.long)
+
+
+print(f"col length : {len(col)}")
+print(f"rowptr length : {len(rowptr)}")
+print(f"N : {N}")
+
+relation_ptr.share_memory_()
+relation_ptr[0]=0
+print(f"[0] : {relation_ptr[0].dtype}")
+print(f"rowptr_dtype : {rowptr[0].dtype}")
+
+def task(i):
+    row_sz=rowptr[i+1]-rowptr[i]
+    j=0
+    while (j<row_sz and col[rowptr[i]+j]<nums[0]):
+        j+=1
+    relation_ptr[3*i+1]=rowptr[i]+j
     
+    while (j<row_sz and col[rowptr[i]+j]<nums[1]):
+        j+=1
+    relation_ptr[3*i+2]=rowptr[i]+j
 
-if not osp.exists(done_flag_path):  # Will take ~3 hours...
-    t = time.perf_counter()
-    fl=open(log_path,'w')
+    relation_ptr[3*i+3]=rowptr[i+1]
+    if i%1000000==0:
+        print(f"{i}th row : {relation_ptr[3*i+1]}, {relation_ptr[3*i+2]}, {relation_ptr[3*i+3]} - time : {time.time()-t0:.2f}")
 
-    print('Generating full feature matrix...')
-    fl.write('Generating full feature matrix...')
-    fl.write('\n')
-    fl.flush()
-    node_chunk_size = 100000
-    dim_chunk_size = 64
-    N = (dataset.num_papers + dataset.num_authors +
-            dataset.num_institutions)
+num = 48
+pool = Pool(num)
+pool.map(task, range(N)) # This would take 2120s
 
-    paper_feat = dataset.paper_feat
-    x = np.memmap(path, dtype=np.float16, mode='w+',
-                    shape=(N, num_features))
+print(f"first ten relation_ptr(before save) : {relation_ptr[:10]}")
 
-    t0=time.time()
-    print('Copying paper features...','commit -m 1010 UPD')
-    fl.write('Copying paper features...')
-    fl.write('\n')
-    fl.flush()
-    for i in range(0, dataset.num_papers, node_chunk_size):
-        if ((i/node_chunk_size)%10==0):
-            print("COPY - Progress... :",i,"/",dataset.num_papers,"Consumed time :",time.time()-t0)
-            fl.write("COPY - Progress... :"+str(i)+"/"+str(dataset.num_papers)+"| Consumed time :"+str(time.time()-t0))
-            fl.write('\n')
-            fl.flush()
-        j = min(i + node_chunk_size, dataset.num_papers)
-        x[i:j] = paper_feat[i:j]
-    edge_index = dataset.edge_index('author', 'writes', 'paper')
-    row, col = torch.from_numpy(edge_index)
-    adj_t = SparseTensor(
-        row=row, col=col,
-        sparse_sizes=(dataset.num_authors, dataset.num_papers),
-        is_sorted=True)
-    # Processing 64-dim subfeatures at a time for memory efficiency.
-    print('Generating author features...')
-    fl.write('Generating author features...')
-    fl.write('\n')
-    fl.flush()
-    t0=time.time()
-    for i in range(0, num_features, dim_chunk_size):
-        print("GEN_author Progress... ",i,"/",num_features/dim_chunk_size,"Consumed time :",time.time()-t0)
-        fl.write("GEN_author Progress... "+str(i)+"/"+str(num_features/dim_chunk_size)+"| Consumed time :"+str(time.time()-t0))
-        fl.write('\n')
-        fl.flush()
-        j = min(i + dim_chunk_size, num_features)
-        inputs = get_col_slice(fl, paper_feat, start_row_idx=0,
-                                end_row_idx=dataset.num_papers,
-                                start_col_idx=i, end_col_idx=j)
-        inputs = torch.from_numpy(inputs)
-        outputs = adj_t.matmul(inputs, reduce='mean').numpy()
-        del inputs
-        save_col_slice(
-            fl, x_src=outputs, x_dst=x, start_row_idx=dataset.num_papers,
-            end_row_idx=dataset.num_papers + dataset.num_authors,
-            start_col_idx=i, end_col_idx=j)
-        del outputs
-    edge_index = dataset.edge_index('author', 'institution')
-    row, col = torch.from_numpy(edge_index)
-    adj_t = SparseTensor(
-        row=col, col=row,
-        sparse_sizes=(dataset.num_institutions, dataset.num_authors),
-        is_sorted=False)
-    
-    print('Generating institution features...')
-    fl.write('Generating institution features...')
-    fl.write('\n')
-    fl.flush()
-    t0=time.time()
-    # Processing 64-dim subfeatures at a time for memory efficiency.
-    for i in range(0, num_features, dim_chunk_size):
-        print("GEN_IN Progress... ",i,"/",num_features/dim_chunk_size,"Consumed time :",time.time()-t0)
-        fl.write("GEN_IN Progress... "+str(i)+"/"+str(num_features/dim_chunk_size)+"| Consumed time :"+str(time.time()-t0))
-        fl.write('\n')
-        fl.flush()
-        j = min(i + dim_chunk_size, num_features)
-        inputs = get_col_slice(
-            fl, x, start_row_idx=dataset.num_papers,
-            end_row_idx=dataset.num_papers + dataset.num_authors,
-            start_col_idx=i, end_col_idx=j)
-        inputs = torch.from_numpy(inputs)
-        outputs = adj_t.matmul(inputs, reduce='mean').numpy()
-        del inputs
-        save_col_slice(
-            fl, x_src=outputs, x_dst=x,
-            start_row_idx=dataset.num_papers + dataset.num_authors,
-            end_row_idx=N, start_col_idx=i, end_col_idx=j)
-        del outputs
-    x.flush()
-    del x
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-    with open(done_flag_path, 'w') as f:
-        f.write('done')
-    fl.close()
-path = f'{dataset.dir}/full_feat.npy'
+torch.save(relation_ptr, "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/relation_ptr.pt")
 
 
 
-np.save("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/relation_ptr",relation_ptr)
+print("Loading relation_ptr...")
+relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/relation_ptr.pt")
+print(f"Done! {time.time()-t0:.2f}")
+
+print(f"first ten rowptr : {rowptr[:10]}")
+print(f"first ten relation_ptr : {relation_ptr[:10]}")
+
+for i in range(100):
+    if(int(rowptr[i]) != int(relation_ptr[3*i])):
+        print(f"rowptr : {rowptr[i]}")
+        print(f"relation_ptr : {relation_ptr[3*i]}")
+        break
+    elif(int(relation_ptr[3*i+1])>int(relation_ptr[3*i+2]) or int(relation_ptr[3*i+2])>int(relation_ptr[3*i+3])):
+        print(f"Three relation ptr : {int(relation_ptr[3*i+1])}, {int(relation_ptr[3*i+2])}, {int(relation_ptr[3*i+3])}")  
+        break
+
+print(f"last element : {rowptr[-1]}, {relation_ptr[-1]}")
+
+'''
+122000000th row : 2999310912, 2999310912, 2999310920 - time : 1410.64
+123000000th row : 3036098255, 3036098255, 3036098256 - time : 1579.02
+first ten relation_ptr(before save) : tensor([0, 0, 2, 2, 4, 6, 6, 6, 8, 8])
+Loading relation_ptr...
+Done! 1990.59
+first ten rowptr : tensor([  0,   2,   6,   8,  48,  51,  53,  62,  86, 116])
+first ten relation_ptr : tensor([0, 0, 2, 2, 4, 6, 6, 6, 8, 8])
+last element : 3454471824, 3454471824
+'''

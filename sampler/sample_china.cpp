@@ -1,5 +1,9 @@
-#include "sample_cpu.h"
+#pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#include "sample_cpu.h"
 #include "utils.h"
 
 #ifdef _WIN32
@@ -43,28 +47,7 @@ sample_adj_cpu(torch::Tensor rowptr, torch::Tensor col, torch::Tensor idx,
 
   int64_t n, c, e, row_start, row_end, row_count, ppr_count, atr_count, ins_count;
 
-  if (num_neighbors < 0) { // No sampling ======================================
-
-    for (int64_t i = 0; i < idx.numel(); i++) {
-      n = idx_data[i];
-      row_start = rowptr_data[n], row_end = rowptr_data[n + 1];
-      row_count = row_end - row_start;
-
-      for (int64_t j = 0; j < row_count; j++) {
-        e = row_start + j;
-        c = col_data[e];
-
-        if (n_id_map.count(c) == 0) {
-          n_id_map[c] = n_ids.size();
-          n_ids.push_back(c);
-        }
-        cols[i].push_back(std::make_tuple(n_id_map[c], e));
-      }
-      out_rowptr_data[i + 1] = out_rowptr_data[i] + cols[i].size();
-    }
-  }
-
-  else if (replace) { // Sample with replacement ===============================
+  if (replace) { // Sample with replacement ===============================
 
     for (int64_t i = 0; i < idx.numel(); i++) {
       n = idx_data[i];
