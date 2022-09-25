@@ -327,7 +327,7 @@ class RGNN(LightningModule):
             print('train_acc : '+str(tmp_acc)+' | loss : '+str(train_loss)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(1112392//args.batch_size))
             f_log.write('train_acc : '+str(tmp_acc)+' | loss : '+str(train_loss)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(1112392//args.batch_size))
             f_log.write('\n')
-            #f_log.flush()
+            f_log.flush()
         return train_loss
 
     def validation_step(self, batch, batch_idx: int):
@@ -344,7 +344,7 @@ class RGNN(LightningModule):
             print('val_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(138949//args.batch_size))
             f_log.write('val_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(138949//args.batch_size))
             f_log.write('\n')
-            #f_log.flush()
+            f_log.flush()
 
     def test_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
