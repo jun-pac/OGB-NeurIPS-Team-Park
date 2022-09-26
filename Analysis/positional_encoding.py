@@ -31,6 +31,19 @@ train_year=dataset.paper_year[train_idx]
 valid_year=dataset.paper_year[valid_idx]
 test_year=dataset.paper_year[test_idx]
 test_challenge_year=dataset.paper_year[test_challenge_idx]
+year_m1=dataset.paper_year
+year_m=dataset.paper_year[:]
+
+t1=time.time()
+for i in range(0,100000000,10000):
+    a=dataset.paper_year[i]
+print(f"Disk random access 10000 : {time.time()-t1}")
+
+t1=time.time()
+for i in range(0,100000000,10000):
+    a=year_m1[i]
+print(f"Memory random access 10000 : {time.time()-t1}")
+print()
 
 print(f"Train          : {train_year[:10]}, Max : {max(train_year)}, Min : {min(train_year)}")
 print(f"Valid          : {valid_year[:10]}, Max : {max(valid_year)}, Min : {min(valid_year)}")
@@ -65,7 +78,42 @@ for i in range(bit):
     wave=np.arange(bit)
     wave=np.cos((wave-i)*np.pi/10)
     pos_row=torch.from_numpy(wave)
-    print(f"{i}th encoding : {pos_row}")
+    #print(f"{i}th encoding : {pos_row}")
     positional_encoding.append(pos_row)
 
-#print(-1 if _idx[0]==0 else 1)
+
+'''
+print(f"type(train_idx) : {type(train_idx)}")
+print(f"type(train_year) : {type(train_year)}")
+print(f"type(dataset.paper_year) : {type(dataset.paper_year)}")
+print(f"dataset.paper_year.shape : {dataset.paper_year.shape}")
+print(f"type(year_m) : {type(year_m)}")
+print(f"year_m[range(0,100000000,10000000)] : {year_m[range(0,100000000,10000000)]}")
+
+for i in range(10):
+    print(int(4+torch.randn(1)*4))
+
+intd=80000000+torch.randn(20, dtype=torch.float64)*10000000
+print([int(i) for i in intd])
+print(intd.to(torch.long))
+print(year_m[intd.to(torch.long)])
+print(year_m[-1])
+'''
+
+edge_index = dataset.edge_index('paper', 'cites', 'paper')
+print(f"type(edge_index) : {type(edge_index)}")
+print(f"edge_index.shape : {edge_index.shape}")
+
+row, col=edge_index
+# row's year is bigger than col's year
+# row cites col
+small_row=[]
+large_col=[]
+for i in range(20000,30000):
+    if year_m[row[i]]<year_m[col[i]]:
+        small_row.append(year_m[row[i]])
+        large_col.append(year_m[col[i]])
+for i in range(len(small_row)):
+    print(f"({small_row[i]}, {large_col[i]})", end=' ')
+print()
+

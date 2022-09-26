@@ -1,0 +1,10 @@
+val_acc : 0.001953125 | time : 1153.7151827812195 | batch : 0/135
+Validation Epoch end... Accuracy : 0.003951958572905034
+train_acc : 0.009765625 | loss : tensor(5.1615, grad_fn=<NllLossBackward>) | time : 1189.8781125545502 | batch : 0/1086
+train_acc : 0.546875 | loss : tensor(1.5774, grad_fn=<NllLossBackward>) | time : 1681.6054372787476 | batch : 100/1086
+train_acc : 0.599609375 | loss : tensor(1.3757, grad_fn=<NllLossBackward>) | time : 2161.1730575561523 | batch : 200/1086
+train_acc : 0.63671875 | loss : tensor(1.2352, grad_fn=<NllLossBackward>) | time : 2639.779955148697 | batch : 300/1086
+train_acc : 0.6533203125 | loss : tensor(1.1870, grad_fn=<NllLossBackward>) | time : 3111.2439556121826 | batch : 400/1086
+train_acc : 0.6630859375 | loss : tensor(1.1057, grad_fn=<NllLossBackward>) | time : 3592.835225343704 | batch : 500/1086
+train_acc : 0.6513671875 | loss : tensor(1.2082, grad_fn=<NllLossBackward>) | time : 4069.2120327949524 | batch : 600/1086
+train_acc : 0.658203125 | loss : tensor(1.1548, grad_fn=<NllLossBackward>) | time : 4546.620727777481 | batch : 700/1086

@@ -94,14 +94,15 @@ class MAG240M(LightningDataModule):
         
         self.y = torch.from_numpy(dataset.all_paper_label)
 
-        path='/fs/ess/PAS1289/mag240m_kddcup2021/full_adj_t.pt'
+        #path = f'{dataset.dir}/asym_adj_t.pt'
+        path='/fs/ess/PAS1289/mag240m_kddcup2021/asym_adj_t.pt'
         self.adj_t = torch.load(path)
         one_hot_encoding = np.eye(153)[[int(x) for x in self.train_label]].astype(np.float16)
         self.one_hot_dict={}
         for i in range(len(self.train_idx)):
             self.one_hot_dict[int(self.train_idx[i])]=one_hot_encoding[i]
 
-        self.relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/relation_ptr.pt")
+        self.relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/mono_relation_ptr.pt")
         self.arxiv_idx=set()
         for i in self.train_idx:
             self.arxiv_idx.add(int(i))
@@ -181,6 +182,7 @@ class MAG240M(LightningDataModule):
         y = self.y[n_id[:batch_size]].to(torch.long)
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
+
     def convert_batch_test(self, batch_size, n_id, adjs):
         #t0=time.time()
         x = self.x[n_id]
@@ -196,7 +198,6 @@ class MAG240M(LightningDataModule):
             
         x=torch.from_numpy(np.concatenate((x, append_feat, append_time), axis=1)).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
-        #print(f"CONVERT TEST n_id[0] : {n_id[0]} | In train : {(int(n_id[0]) in self.one_hot_dict)} | Year : {0 if (int(n_id[0]) not in self.arxiv_idx) else self.paper_year[int(n_id[0])]} | POS ECD : {append_time[0]}")
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
@@ -397,13 +398,10 @@ if __name__ == '__main__':
     # Must specify seed everytime.
     # Batchsize, N_source need to be precisely selected, but don't change it for now.
 
-    # DEBUG
-    # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.5 --batch_size=512
-
     # MAIN
-    # BEST # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/New-time-NS_p=0.1_batch=1024/lightning_logs/version_13009733/checkpoints/epoch=8-step=9782.ckpt
-    # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=512 --ckpt=/users/PAS1289/oiocha/logs/New-time-NS_p=0.1_batch=512/lightning_logs/version_13015175/checkpoints/epoch=10-step=23902.ckpt
-    # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=1024 --hidden_channels=2048 --ckpt=/users/PAS1289/oiocha/logs/New-time-NS_p=0.1_batch=1024_hidden=2048/lightning_logs/version_13013238/checkpoints/epoch=4-step=5434.ckpt
+    # python OGB-NeurIPS-Team-Park/monotonic_NS.py --label_disturb_p=0.1 --batch_size=1024
+    # python OGB-NeurIPS-Team-Park/monotonic_NS.py --label_disturb_p=0.1 --batch_size=512
+    # python OGB-NeurIPS-Team-Park/monotonic_NS.py --label_disturb_p=0.1 --batch_size=1024 --hidden_channels=2048
 
     t0=time.time()
     args = parser.parse_args()
@@ -417,9 +415,9 @@ if __name__ == '__main__':
 
     # Initialize log directory
     if args.hidden_channels==1024:
-        name=f'/New-time-NS_p={args.label_disturb_p}_batch={args.batch_size}'
+        name=f'/mono-NS_p={args.label_disturb_p}_batch={args.batch_size}'
     else:
-        name=f'/New-time-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
+        name=f'/mono-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
 
     NROOT='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/txtlog' # log file's root.
     path_log = NROOT+name+'.txt'

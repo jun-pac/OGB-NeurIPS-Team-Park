@@ -93,8 +93,8 @@ def python_sample(rowptr: torch.Tensor, col: torch.Tensor, idx: torch.Tensor,num
         # Of course it interact with pseudo idx.
         # I think out_rowptr is ptr of out_rowptr
     N = len(n_ids)
-    #out_n_id = torch.from_blob(n_ids.data(), {N}, col.options()).clone()
-    #out_n_id=torch.clone(torch.Tensor(n_ids).to(dtype=col.dtype))
+    # out_n_id = torch.from_blob(n_ids.data(), {N}, col.options()).clone()
+    # out_n_id=torch.clone(torch.Tensor(n_ids).to(dtype=col.dtype))
     out_n_id=torch.Tensor(N).to(dtype=torch.int64)
     for i in range(N):
         out_n_id[i]=n_ids[i]

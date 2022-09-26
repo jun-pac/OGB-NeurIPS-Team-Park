@@ -26,15 +26,68 @@ from multiprocessing import Pool, Process, Array
 t0=time.time()
 ROOT='/fs/ess/PAS1289'
 dataset = MAG240MDataset(ROOT)
+print(f"dataset.dir : {dataset.dir}")
+path ='/fs/ess/PAS1289/mag240m_kddcup2021/asym_adj_t.pt'
+
+if not osp.exists(path):  
+    t = time.perf_counter()
+    print('Merging adjacency matrices...', end=' ', flush=True)
+    edge_index = dataset.edge_index('paper', 'cites', 'paper')
+    edge_index = torch.from_numpy(edge_index)
+    row, col = edge_index
+    rows, cols = [row], [col]
+
+    edge_index = dataset.edge_index('author', 'writes', 'paper')
+    row, col = torch.from_numpy(edge_index)
+    row += dataset.num_papers
+    rows += [row, col]
+    cols += [col, row]
+
+    edge_index = dataset.edge_index('author', 'institution')
+    row, col = torch.from_numpy(edge_index)
+    row += dataset.num_papers
+    col += dataset.num_papers + dataset.num_authors
+    rows += [row, col]
+    cols += [col, row]
+
+    edge_types = [
+        torch.full(x.size(), i, dtype=torch.int8)
+        for i, x in enumerate(rows)
+    ]
+
+    row = torch.cat(rows, dim=0)
+    del rows
+    col = torch.cat(cols, dim=0)
+    del cols
+
+    N = (dataset.num_papers + dataset.num_authors +
+            dataset.num_institutions)
+
+    perm = (N * row).add_(col).numpy().argsort()
+    perm = torch.from_numpy(perm)
+    row = row[perm]
+    col = col[perm]
+
+    edge_type = torch.cat(edge_types, dim=0)[perm]
+    del edge_types
+
+    asym_adj_t = SparseTensor(row=row, col=col, value=edge_type,
+                                sparse_sizes=(N, N), is_sorted=True)
+
+    torch.save(asym_adj_t, path)
+    print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    adj_t=asym_adj_t
+
+else:
+    print("Loading data...")
+    adj_t = torch.load('/fs/ess/PAS1289/mag240m_kddcup2021/asym_adj_t.pt')
+    print(f"Done! {time.time()-t0}")
 
 N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
 nums=[dataset.num_papers, dataset.num_papers + dataset.num_authors, N]
 
-print("Loading data...")
-path='/fs/ess/PAS1289/mag240m_kddcup2021/full_adj_t.pt'
-adj_t = torch.load(path)
 rowptr,col,_=adj_t.csr()
-print(f"Done! {time.time()-t0}")
+
 
 relation_ptr=torch.Tensor(3*N+1).to(torch.long)
 
@@ -69,7 +122,7 @@ pool.map(task, range(N)) # This would take 2120s
 
 print(f"first ten relation_ptr(before save) : {relation_ptr[:10]}")
 
-torch.save(relation_ptr, "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/relation_ptr.pt")
+torch.save(relation_ptr, "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/mono_relation_ptr.pt")
 
 
 '''

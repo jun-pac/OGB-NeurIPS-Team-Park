@@ -94,14 +94,15 @@ class MAG240M(LightningDataModule):
         
         self.y = torch.from_numpy(dataset.all_paper_label)
 
-        path='/fs/ess/PAS1289/mag240m_kddcup2021/full_adj_t.pt'
+        #path = f'{dataset.dir}/asym_adj_t.pt'
+        path='/fs/ess/PAS1289/mag240m_kddcup2021/asym_adj_t.pt'
         self.adj_t = torch.load(path)
         one_hot_encoding = np.eye(153)[[int(x) for x in self.train_label]].astype(np.float16)
         self.one_hot_dict={}
         for i in range(len(self.train_idx)):
             self.one_hot_dict[int(self.train_idx[i])]=one_hot_encoding[i]
 
-        self.relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/relation_ptr.pt")
+        self.relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/mono_relation_ptr.pt")
         self.arxiv_idx=set()
         for i in self.train_idx:
             self.arxiv_idx.add(int(i))
@@ -114,7 +115,7 @@ class MAG240M(LightningDataModule):
 
         # Build positional encoding
         self.num_papers=dataset.num_papers
-        self.paper_year=dataset.paper_year # load years to memory!
+        self.paper_year=dataset.paper_year[:] # load years to memory!
         _idx=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,4,4,5,5,6,7,8,9,9]
         self.year_to_idx=[0]*1985+_idx
         self.positional_encoding=[]
@@ -179,7 +180,25 @@ class MAG240M(LightningDataModule):
                 append_time[i]=self.positional_encoding[self.year_to_idx[year]]
         x=torch.from_numpy(np.concatenate((x, append_feat, append_time), axis=1)).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
+
+        adj_t,_a,_b=adjs[0]
+        row,col,_=adj_t.coo()
+        print(f"total length : {len(row)}")
+        cnt1=0
+        cnt2=0
+        for i in range(len(row)):
+            if(n_id[row[i]]>=self.num_papers or n_id[col[i]]>=self.num_papers):
+                continue
+            if(self.paper_year[n_id[row[i]]] < self.paper_year[n_id[col[i]]]):
+                cnt1+=1
+            else:
+                cnt2+=1
+        print(f"row<col : {cnt1}, row>=col : {cnt2}")
+        f_log.write(f"total length : {len(row)}\n")
+        f_log.write(f"row<col : {cnt1}, row>=col : {cnt2}\n")
+        f_log.flush()
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
+
 
     def convert_batch_test(self, batch_size, n_id, adjs):
         #t0=time.time()
@@ -196,7 +215,23 @@ class MAG240M(LightningDataModule):
             
         x=torch.from_numpy(np.concatenate((x, append_feat, append_time), axis=1)).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
-        #print(f"CONVERT TEST n_id[0] : {n_id[0]} | In train : {(int(n_id[0]) in self.one_hot_dict)} | Year : {0 if (int(n_id[0]) not in self.arxiv_idx) else self.paper_year[int(n_id[0])]} | POS ECD : {append_time[0]}")
+
+        adj_t,_a,_b=adjs[0]
+        row,col,_=adj_t.coo()
+        print(f"total length : {len(row)}")
+        cnt1=0
+        cnt2=0
+        for i in range(len(row)):
+            if(n_id[row[i]]>=self.num_papers or n_id[col[i]]>=self.num_papers):
+                continue
+            if(self.paper_year[n_id[row[i]]] < self.paper_year[n_id[col[i]]]):
+                cnt1+=1
+            else:
+                cnt2+=1
+        print(f"row<col : {cnt1}, row>=col : {cnt2}")
+        f_log.write(f"total length : {len(row)}\n")
+        f_log.write(f"row<col : {cnt1}, row>=col : {cnt2}\n")
+        f_log.flush()
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
@@ -297,18 +332,10 @@ class RGNN(LightningModule):
 
     def training_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
-
-        #CHINA-DEBUG
-        #print(f"Training step - y_hat, batch.y : {y_hat}, {batch.y}")
-        #print(f"Sizes - y_hat, batch.y : {y_hat.shape}, {batch.y.shape}")
-
         train_loss = F.cross_entropy(y_hat, batch.y)
         tmp_acc=self.train_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
         self.train_acc_sum+=batch.x.shape[0]*tmp_acc
         self.train_cnt+=batch.x.shape[0]
-        # What side effect previous code has??
-        # I think train_acc is just Accuracy type. But how logger detect its class and print meaningful information automatically?
-        #self.log('train_acc', self.train_acc, prog_bar=True, on_step=False, on_epoch=True)
         self.log('train_acc', tmp_acc, prog_bar=True, on_step=False, on_epoch=True)
         if(batch_idx%100==0):
             print('train_acc : '+str(tmp_acc)+' | loss : '+str(train_loss)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(1112392//args.batch_size))
@@ -340,7 +367,6 @@ class RGNN(LightningModule):
         self.test_cnt+=batch.x.shape[0]
         self.test_res.append(y_hat.softmax(dim=-1).cpu().numpy())
 
-        #self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         self.log('test_acc', tmp_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         if(batch_idx%50==0):
             print('test_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
@@ -394,17 +420,9 @@ if __name__ == '__main__':
     parser.add_argument('--time_disturb_p', type=float, default=0.2)
     parser.add_argument('--ver', type=int, default=0) # Used in ensemble step.
     parser.add_argument('--bit', type=int, default=10) # Used in ensemble step.
-    # Must specify seed everytime.
-    # Batchsize, N_source need to be precisely selected, but don't change it for now.
 
-    # DEBUG
-    # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.5 --batch_size=512
-
-    # MAIN
-    # BEST # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/New-time-NS_p=0.1_batch=1024/lightning_logs/version_13009733/checkpoints/epoch=8-step=9782.ckpt
-    # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=512 --ckpt=/users/PAS1289/oiocha/logs/New-time-NS_p=0.1_batch=512/lightning_logs/version_13015175/checkpoints/epoch=10-step=23902.ckpt
-    # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=1024 --hidden_channels=2048 --ckpt=/users/PAS1289/oiocha/logs/New-time-NS_p=0.1_batch=1024_hidden=2048/lightning_logs/version_13013238/checkpoints/epoch=4-step=5434.ckpt
-
+    # python OGB-NeurIPS-Team-Park/monotonic_NS_debug.py --label_disturb_p=0.2 --batch_size=1024
+    
     t0=time.time()
     args = parser.parse_args()
     #args.sizes = [int(i) for i in args.sizes.split('-')]
@@ -417,9 +435,9 @@ if __name__ == '__main__':
 
     # Initialize log directory
     if args.hidden_channels==1024:
-        name=f'/New-time-NS_p={args.label_disturb_p}_batch={args.batch_size}'
+        name=f'/mono-NS_p={args.label_disturb_p}_batch={args.batch_size}'
     else:
-        name=f'/New-time-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
+        name=f'/mono-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
 
     NROOT='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/txtlog' # log file's root.
     path_log = NROOT+name+'.txt'
@@ -488,3 +506,31 @@ if __name__ == '__main__':
                 y_preds.append(out)
         res = {'y_pred': torch.cat(y_preds, dim=0)}
         evaluator.save_test_submission(res, 'results'+name, mode='test-dev')
+
+'''
+row<col : 1808, row>=col : 123859
+total length : 198645
+row<col : 1633, row>=col : 133328
+total length : 199155
+row<col : 1819, row>=col : 118958
+row<col : 1677, row>=col : 121219
+total length : 218986
+total length : 207850
+row<col : 1891, row>=col : 134574
+total length : 196435
+row<col : 1766, row>=col : 123232
+row<col : 1712, row>=col : 117430
+total length : 209759
+total length : 208876
+row<col : 1722, row>=col : 126553
+total length : 214203
+row<col : 2071, row>=col : 127752
+total length : 191754
+row<col : 1839, row>=col : 127362
+row<col : 1625, row>=col : 112083
+total length : 202369
+total length : 207571
+row<col : 1645, row>=col : 121222
+total length : 205028
+row<col : 1846, row>=col : 126259
+'''

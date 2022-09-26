@@ -1,0 +1,284 @@
+val_acc : 0.001953125 | time : 1428.9360299110413 | batch : 0/135
+Validation Epoch end... Accuracy : 0.005771271201600387
+train_acc : 0.0078125 | loss : tensor(5.1721, grad_fn=<NllLossBackward>) | time : 1443.8331763744354 | batch : 0/1086
+train_acc : 0.490234375 | loss : tensor(1.7154, grad_fn=<NllLossBackward>) | time : 1688.9747667312622 | batch : 100/1086
+train_acc : 0.576171875 | loss : tensor(1.3355, grad_fn=<NllLossBackward>) | time : 1933.3693656921387 | batch : 200/1086
+train_acc : 0.533203125 | loss : tensor(1.5773, grad_fn=<NllLossBackward>) | time : 2177.2583951950073 | batch : 300/1086
+train_acc : 0.58984375 | loss : tensor(1.3648, grad_fn=<NllLossBackward>) | time : 2419.8216948509216 | batch : 400/1086
+train_acc : 0.580078125 | loss : tensor(1.3150, grad_fn=<NllLossBackward>) | time : 2662.7135388851166 | batch : 500/1086
+train_acc : 0.6015625 | loss : tensor(1.2887, grad_fn=<NllLossBackward>) | time : 2904.194487094879 | batch : 600/1086
+train_acc : 0.587890625 | loss : tensor(1.3727, grad_fn=<NllLossBackward>) | time : 3145.3174669742584 | batch : 700/1086
+train_acc : 0.576171875 | loss : tensor(1.3683, grad_fn=<NllLossBackward>) | time : 3387.1068880558014 | batch : 800/1086
+train_acc : 0.623046875 | loss : tensor(1.2925, grad_fn=<NllLossBackward>) | time : 3628.817446231842 | batch : 900/1086
+train_acc : 0.640625 | loss : tensor(1.1926, grad_fn=<NllLossBackward>) | time : 3875.169938325882 | batch : 1000/1086
+train_acc : 0.619140625 | loss : tensor(1.2272, grad_fn=<NllLossBackward>) | time : 4118.322484970093 | batch : 1100/1086
+train_acc : 0.595703125 | loss : tensor(1.2940, grad_fn=<NllLossBackward>) | time : 4364.738039970398 | batch : 1200/1086
+train_acc : 0.6328125 | loss : tensor(1.1889, grad_fn=<NllLossBackward>) | time : 4608.397483348846 | batch : 1300/1086
+train_acc : 0.578125 | loss : tensor(1.3200, grad_fn=<NllLossBackward>) | time : 4852.466603040695 | batch : 1400/1086
+train_acc : 0.654296875 | loss : tensor(1.1930, grad_fn=<NllLossBackward>) | time : 5096.032493829727 | batch : 1500/1086
+train_acc : 0.65234375 | loss : tensor(1.1482, grad_fn=<NllLossBackward>) | time : 5338.144391775131 | batch : 1600/1086
+train_acc : 0.658203125 | loss : tensor(1.2043, grad_fn=<NllLossBackward>) | time : 5582.873933553696 | batch : 1700/1086
+train_acc : 0.638671875 | loss : tensor(1.2039, grad_fn=<NllLossBackward>) | time : 5824.187119722366 | batch : 1800/1086
+train_acc : 0.646484375 | loss : tensor(1.1486, grad_fn=<NllLossBackward>) | time : 6070.140084505081 | batch : 1900/1086
+train_acc : 0.623046875 | loss : tensor(1.3347, grad_fn=<NllLossBackward>) | time : 6312.134061574936 | batch : 2000/1086
+train_acc : 0.65234375 | loss : tensor(1.1856, grad_fn=<NllLossBackward>) | time : 6554.161829948425 | batch : 2100/1086
+val_acc : 0.001953125 | time : 1547.0591654777527 | batch : 0/271
+Validation Epoch end... Accuracy : 0.005771271201600387
+train_acc : 0.0078125 | loss : tensor(5.1721, grad_fn=<NllLossBackward>) | time : 1560.7339360713959 | batch : 0/2172
+train_acc : 0.490234375 | loss : tensor(1.7154, grad_fn=<NllLossBackward>) | time : 1808.6538317203522 | batch : 100/2172
+train_acc : 0.576171875 | loss : tensor(1.3355, grad_fn=<NllLossBackward>) | time : 2052.005098581314 | batch : 200/2172
+train_acc : 0.533203125 | loss : tensor(1.5773, grad_fn=<NllLossBackward>) | time : 2295.4470975399017 | batch : 300/2172
+train_acc : 0.58984375 | loss : tensor(1.3648, grad_fn=<NllLossBackward>) | time : 2539.8743953704834 | batch : 400/2172
+train_acc : 0.580078125 | loss : tensor(1.3150, grad_fn=<NllLossBackward>) | time : 2785.517738342285 | batch : 500/2172
+train_acc : 0.6015625 | loss : tensor(1.2887, grad_fn=<NllLossBackward>) | time : 3029.856515645981 | batch : 600/2172
+train_acc : 0.587890625 | loss : tensor(1.3727, grad_fn=<NllLossBackward>) | time : 3275.7509291172028 | batch : 700/2172
+train_acc : 0.576171875 | loss : tensor(1.3683, grad_fn=<NllLossBackward>) | time : 3521.932556629181 | batch : 800/2172
+train_acc : 0.623046875 | loss : tensor(1.2925, grad_fn=<NllLossBackward>) | time : 3765.54656457901 | batch : 900/2172
+train_acc : 0.640625 | loss : tensor(1.1926, grad_fn=<NllLossBackward>) | time : 4012.4569594860077 | batch : 1000/2172
+train_acc : 0.619140625 | loss : tensor(1.2272, grad_fn=<NllLossBackward>) | time : 4260.714056491852 | batch : 1100/2172
+train_acc : 0.595703125 | loss : tensor(1.2940, grad_fn=<NllLossBackward>) | time : 4506.241242647171 | batch : 1200/2172
+train_acc : 0.6328125 | loss : tensor(1.1889, grad_fn=<NllLossBackward>) | time : 4752.858836650848 | batch : 1300/2172
+train_acc : 0.578125 | loss : tensor(1.3200, grad_fn=<NllLossBackward>) | time : 4998.541985273361 | batch : 1400/2172
+train_acc : 0.654296875 | loss : tensor(1.1930, grad_fn=<NllLossBackward>) | time : 5239.4293513298035 | batch : 1500/2172
+train_acc : 0.65234375 | loss : tensor(1.1482, grad_fn=<NllLossBackward>) | time : 5478.26939034462 | batch : 1600/2172
+train_acc : 0.658203125 | loss : tensor(1.2043, grad_fn=<NllLossBackward>) | time : 5719.824149847031 | batch : 1700/2172
+train_acc : 0.638671875 | loss : tensor(1.2039, grad_fn=<NllLossBackward>) | time : 5960.398280382156 | batch : 1800/2172
+train_acc : 0.646484375 | loss : tensor(1.1486, grad_fn=<NllLossBackward>) | time : 6204.06333899498 | batch : 1900/2172
+train_acc : 0.623046875 | loss : tensor(1.3347, grad_fn=<NllLossBackward>) | time : 6446.6464738845825 | batch : 2000/2172
+train_acc : 0.65234375 | loss : tensor(1.1856, grad_fn=<NllLossBackward>) | time : 6692.634036779404 | batch : 2100/2172
+Train Epoch end... Accuracy : 0.5988461776843353
+val_acc : 0.65234375 | time : 6872.143726825714 | batch : 0/271
+val_acc : 0.634765625 | time : 7007.23362159729 | batch : 50/271
+val_acc : 0.658203125 | time : 7136.917279720306 | batch : 100/271
+val_acc : 0.6484375 | time : 7272.761781454086 | batch : 150/271
+val_acc : 0.640625 | time : 7403.0238308906555 | batch : 200/271
+val_acc : 0.6484375 | time : 7540.390676498413 | batch : 250/271
+Validation Epoch end... Accuracy : 0.6362651609276526
+Succesfully saved!
+train_acc : 0.5859375 | loss : tensor(1.2952, grad_fn=<NllLossBackward>) | time : 7601.127057313919 | batch : 0/2172
+train_acc : 0.63671875 | loss : tensor(1.2729, grad_fn=<NllLossBackward>) | time : 7849.355949878693 | batch : 100/2172
+train_acc : 0.625 | loss : tensor(1.1418, grad_fn=<NllLossBackward>) | time : 8093.362411022186 | batch : 200/2172
+train_acc : 0.623046875 | loss : tensor(1.2411, grad_fn=<NllLossBackward>) | time : 8340.11201763153 | batch : 300/2172
+train_acc : 0.65625 | loss : tensor(1.1874, grad_fn=<NllLossBackward>) | time : 8584.869843482971 | batch : 400/2172
+train_acc : 0.6015625 | loss : tensor(1.2807, grad_fn=<NllLossBackward>) | time : 8832.741986751556 | batch : 500/2172
+train_acc : 0.685546875 | loss : tensor(1.0199, grad_fn=<NllLossBackward>) | time : 9081.767255544662 | batch : 600/2172
+train_acc : 0.625 | loss : tensor(1.2386, grad_fn=<NllLossBackward>) | time : 9330.37215256691 | batch : 700/2172
+train_acc : 0.654296875 | loss : tensor(1.0698, grad_fn=<NllLossBackward>) | time : 9579.387767076492 | batch : 800/2172
+train_acc : 0.66015625 | loss : tensor(1.1399, grad_fn=<NllLossBackward>) | time : 9825.486226320267 | batch : 900/2172
+train_acc : 0.65234375 | loss : tensor(1.1421, grad_fn=<NllLossBackward>) | time : 10071.87720322609 | batch : 1000/2172
+train_acc : 0.634765625 | loss : tensor(1.2150, grad_fn=<NllLossBackward>) | time : 10318.525821447372 | batch : 1100/2172
+train_acc : 0.6640625 | loss : tensor(1.0602, grad_fn=<NllLossBackward>) | time : 10568.209592819214 | batch : 1200/2172
+train_acc : 0.66796875 | loss : tensor(1.1746, grad_fn=<NllLossBackward>) | time : 10814.427399396896 | batch : 1300/2172
+train_acc : 0.642578125 | loss : tensor(1.1337, grad_fn=<NllLossBackward>) | time : 11063.596144914627 | batch : 1400/2172
+train_acc : 0.66015625 | loss : tensor(1.1119, grad_fn=<NllLossBackward>) | time : 11313.414240598679 | batch : 1500/2172
+train_acc : 0.66796875 | loss : tensor(1.0686, grad_fn=<NllLossBackward>) | time : 11561.809542655945 | batch : 1600/2172
+train_acc : 0.603515625 | loss : tensor(1.2358, grad_fn=<NllLossBackward>) | time : 11808.736036777496 | batch : 1700/2172
+train_acc : 0.65234375 | loss : tensor(1.1667, grad_fn=<NllLossBackward>) | time : 12055.920905590057 | batch : 1800/2172
+train_acc : 0.638671875 | loss : tensor(1.2132, grad_fn=<NllLossBackward>) | time : 12300.522429704666 | batch : 1900/2172
+train_acc : 0.62890625 | loss : tensor(1.1674, grad_fn=<NllLossBackward>) | time : 12543.584733724594 | batch : 2000/2172
+train_acc : 0.6484375 | loss : tensor(1.0515, grad_fn=<NllLossBackward>) | time : 12785.984365224838 | batch : 2100/2172
+Train Epoch end... Accuracy : 0.6420392249672761
+val_acc : 0.650390625 | time : 12965.324698925018 | batch : 0/271
+val_acc : 0.650390625 | time : 13100.376346826553 | batch : 50/271
+val_acc : 0.6640625 | time : 13238.952082395554 | batch : 100/271
+val_acc : 0.6328125 | time : 13369.437429189682 | batch : 150/271
+val_acc : 0.65625 | time : 13499.694633245468 | batch : 200/271
+val_acc : 0.67578125 | time : 13632.555724859238 | batch : 250/271
+Validation Epoch end... Accuracy : 0.6548340092272917
+Succesfully saved!
+train_acc : 0.638671875 | loss : tensor(1.0965, grad_fn=<NllLossBackward>) | time : 13694.602962970734 | batch : 0/2172
+train_acc : 0.642578125 | loss : tensor(1.1959, grad_fn=<NllLossBackward>) | time : 13941.346919298172 | batch : 100/2172
+train_acc : 0.640625 | loss : tensor(1.0738, grad_fn=<NllLossBackward>) | time : 14191.279579877853 | batch : 200/2172
+train_acc : 0.666015625 | loss : tensor(1.0920, grad_fn=<NllLossBackward>) | time : 14440.888298034668 | batch : 300/2172
+train_acc : 0.6328125 | loss : tensor(1.1340, grad_fn=<NllLossBackward>) | time : 14686.02717590332 | batch : 400/2172
+train_acc : 0.634765625 | loss : tensor(1.1335, grad_fn=<NllLossBackward>) | time : 14929.074557065964 | batch : 500/2172
+train_acc : 0.65625 | loss : tensor(1.1251, grad_fn=<NllLossBackward>) | time : 15175.822135210037 | batch : 600/2172
+train_acc : 0.669921875 | loss : tensor(1.0491, grad_fn=<NllLossBackward>) | time : 15422.853348731995 | batch : 700/2172
+train_acc : 0.642578125 | loss : tensor(1.1486, grad_fn=<NllLossBackward>) | time : 15669.407143831253 | batch : 800/2172
+train_acc : 0.6640625 | loss : tensor(1.0750, grad_fn=<NllLossBackward>) | time : 15915.806944131851 | batch : 900/2172
+train_acc : 0.623046875 | loss : tensor(1.1530, grad_fn=<NllLossBackward>) | time : 16158.755064725876 | batch : 1000/2172
+train_acc : 0.642578125 | loss : tensor(1.1958, grad_fn=<NllLossBackward>) | time : 16402.037851810455 | batch : 1100/2172
+train_acc : 0.640625 | loss : tensor(1.1278, grad_fn=<NllLossBackward>) | time : 16647.840838432312 | batch : 1200/2172
+train_acc : 0.685546875 | loss : tensor(1.0617, grad_fn=<NllLossBackward>) | time : 16893.93632864952 | batch : 1300/2172
+train_acc : 0.666015625 | loss : tensor(1.1398, grad_fn=<NllLossBackward>) | time : 17138.47797369957 | batch : 1400/2172
+train_acc : 0.640625 | loss : tensor(1.1188, grad_fn=<NllLossBackward>) | time : 17382.410500764847 | batch : 1500/2172
+train_acc : 0.62890625 | loss : tensor(1.1438, grad_fn=<NllLossBackward>) | time : 17624.010769844055 | batch : 1600/2172
+train_acc : 0.666015625 | loss : tensor(1.0735, grad_fn=<NllLossBackward>) | time : 17870.47718524933 | batch : 1700/2172
+train_acc : 0.6640625 | loss : tensor(1.0735, grad_fn=<NllLossBackward>) | time : 18118.04593706131 | batch : 1800/2172
+train_acc : 0.66796875 | loss : tensor(1.0668, grad_fn=<NllLossBackward>) | time : 18367.87775707245 | batch : 1900/2172
+train_acc : 0.65625 | loss : tensor(1.0877, grad_fn=<NllLossBackward>) | time : 18612.25593328476 | batch : 2000/2172
+train_acc : 0.67578125 | loss : tensor(1.0802, grad_fn=<NllLossBackward>) | time : 18860.769638299942 | batch : 2100/2172
+Train Epoch end... Accuracy : 0.6544839862262313
+val_acc : 0.658203125 | time : 19043.70573782921 | batch : 0/271
+val_acc : 0.662109375 | time : 19179.00120472908 | batch : 50/271
+val_acc : 0.69921875 | time : 19310.41081404686 | batch : 100/271
+val_acc : 0.66796875 | time : 19447.899776935577 | batch : 150/271
+val_acc : 0.677734375 | time : 19591.92472219467 | batch : 200/271
+val_acc : 0.671875 | time : 19726.337987422943 | batch : 250/271
+Validation Epoch end... Accuracy : 0.6654532872296126
+Succesfully saved!
+train_acc : 0.66015625 | loss : tensor(1.0529, grad_fn=<NllLossBackward>) | time : 19790.00274991989 | batch : 0/2172
+train_acc : 0.646484375 | loss : tensor(1.0645, grad_fn=<NllLossBackward>) | time : 20039.866909980774 | batch : 100/2172
+train_acc : 0.64453125 | loss : tensor(1.1253, grad_fn=<NllLossBackward>) | time : 20290.246597766876 | batch : 200/2172
+train_acc : 0.666015625 | loss : tensor(1.1160, grad_fn=<NllLossBackward>) | time : 20539.27189064026 | batch : 300/2172
+train_acc : 0.669921875 | loss : tensor(1.1005, grad_fn=<NllLossBackward>) | time : 20787.463938474655 | batch : 400/2172
+train_acc : 0.697265625 | loss : tensor(1.0154, grad_fn=<NllLossBackward>) | time : 21038.338977575302 | batch : 500/2172
+train_acc : 0.63671875 | loss : tensor(1.2285, grad_fn=<NllLossBackward>) | time : 21283.562194108963 | batch : 600/2172
+train_acc : 0.6953125 | loss : tensor(1.0155, grad_fn=<NllLossBackward>) | time : 21532.271975278854 | batch : 700/2172
+train_acc : 0.6640625 | loss : tensor(1.0430, grad_fn=<NllLossBackward>) | time : 21780.590613365173 | batch : 800/2172
+train_acc : 0.666015625 | loss : tensor(1.1048, grad_fn=<NllLossBackward>) | time : 22027.29354405403 | batch : 900/2172
+train_acc : 0.685546875 | loss : tensor(1.0742, grad_fn=<NllLossBackward>) | time : 22276.026455163956 | batch : 1000/2172
+train_acc : 0.689453125 | loss : tensor(1.0560, grad_fn=<NllLossBackward>) | time : 22521.849744081497 | batch : 1100/2172
+train_acc : 0.65234375 | loss : tensor(1.1595, grad_fn=<NllLossBackward>) | time : 22768.523805618286 | batch : 1200/2172
+train_acc : 0.669921875 | loss : tensor(1.0462, grad_fn=<NllLossBackward>) | time : 23019.859878778458 | batch : 1300/2172
+train_acc : 0.662109375 | loss : tensor(1.0537, grad_fn=<NllLossBackward>) | time : 23266.683782339096 | batch : 1400/2172
+train_acc : 0.66015625 | loss : tensor(1.1256, grad_fn=<NllLossBackward>) | time : 23513.9243350029 | batch : 1500/2172
+train_acc : 0.677734375 | loss : tensor(1.0622, grad_fn=<NllLossBackward>) | time : 23763.949281454086 | batch : 1600/2172
+train_acc : 0.66015625 | loss : tensor(1.0350, grad_fn=<NllLossBackward>) | time : 24013.703563690186 | batch : 1700/2172
+train_acc : 0.67578125 | loss : tensor(1.0552, grad_fn=<NllLossBackward>) | time : 24262.171771764755 | batch : 1800/2172
+train_acc : 0.6640625 | loss : tensor(0.9598, grad_fn=<NllLossBackward>) | time : 24509.38414621353 | batch : 1900/2172
+train_acc : 0.673828125 | loss : tensor(1.0364, grad_fn=<NllLossBackward>) | time : 24757.44020843506 | batch : 2000/2172
+train_acc : 0.65234375 | loss : tensor(1.1456, grad_fn=<NllLossBackward>) | time : 25006.555365800858 | batch : 2100/2172
+Train Epoch end... Accuracy : 0.6617746883244844
+val_acc : 0.6640625 | time : 25189.81845998764 | batch : 0/271
+val_acc : 0.669921875 | time : 25327.69714832306 | batch : 50/271
+val_acc : 0.6953125 | time : 25451.796767950058 | batch : 100/271
+val_acc : 0.646484375 | time : 25578.029927015305 | batch : 150/271
+val_acc : 0.66796875 | time : 25705.148547887802 | batch : 200/271
+val_acc : 0.671875 | time : 25840.21515083313 | batch : 250/271
+Validation Epoch end... Accuracy : 0.6684395002657297
+Succesfully saved!
+train_acc : 0.6796875 | loss : tensor(1.0163, grad_fn=<NllLossBackward>) | time : 25899.75293493271 | batch : 0/2172
+train_acc : 0.677734375 | loss : tensor(0.9803, grad_fn=<NllLossBackward>) | time : 26142.03950214386 | batch : 100/2172
+train_acc : 0.623046875 | loss : tensor(1.1732, grad_fn=<NllLossBackward>) | time : 26382.01164507866 | batch : 200/2172
+train_acc : 0.681640625 | loss : tensor(0.9658, grad_fn=<NllLossBackward>) | time : 26625.806157827377 | batch : 300/2172
+train_acc : 0.6640625 | loss : tensor(1.1048, grad_fn=<NllLossBackward>) | time : 26868.67933702469 | batch : 400/2172
+train_acc : 0.6640625 | loss : tensor(1.1161, grad_fn=<NllLossBackward>) | time : 27110.42461848259 | batch : 500/2172
+train_acc : 0.685546875 | loss : tensor(1.1293, grad_fn=<NllLossBackward>) | time : 27353.518451213837 | batch : 600/2172
+train_acc : 0.66796875 | loss : tensor(1.0150, grad_fn=<NllLossBackward>) | time : 27597.157618522644 | batch : 700/2172
+train_acc : 0.681640625 | loss : tensor(0.9601, grad_fn=<NllLossBackward>) | time : 27839.24391222 | batch : 800/2172
+train_acc : 0.658203125 | loss : tensor(1.1223, grad_fn=<NllLossBackward>) | time : 28082.744405031204 | batch : 900/2172
+train_acc : 0.6484375 | loss : tensor(1.1094, grad_fn=<NllLossBackward>) | time : 28326.25079035759 | batch : 1000/2172
+train_acc : 0.671875 | loss : tensor(1.0556, grad_fn=<NllLossBackward>) | time : 28571.05909538269 | batch : 1100/2172
+train_acc : 0.67578125 | loss : tensor(1.0697, grad_fn=<NllLossBackward>) | time : 28815.787630796432 | batch : 1200/2172
+train_acc : 0.634765625 | loss : tensor(1.1167, grad_fn=<NllLossBackward>) | time : 29056.414826631546 | batch : 1300/2172
+train_acc : 0.66796875 | loss : tensor(1.0292, grad_fn=<NllLossBackward>) | time : 29298.545458316803 | batch : 1400/2172
+train_acc : 0.658203125 | loss : tensor(1.1459, grad_fn=<NllLossBackward>) | time : 29543.689881563187 | batch : 1500/2172
+train_acc : 0.640625 | loss : tensor(1.1125, grad_fn=<NllLossBackward>) | time : 29789.530826091766 | batch : 1600/2172
+train_acc : 0.63671875 | loss : tensor(1.0367, grad_fn=<NllLossBackward>) | time : 30034.44378709793 | batch : 1700/2172
+train_acc : 0.66796875 | loss : tensor(1.0528, grad_fn=<NllLossBackward>) | time : 30280.225761413574 | batch : 1800/2172
+train_acc : 0.6640625 | loss : tensor(1.1757, grad_fn=<NllLossBackward>) | time : 30526.071498394012 | batch : 1900/2172
+train_acc : 0.6640625 | loss : tensor(1.0687, grad_fn=<NllLossBackward>) | time : 30772.48942708969 | batch : 2000/2172
+train_acc : 0.666015625 | loss : tensor(1.0644, grad_fn=<NllLossBackward>) | time : 31018.10514807701 | batch : 2100/2172
+Train Epoch end... Accuracy : 0.6676544070447398
+val_acc : 0.658203125 | time : 31198.676493406296 | batch : 0/271
+val_acc : 0.650390625 | time : 31334.730583906174 | batch : 50/271
+val_acc : 0.693359375 | time : 31465.180260658264 | batch : 100/271
+val_acc : 0.65234375 | time : 31592.19202876091 | batch : 150/271
+val_acc : 0.673828125 | time : 31724.519414663315 | batch : 200/271
+val_acc : 0.67578125 | time : 31859.975644350052 | batch : 250/271
+Validation Epoch end... Accuracy : 0.6671834577048515
+train_acc : 0.689453125 | loss : tensor(0.9977, grad_fn=<NllLossBackward>) | time : 31921.023307561874 | batch : 0/2172
+train_acc : 0.685546875 | loss : tensor(1.0496, grad_fn=<NllLossBackward>) | time : 32169.10036277771 | batch : 100/2172
+train_acc : 0.677734375 | loss : tensor(1.0283, grad_fn=<NllLossBackward>) | time : 32413.961659431458 | batch : 200/2172
+train_acc : 0.6796875 | loss : tensor(1.0333, grad_fn=<NllLossBackward>) | time : 32656.347504377365 | batch : 300/2172
+train_acc : 0.689453125 | loss : tensor(1.0451, grad_fn=<NllLossBackward>) | time : 32897.2115380764 | batch : 400/2172
+train_acc : 0.689453125 | loss : tensor(1.0014, grad_fn=<NllLossBackward>) | time : 33142.82580804825 | batch : 500/2172
+train_acc : 0.69921875 | loss : tensor(0.9697, grad_fn=<NllLossBackward>) | time : 33389.307398080826 | batch : 600/2172
+train_acc : 0.66796875 | loss : tensor(1.0055, grad_fn=<NllLossBackward>) | time : 33631.768624544144 | batch : 700/2172
+train_acc : 0.666015625 | loss : tensor(1.0594, grad_fn=<NllLossBackward>) | time : 33877.77975106239 | batch : 800/2172
+train_acc : 0.705078125 | loss : tensor(0.9047, grad_fn=<NllLossBackward>) | time : 34123.84779763222 | batch : 900/2172
+train_acc : 0.625 | loss : tensor(1.1452, grad_fn=<NllLossBackward>) | time : 34371.19768285751 | batch : 1000/2172
+train_acc : 0.662109375 | loss : tensor(1.0412, grad_fn=<NllLossBackward>) | time : 34618.84210062027 | batch : 1100/2172
+train_acc : 0.671875 | loss : tensor(1.1486, grad_fn=<NllLossBackward>) | time : 34866.806728839874 | batch : 1200/2172
+train_acc : 0.654296875 | loss : tensor(1.1115, grad_fn=<NllLossBackward>) | time : 35116.784841775894 | batch : 1300/2172
+train_acc : 0.6640625 | loss : tensor(1.0672, grad_fn=<NllLossBackward>) | time : 35366.55995249748 | batch : 1400/2172
+train_acc : 0.64453125 | loss : tensor(1.0275, grad_fn=<NllLossBackward>) | time : 35618.71775364876 | batch : 1500/2172
+train_acc : 0.63671875 | loss : tensor(1.1235, grad_fn=<NllLossBackward>) | time : 35868.42868614197 | batch : 1600/2172
+train_acc : 0.662109375 | loss : tensor(1.1436, grad_fn=<NllLossBackward>) | time : 36119.42163300514 | batch : 1700/2172
+train_acc : 0.685546875 | loss : tensor(1.0070, grad_fn=<NllLossBackward>) | time : 36365.99996972084 | batch : 1800/2172
+train_acc : 0.701171875 | loss : tensor(0.9858, grad_fn=<NllLossBackward>) | time : 36614.502663850784 | batch : 1900/2172
+train_acc : 0.693359375 | loss : tensor(1.0019, grad_fn=<NllLossBackward>) | time : 36862.73112487793 | batch : 2000/2172
+train_acc : 0.662109375 | loss : tensor(1.0272, grad_fn=<NllLossBackward>) | time : 37114.947860240936 | batch : 2100/2172
+Train Epoch end... Accuracy : 0.6720872800095541
+val_acc : 0.671875 | time : 37298.02205276489 | batch : 0/271
+val_acc : 0.650390625 | time : 37441.34939742088 | batch : 50/271
+val_acc : 0.693359375 | time : 37573.78700900078 | batch : 100/271
+val_acc : 0.64453125 | time : 37703.78905057907 | batch : 150/271
+val_acc : 0.662109375 | time : 37838.22664451599 | batch : 200/271
+val_acc : 0.66796875 | time : 37979.41807103157 | batch : 250/271
+Validation Epoch end... Accuracy : 0.6646447902665523
+train_acc : 0.685546875 | loss : tensor(1.0629, grad_fn=<NllLossBackward>) | time : 38036.92914509773 | batch : 0/2172
+train_acc : 0.640625 | loss : tensor(1.1305, grad_fn=<NllLossBackward>) | time : 38289.27515029907 | batch : 100/2172
+train_acc : 0.650390625 | loss : tensor(1.1575, grad_fn=<NllLossBackward>) | time : 38541.202937841415 | batch : 200/2172
+train_acc : 0.69140625 | loss : tensor(0.9945, grad_fn=<NllLossBackward>) | time : 38792.424095630646 | batch : 300/2172
+train_acc : 0.689453125 | loss : tensor(1.0328, grad_fn=<NllLossBackward>) | time : 39039.99540448189 | batch : 400/2172
+train_acc : 0.720703125 | loss : tensor(0.9356, grad_fn=<NllLossBackward>) | time : 39290.6300611496 | batch : 500/2172
+train_acc : 0.669921875 | loss : tensor(0.9839, grad_fn=<NllLossBackward>) | time : 39540.507635593414 | batch : 600/2172
+train_acc : 0.7109375 | loss : tensor(0.8914, grad_fn=<NllLossBackward>) | time : 39790.482051849365 | batch : 700/2172
+train_acc : 0.66015625 | loss : tensor(1.0553, grad_fn=<NllLossBackward>) | time : 40041.27884578705 | batch : 800/2172
+train_acc : 0.689453125 | loss : tensor(1.0144, grad_fn=<NllLossBackward>) | time : 40287.49425625801 | batch : 900/2172
+train_acc : 0.6953125 | loss : tensor(0.9538, grad_fn=<NllLossBackward>) | time : 40534.87731575966 | batch : 1000/2172
+train_acc : 0.66015625 | loss : tensor(1.0581, grad_fn=<NllLossBackward>) | time : 40782.20831012726 | batch : 1100/2172
+train_acc : 0.68359375 | loss : tensor(1.0641, grad_fn=<NllLossBackward>) | time : 41029.68907165527 | batch : 1200/2172
+train_acc : 0.671875 | loss : tensor(1.0206, grad_fn=<NllLossBackward>) | time : 41279.039774894714 | batch : 1300/2172
+train_acc : 0.662109375 | loss : tensor(1.0733, grad_fn=<NllLossBackward>) | time : 41530.4253680706 | batch : 1400/2172
+train_acc : 0.67578125 | loss : tensor(1.0262, grad_fn=<NllLossBackward>) | time : 41778.36339139938 | batch : 1500/2172
+train_acc : 0.712890625 | loss : tensor(0.9449, grad_fn=<NllLossBackward>) | time : 42023.97693538666 | batch : 1600/2172
+train_acc : 0.662109375 | loss : tensor(1.0303, grad_fn=<NllLossBackward>) | time : 42274.565725803375 | batch : 1700/2172
+train_acc : 0.6640625 | loss : tensor(1.0544, grad_fn=<NllLossBackward>) | time : 42524.11915564537 | batch : 1800/2172
+train_acc : 0.68359375 | loss : tensor(0.9947, grad_fn=<NllLossBackward>) | time : 42777.6194665432 | batch : 1900/2172
+train_acc : 0.662109375 | loss : tensor(1.0274, grad_fn=<NllLossBackward>) | time : 43028.00560474396 | batch : 2000/2172
+train_acc : 0.7109375 | loss : tensor(0.9567, grad_fn=<NllLossBackward>) | time : 43278.00001835823 | batch : 2100/2172
+Train Epoch end... Accuracy : 0.6754521466104253
+val_acc : 0.68359375 | time : 43460.98245573044 | batch : 0/271
+val_acc : 0.66015625 | time : 43606.63318514824 | batch : 50/271
+val_acc : 0.6875 | time : 43743.38513684273 | batch : 100/271
+val_acc : 0.66015625 | time : 43873.73892092705 | batch : 150/271
+val_acc : 0.6640625 | time : 44016.63132882118 | batch : 200/271
+val_acc : 0.6796875 | time : 44148.714690208435 | batch : 250/271
+Validation Epoch end... Accuracy : 0.6674107009099247
+train_acc : 0.68359375 | loss : tensor(1.0383, grad_fn=<NllLossBackward>) | time : 44209.708246946335 | batch : 0/2172
+train_acc : 0.67578125 | loss : tensor(1.0006, grad_fn=<NllLossBackward>) | time : 44454.30388355255 | batch : 100/2172
+train_acc : 0.67578125 | loss : tensor(0.9680, grad_fn=<NllLossBackward>) | time : 44694.44106864929 | batch : 200/2172
+train_acc : 0.638671875 | loss : tensor(1.1429, grad_fn=<NllLossBackward>) | time : 44941.36886429787 | batch : 300/2172
+train_acc : 0.677734375 | loss : tensor(0.9947, grad_fn=<NllLossBackward>) | time : 45186.01650238037 | batch : 400/2172
+train_acc : 0.69140625 | loss : tensor(0.9738, grad_fn=<NllLossBackward>) | time : 45429.6491355896 | batch : 500/2172
+train_acc : 0.671875 | loss : tensor(1.0824, grad_fn=<NllLossBackward>) | time : 45675.49157142639 | batch : 600/2172
+train_acc : 0.73046875 | loss : tensor(0.9047, grad_fn=<NllLossBackward>) | time : 45921.44658756256 | batch : 700/2172
+train_acc : 0.69921875 | loss : tensor(0.9535, grad_fn=<NllLossBackward>) | time : 46168.53293991089 | batch : 800/2172
+train_acc : 0.69140625 | loss : tensor(1.0450, grad_fn=<NllLossBackward>) | time : 46412.497677087784 | batch : 900/2172
+train_acc : 0.654296875 | loss : tensor(1.0994, grad_fn=<NllLossBackward>) | time : 46658.636912345886 | batch : 1000/2172
+train_acc : 0.693359375 | loss : tensor(1.0514, grad_fn=<NllLossBackward>) | time : 46903.58902454376 | batch : 1100/2172
+train_acc : 0.666015625 | loss : tensor(1.0319, grad_fn=<NllLossBackward>) | time : 47148.29738283157 | batch : 1200/2172
+train_acc : 0.66015625 | loss : tensor(1.1080, grad_fn=<NllLossBackward>) | time : 47393.952224731445 | batch : 1300/2172
+train_acc : 0.662109375 | loss : tensor(1.1000, grad_fn=<NllLossBackward>) | time : 47638.46605372429 | batch : 1400/2172
+train_acc : 0.677734375 | loss : tensor(1.0893, grad_fn=<NllLossBackward>) | time : 47881.366003751755 | batch : 1500/2172
+train_acc : 0.671875 | loss : tensor(1.0450, grad_fn=<NllLossBackward>) | time : 48126.38601374626 | batch : 1600/2172
+train_acc : 0.673828125 | loss : tensor(1.0079, grad_fn=<NllLossBackward>) | time : 48373.12052869797 | batch : 1700/2172
+train_acc : 0.677734375 | loss : tensor(1.0388, grad_fn=<NllLossBackward>) | time : 48618.95393872261 | batch : 1800/2172
+train_acc : 0.65234375 | loss : tensor(1.1124, grad_fn=<NllLossBackward>) | time : 48868.12124466896 | batch : 1900/2172
+train_acc : 0.673828125 | loss : tensor(0.9939, grad_fn=<NllLossBackward>) | time : 49118.65808010101 | batch : 2000/2172
+train_acc : 0.693359375 | loss : tensor(1.0347, grad_fn=<NllLossBackward>) | time : 49368.936396598816 | batch : 2100/2172
+Train Epoch end... Accuracy : 0.6788776215944495
+val_acc : 0.6796875 | time : 49550.65297818184 | batch : 0/271
+val_acc : 0.662109375 | time : 49686.984424352646 | batch : 50/271
+val_acc : 0.697265625 | time : 49822.242530584335 | batch : 100/271
+val_acc : 0.650390625 | time : 49963.4137032032 | batch : 150/271
+val_acc : 0.677734375 | time : 50105.67081141472 | batch : 200/271
+val_acc : 0.6796875 | time : 50236.96402788162 | batch : 250/271
+Validation Epoch end... Accuracy : 0.6748844301580693
+Succesfully saved!
+train_acc : 0.6796875 | loss : tensor(0.9673, grad_fn=<NllLossBackward>) | time : 50296.28317260742 | batch : 0/2172
+train_acc : 0.662109375 | loss : tensor(1.0592, grad_fn=<NllLossBackward>) | time : 50545.66047215462 | batch : 100/2172
+train_acc : 0.708984375 | loss : tensor(0.9509, grad_fn=<NllLossBackward>) | time : 50794.02000427246 | batch : 200/2172
+train_acc : 0.673828125 | loss : tensor(0.9788, grad_fn=<NllLossBackward>) | time : 51040.1362452507 | batch : 300/2172
+train_acc : 0.6796875 | loss : tensor(1.0157, grad_fn=<NllLossBackward>) | time : 51286.56918120384 | batch : 400/2172
+train_acc : 0.720703125 | loss : tensor(0.8408, grad_fn=<NllLossBackward>) | time : 51531.56888651848 | batch : 500/2172
+train_acc : 0.666015625 | loss : tensor(1.0507, grad_fn=<NllLossBackward>) | time : 51777.9378452301 | batch : 600/2172
+train_acc : 0.689453125 | loss : tensor(1.0098, grad_fn=<NllLossBackward>) | time : 52024.91270875931 | batch : 700/2172
+train_acc : 0.703125 | loss : tensor(0.9338, grad_fn=<NllLossBackward>) | time : 52269.28906917572 | batch : 800/2172
+train_acc : 0.72265625 | loss : tensor(0.8647, grad_fn=<NllLossBackward>) | time : 52515.69262385368 | batch : 900/2172
+train_acc : 0.734375 | loss : tensor(0.9330, grad_fn=<NllLossBackward>) | time : 52759.22259926796 | batch : 1000/2172
+train_acc : 0.681640625 | loss : tensor(0.9690, grad_fn=<NllLossBackward>) | time : 53006.3980755806 | batch : 1100/2172
+train_acc : 0.666015625 | loss : tensor(1.0557, grad_fn=<NllLossBackward>) | time : 53254.62652659416 | batch : 1200/2172

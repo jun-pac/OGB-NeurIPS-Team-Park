@@ -1,0 +1,169 @@
+Validation epoch end... Accuracy : 0.004000000189989805
+Train accuracy : 0.07999999821186066(Loss:4.961551189422607) | Idx : 500000 / 1112392 | Time : 39.49598407745361
+Training end... Accuracy : 0.07101992847220794
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 70.21335458755493
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07500000298023224(Loss:4.966552257537842) | Idx : 500000 / 1112392 | Time : 108.45001363754272
+Training end... Accuracy : 0.07125815384387382
+Validation accuracy : 0.008999999612569809 | Idx : 100000 / 138949 | Time : 139.04867339134216
+Validation epoch end... Accuracy : 0.01340060036108028
+Train accuracy : 0.07000000029802322(Loss:4.971551895141602) | Idx : 500000 / 1112392 | Time : 167.85898780822754
+Training end... Accuracy : 0.0709848688632229
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 200.17810034751892
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07199999690055847(Loss:4.9695515632629395) | Idx : 500000 / 1112392 | Time : 229.09002304077148
+Training end... Accuracy : 0.07136513049380643
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 261.26641154289246
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07800000160932541(Loss:4.9635515213012695) | Idx : 500000 / 1112392 | Time : 291.6082248687744
+Training end... Accuracy : 0.07136513055239879
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 324.0178565979004
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07800000160932541(Loss:4.9635515213012695) | Idx : 500000 / 1112392 | Time : 355.5692574977875
+Training end... Accuracy : 0.07136513050468365
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 388.0024688243866
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.08299999684095383(Loss:4.958552360534668) | Idx : 500000 / 1112392 | Time : 415.30865812301636
+Training end... Accuracy : 0.0713651305691433
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 448.0478563308716
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06499999761581421(Loss:4.976551532745361) | Idx : 500000 / 1112392 | Time : 476.27048087120056
+Training end... Accuracy : 0.07136513053005493
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 508.84739208221436
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.05400000140070915(Loss:4.987548828125) | Idx : 500000 / 1112392 | Time : 547.1368460655212
+Training end... Accuracy : 0.0713651305021117
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 582.0270855426788
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07400000095367432(Loss:4.9675517082214355) | Idx : 500000 / 1112392 | Time : 620.457676410675
+Training end... Accuracy : 0.07136513049578898
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 658.2992808818817
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.08399999886751175(Loss:4.957551956176758) | Idx : 500000 / 1112392 | Time : 700.4619328975677
+Training end... Accuracy : 0.07136513051890979
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 748.9364314079285
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06400000303983688(Loss:4.9775519371032715) | Idx : 500000 / 1112392 | Time : 779.2032654285431
+Training end... Accuracy : 0.07136513048091986
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 816.2718164920807
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06400000303983688(Loss:4.977550506591797) | Idx : 500000 / 1112392 | Time : 856.6358323097229
+Training end... Accuracy : 0.07136423152244267
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 905.5798802375793
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07400000095367432(Loss:4.9675517082214355) | Idx : 500000 / 1112392 | Time : 935.5039026737213
+Training end... Accuracy : 0.07135344399483619
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 970.7898993492126
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.0729999989271164(Loss:4.9685516357421875) | Idx : 500000 / 1112392 | Time : 999.7838506698608
+Training end... Accuracy : 0.07136063566793151
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1032.4832558631897
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06800000369548798(Loss:4.9735517501831055) | Idx : 500000 / 1112392 | Time : 1066.2375452518463
+Training end... Accuracy : 0.0713651305389496
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1099.9178211688995
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.08100000023841858(Loss:4.960551738739014) | Idx : 500000 / 1112392 | Time : 1133.9978489875793
+Training end... Accuracy : 0.07136513060482919
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1166.9478948116302
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06700000166893005(Loss:4.974551677703857) | Idx : 500000 / 1112392 | Time : 1202.7500505447388
+Training end... Accuracy : 0.0713651306263961
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1235.595963716507
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07500000298023224(Loss:4.966551780700684) | Idx : 500000 / 1112392 | Time : 1278.488550901413
+Training end... Accuracy : 0.0713651304893591
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1324.1399154663086
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07400000095367432(Loss:4.967552185058594) | Idx : 500000 / 1112392 | Time : 1365.4767534732819
+Training end... Accuracy : 0.07136513046334483
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1411.03568816185
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07800000160932541(Loss:4.963551044464111) | Idx : 500000 / 1112392 | Time : 1453.3325023651123
+Training end... Accuracy : 0.07136513065956361
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1506.0435330867767
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06499999761581421(Loss:4.976551532745361) | Idx : 500000 / 1112392 | Time : 1545.8966116905212
+Training end... Accuracy : 0.07136153473389502
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1594.8106081485748
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07599999755620956(Loss:4.965551853179932) | Idx : 500000 / 1112392 | Time : 1641.585420370102
+Training end... Accuracy : 0.07136513060257872
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1691.501708984375
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.08900000154972076(Loss:4.95255184173584) | Idx : 500000 / 1112392 | Time : 1736.4545783996582
+Training end... Accuracy : 0.07136513069583891
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1786.208241224289
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07599999755620956(Loss:4.965551853179932) | Idx : 500000 / 1112392 | Time : 1828.9668772220612
+Training end... Accuracy : 0.07136513064528391
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1878.6487472057343
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06700000166893005(Loss:4.974551677703857) | Idx : 500000 / 1112392 | Time : 1920.9922528266907
+Training end... Accuracy : 0.07136513056019504
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 1970.8062391281128
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07000000029802322(Loss:4.971551895141602) | Idx : 500000 / 1112392 | Time : 2013.9560017585754
+Training end... Accuracy : 0.071365130576109
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2063.889484167099
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07000000029802322(Loss:4.971551895141602) | Idx : 500000 / 1112392 | Time : 2106.2537803649902
+Training end... Accuracy : 0.07136513057243862
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2155.923902273178
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06599999964237213(Loss:4.975551605224609) | Idx : 500000 / 1112392 | Time : 2196.3413825035095
+Training end... Accuracy : 0.07136513067992493
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2245.5024807453156
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07000000029802322(Loss:4.971551895141602) | Idx : 500000 / 1112392 | Time : 2284.093858242035
+Training end... Accuracy : 0.07136513059022798
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2331.36386013031
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07699999958276749(Loss:4.96455192565918) | Idx : 500000 / 1112392 | Time : 2375.2270386219025
+Training end... Accuracy : 0.0713651304753205
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2424.4834365844727
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.0729999989271164(Loss:4.9685516357421875) | Idx : 500000 / 1112392 | Time : 2473.0437066555023
+Training end... Accuracy : 0.07136513050803256
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2522.627822160721
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07999999821186066(Loss:4.961551666259766) | Idx : 500000 / 1112392 | Time : 2566.7637045383453
+Training end... Accuracy : 0.07136513057809156
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2616.384813308716
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07199999690055847(Loss:4.9695515632629395) | Idx : 500000 / 1112392 | Time : 2657.707334280014
+Training end... Accuracy : 0.07136513049825377
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2706.889883995056
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.05900000035762787(Loss:4.982551574707031) | Idx : 500000 / 1112392 | Time : 2749.139860391617
+Training end... Accuracy : 0.0713651304896002
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2798.822844028473
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07800000160932541(Loss:4.9635515213012695) | Idx : 500000 / 1112392 | Time : 2838.5726754665375
+Training end... Accuracy : 0.07136513053900319
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2886.9858198165894
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07199999690055847(Loss:4.9695515632629395) | Idx : 500000 / 1112392 | Time : 2932.3356251716614
+Training end... Accuracy : 0.07136513048793916
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 2980.734386920929
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06700000166893005(Loss:4.974551677703857) | Idx : 500000 / 1112392 | Time : 3027.37459731102
+Training end... Accuracy : 0.07136513052785805
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 3078.880397796631
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06499999761581421(Loss:4.976551532745361) | Idx : 500000 / 1112392 | Time : 3119.367151737213
+Training end... Accuracy : 0.07136513059143358
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 3169.4580228328705
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07199999690055847(Loss:4.9695515632629395) | Idx : 500000 / 1112392 | Time : 3209.0683693885803
+Training end... Accuracy : 0.07136513050996153
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 3257.572947025299
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.07800000160932541(Loss:4.9635515213012695) | Idx : 500000 / 1112392 | Time : 3304.6299970149994
+Training end... Accuracy : 0.07136513058395884
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 3354.7005746364594
+Validation epoch end... Accuracy : 0.0
+Train accuracy : 0.06700000166893005(Loss:4.974551677703857) | Idx : 500000 / 1112392 | Time : 3395.7783210277557
+Training end... Accuracy : 0.07136513049656593
+Validation accuracy : 0.0 | Idx : 100000 / 138949 | Time : 3445.8735082149506
+Validation epoch end... Accuracy : 0.0

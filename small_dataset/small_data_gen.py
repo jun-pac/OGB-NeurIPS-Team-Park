@@ -19,6 +19,7 @@ from torch.optim.lr_scheduler import StepLR
 from torch_geometric.data import NeighborSampler
 from torch_geometric.nn import GATConv, SAGEConv
 from torch_sparse import SparseTensor
+from ogb.lsc import MAG240MDataset
 from tqdm import tqdm
 
 from torch_geometric.utils.sparse import dense_to_sparse
@@ -276,6 +277,7 @@ print(f"sampled col : {col}")
 print(f"sampled n_id : {n_id}")
 print(f"sampled e_id : {e_id}")
 
+# Precision debug
 samp=torch.Tensor(1).to(torch.long)
 samp[0]=99999999999
 print(int(samp[0]))
@@ -321,3 +323,22 @@ sampled n_id : tensor([3, 7, 5, 2, 6]) # mapping pseudo idx-> real idx :
 # (3,7), (3,5), (7,7), (7,5), (7,2), (7,6) are sampled.
 sampled e_id : tensor([ 2,  1, 12, 10,  9, 11])
 '''
+
+ROOT='/fs/ess/PAS1289/mag240m_kddcup2021'
+dataset = MAG240MDataset(root = ROOT)
+year=dataset.paper_year
+
+
+row,col,_=adj_t.coo()
+print(row)
+print(col)
+print(n_id)
+print(f"total length : {len(row)}")
+cnt1=0
+cnt2=0
+for i in range(len(row)):
+    if(year[row[i]] < year[col[i]]):
+        cnt1+=1
+    else:
+        cnt2+=1
+print(f"row<col : {cnt1}, row>=col : {cnt2}")

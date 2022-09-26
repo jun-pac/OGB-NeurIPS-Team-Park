@@ -1,0 +1,177 @@
+total length : 327532
+row<col : 2203, row>=col : 215286
+total length : 337528
+row<col : 2326, row>=col : 222728
+total length : 329062
+row<col : 2303, row>=col : 214923
+total length : 342351
+row<col : 2190, row>=col : 225352
+total length : 345478
+row<col : 2373, row>=col : 223939
+total length : 343144
+row<col : 2280, row>=col : 226822
+total length : 353182
+row<col : 2286, row>=col : 232878
+total length : 364039
+row<col : 2179, row>=col : 239354
+total length : 353609
+row<col : 2407, row>=col : 234421
+val_acc : 0.0009765625 | time : 1303.727527141571 | batch : 0/135
+total length : 349853
+row<col : 2366, row>=col : 229303
+total length : 331953
+row<col : 2284, row>=col : 216515
+total length : 338700
+row<col : 2291, row>=col : 221574
+total length : 341335
+row<col : 2194, row>=col : 224603
+total length : 343190
+row<col : 2158, row>=col : 225340
+total length : 349309
+row<col : 2440, row>=col : 230948
+total length : 355476
+row<col : 2289, row>=col : 231620
+total length : 342182
+row<col : 2141, row>=col : 224156
+total length : 349118
+row<col : 2330, row>=col : 231625
+total length : 341928
+row<col : 2319, row>=col : 224257
+total length : 338140
+row<col : 2230, row>=col : 220527
+Validation Epoch end... Accuracy : 0.002478392454101462
+total length : 200520
+row<col : 1717, row>=col : 121098
+total length : 200326
+row<col : 1743, row>=col : 118922
+total length : 200663
+row<col : 1716, row>=col : 119473
+total length : 199644
+row<col : 1466, row>=col : 119553
+total length : 206800
+row<col : 1697, row>=col : 123987
+total length : 209643
+row<col : 1775, row>=col : 126218
+total length : 213632
+row<col : 1981, row>=col : 131824
+total length : 217871
+row<col : 1842, row>=col : 132107
+total length : 205822
+row<col : 1674, row>=col : 122710
+train_acc : 0.0078125 | loss : tensor(5.1511, grad_fn=<NllLossBackward>) | time : 1338.4336857795715 | batch : 0/1086
+total length : 192373
+row<col : 1796, row>=col : 115737
+total length : 189718
+row<col : 1681, row>=col : 112382
+total length : 202672
+row<col : 1944, row>=col : 123150
+total length : 203380
+row<col : 1636, row>=col : 120830
+total length : 199816
+row<col : 1636, row>=col : 119319
+total length : 203331
+row<col : 1643, row>=col : 121964
+total length : 205364
+row<col : 1803, row>=col : 121798
+total length : 215824
+row<col : 1927, row>=col : 132389
+total length : 199571
+row<col : 1866, row>=col : 120727
+total length : 201273
+row<col : 1623, row>=col : 120337
+total length : 202838
+row<col : 1794, row>=col : 123020
+total length : 193667
+row<col : 1795, row>=col : 117047
+total length : 199145
+row<col : 1662, row>=col : 118904
+total length : 196546
+row<col : 1761, row>=col : 117395
+total length : 198794
+row<col : 1709, row>=col : 119492
+total length : 200208
+row<col : 1688, row>=col : 119313
+total length : 207655
+row<col : 1798, row>=col : 124798
+total length : 208272
+row<col : 1742, row>=col : 125395
+total length : 208198
+row<col : 1907, row>=col : 128554
+total length : 210708
+row<col : 1824, row>=col : 126864
+total length : 210163
+row<col : 1821, row>=col : 124549
+total length : 201356
+row<col : 1670, row>=col : 120239
+total length : 213255
+row<col : 1922, row>=col : 129090
+total length : 203635
+row<col : 1758, row>=col : 121537
+total length : 206114
+row<col : 1688, row>=col : 123085
+total length : 203349
+row<col : 1674, row>=col : 119630
+total length : 198131
+row<col : 1682, row>=col : 119135
+total length : 204134
+row<col : 1752, row>=col : 123824
+total length : 207280
+row<col : 1933, row>=col : 126743
+total length : 187570
+row<col : 1649, row>=col : 109204
+total length : 204718
+row<col : 1917, row>=col : 125792
+total length : 208954
+row<col : 1799, row>=col : 125556
+total length : 200727
+row<col : 1823, row>=col : 121304
+total length : 214417
+row<col : 1985, row>=col : 131300
+total length : 210829
+row<col : 1934, row>=col : 128310
+total length : 208384
+row<col : 1804, row>=col : 125771
+total length : 197636
+row<col : 1687, row>=col : 118789
+total length : 205173
+row<col : 1678, row>=col : 123599
+total length : 197909
+row<col : 1728, row>=col : 117812
+total length : 206585
+row<col : 1838, row>=col : 123456
+total length : 206257
+row<col : 1797, row>=col : 124357
+total length : 207238
+row<col : 1865, row>=col : 126788
+total length : 198634
+row<col : 1681, row>=col : 119328
+total length : 197307
+row<col : 1776, row>=col : 119335
+total length : 212169
+row<col : 1860, row>=col : 128427
+total length : 207218
+row<col : 1808, row>=col : 123859
+total length : 220330
+row<col : 1633, row>=col : 133328
+total length : 198645
+row<col : 1819, row>=col : 118958
+total length : 199155
+row<col : 1677, row>=col : 121219
+total length : 218986
+row<col : 1891, row>=col : 134574
+total length : 207850
+row<col : 1766, row>=col : 123232
+total length : 196435
+row<col : 1712, row>=col : 117430
+total length : 209759
+row<col : 1722, row>=col : 126553
+total length : 208876
+row<col : 2071, row>=col : 127752
+total length : 214203
+row<col : 1839, row>=col : 127362
+total length : 191754
+row<col : 1625, row>=col : 112083
+total length : 202369
+row<col : 1645, row>=col : 121222
+total length : 207571
+row<col : 1846, row>=col : 126259
