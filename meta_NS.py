@@ -1,5 +1,4 @@
-# Experiment needed : --batch_size (as we don't use GPU), --label_disturb_p, sample_size
-# For sample_size : just follow 
+# User can select between time, relation, mono behavior. 
 
 import argparse
 import glob
@@ -23,7 +22,8 @@ from torch.optim.lr_scheduler import StepLR
 from torch_geometric.nn import GATConv, SAGEConv
 from torch_sparse import SparseTensor
 from tqdm import tqdm
-from sampler.sample_china import NeighborSampler
+from sampler.sample_china import NeighborSampler as NS_china
+from sampler.sample_toggle import NeighborSampler as NS_toggle
 # Must be always in_memory setup
 
 ROOT='/fs/ess/PAS1289'
@@ -62,7 +62,7 @@ class MAG240M(LightningDataModule):
 
     @property
     def num_relations(self) -> int:
-        return 4
+        return 6 # -IA, +PAP, +APA
 
     def prepare_data(self):
         pass
@@ -88,24 +88,35 @@ class MAG240M(LightningDataModule):
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
                       mode='r', shape=(N, self.num_features))
         self.x = np.empty((N, self.num_features), dtype=np.float16)
+        
         if args.debug:
             print("Mingi debug activate")
             self.x = torch.from_numpy(self.x)
         else:
             self.x[:] = x
             self.x = torch.from_numpy(self.x).share_memory_()
+        
         print(f"full_feat loading time : {time.time()-t1:.2f}")
         
         self.y = torch.from_numpy(dataset.all_paper_label)
 
-        path='/fs/ess/PAS1289/mag240m_kddcup2021/full_adj_t.pt'
-        self.adj_t = torch.load(path)
+        path_mono='/fs/ess/PAS1289/mag240m_kddcup2021/meta_mono_adj_t.pt'
+        if(args.link!='full'):
+            self.mono_adj_t = torch.load(path_mono)
+        if(args.link!='mono'):
+            path_full='/fs/ess/PAS1289/mag240m_kddcup2021/meta_symm_adj_t.pt'
+        self.adj_t = torch.load(path_full)
+
         one_hot_encoding = np.eye(153)[[int(x) for x in self.train_label]].astype(np.float16)
         self.one_hot_dict={}
         for i in range(len(self.train_idx)):
             self.one_hot_dict[int(self.train_idx[i])]=one_hot_encoding[i]
 
-        self.relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/relation_ptr.pt")
+        
+        if(args.link!='full'):
+            self.mono_relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/meta_mono_relation_ptr.pt")
+        if(args.link!='mono'):
+            self.relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/meta_relation_ptr.pt")
         self.arxiv_idx=set()
         for i in self.train_idx:
             self.arxiv_idx.add(int(i))
@@ -126,42 +137,82 @@ class MAG240M(LightningDataModule):
             wave=np.arange(self.bit)
             wave=np.cos((wave-i)*np.pi/10)
             pos_row=torch.from_numpy(wave)
-            #print(f"{i}th encoding : {pos_row}")
             self.positional_encoding.append(pos_row)
 
-
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
+        if args.debug:
+            f_log.write(f'Done! [{time.perf_counter() - t:.2f}s]\n')
+            f_log.flush()
 
     def train_dataloader(self):
-        print("call_train_dataloader")
-        return NeighborSampler(self.adj_t, node_idx=self.train_idx,
+        if args.debug:
+            print("call_train_dataloader")
+        if args.link=='toggle':
+            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.train_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_train,
                                batch_size=self.batch_size, shuffle=True,
-                               num_workers=10, relation_ptr=self.relation_ptr)
+                               num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+        else:
+            relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
+            adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
+            return NS_china(adj_t, node_idx=self.train_idx,
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch_train,
+                               batch_size=self.batch_size, shuffle=True,
+                               num_workers=10, relation_ptr=relation_ptr)
 
     def val_dataloader(self):
-        print("call_val_dataloader")
-        return NeighborSampler(self.adj_t, node_idx=self.val_idx,
+        if args.debug:
+            print("call_val_dataloader")
+        if args.link=='toggle':
+            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.val_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
-                               batch_size=self.batch_size, num_workers=10, relation_ptr=self.relation_ptr)
+                               batch_size=self.batch_size,
+                               num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+        else:
+            relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
+            adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
+            return NS_china(adj_t, node_idx=self.val_idx,
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch_test,
+                               batch_size=self.batch_size, 
+                               num_workers=10, relation_ptr=relation_ptr)
 
     def test_dataloader(self):  # Node_idx=self.val_idx??
-        return NeighborSampler(self.adj_t, node_idx=self.val_idx,
+        if args.link=='toggle':
+            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.val_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
-                               batch_size=self.batch_size, num_workers=2, relation_ptr=self.relation_ptr)
+                               batch_size=self.batch_size,
+                               num_workers=2, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+        else:
+            relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
+            adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
+            return NS_china(adj_t, node_idx=self.val_idx,
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch_test,
+                               batch_size=self.batch_size, 
+                               num_workers=2, relation_ptr=relation_ptr)
 
     def hidden_test_dataloader(self): # This is test-dev. Not test-challenge
-        return NeighborSampler(self.adj_t, node_idx=self.test_idx,
+        if args.link=='toggle':
+            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.test_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
-                               batch_size=self.batch_size, num_workers=3, relation_ptr=self.relation_ptr)
+                               batch_size=self.batch_size,
+                               num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+        else:
+            relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
+            adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
+            return NS_china(adj_t, node_idx=self.test_idx,
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch_test,
+                               batch_size=self.batch_size, 
+                               num_workers=10, relation_ptr=relation_ptr)
 
     def convert_batch_train(self, batch_size, n_id, adjs):
-        #t0=time.time()
         x = self.x[n_id]
         append_feat = np.zeros((len(n_id), 153),dtype=np.float16)
         append_time = np.zeros((len(n_id), self.bit),dtype=np.float16)
@@ -185,6 +236,7 @@ class MAG240M(LightningDataModule):
         y = self.y[n_id[:batch_size]].to(torch.long)
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
+
     def convert_batch_test(self, batch_size, n_id, adjs):
         #t0=time.time()
         x = self.x[n_id]
@@ -200,7 +252,40 @@ class MAG240M(LightningDataModule):
             
         x=torch.from_numpy(np.concatenate((x, append_feat, append_time), axis=1)).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
-        #print(f"CONVERT TEST n_id[0] : {n_id[0]} | In train : {(int(n_id[0]) in self.one_hot_dict)} | Year : {0 if (int(n_id[0]) not in self.arxiv_idx) else self.paper_year[int(n_id[0])]} | POS ECD : {append_time[0]}")
+
+
+        # sejun debug
+        if(args.debug):
+            adj_t,_a,_b=adjs[0]
+            row,col,_=adj_t.coo()
+            cnt1=0
+            cnt2=0
+            for i in range(len(row)):
+                if(n_id[row[i]]>=self.num_papers or n_id[col[i]]>=self.num_papers):
+                    continue
+                if(self.paper_year[n_id[row[i]]] < self.paper_year[n_id[col[i]]]):
+                    cnt1+=1
+                else:
+                    cnt2+=1
+            print(f"2nd sample | row<col : {cnt1}, row>=col : {cnt2} | sample size : {adj_t.sizes()}")
+            f_log.write(f"2nd sample | row<col : {cnt1}, row>=col : {cnt2} | sample size : {adj_t.sizes()}\n")
+            f_log.flush()
+
+            adj_t,_a,_b=adjs[1]
+            row,col,_=adj_t.coo()
+            cnt1=0
+            cnt2=0
+            for i in range(len(row)):
+                if(n_id[row[i]]>=self.num_papers or n_id[col[i]]>=self.num_papers):
+                    continue
+                if(self.paper_year[n_id[row[i]]] < self.paper_year[n_id[col[i]]]):
+                    cnt1+=1
+                else:
+                    cnt2+=1
+            print(f"1st sample | row<col : {cnt1}, row>=col : {cnt2} | sample size : {adj_t.sizes()}")
+            f_log.write(f"1st sample | row<col : {cnt1}, row>=col : {cnt2} | sample size : {adj_t.sizes()}\n")
+            f_log.flush()
+        
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
@@ -279,10 +364,6 @@ class RGNN(LightningModule):
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
         for i, adj_t in enumerate(adjs_t):
-
-            #CHINA-DEBUG
-            #print(f"Forward i, adj_t : {i}, {adj_t}")
-
             x_target = x[:adj_t.size(0)]
             out = self.skips[i](x_target)
             # out tensor is initialized as skip connection of prev. layer(Just Linear layer)
@@ -301,22 +382,14 @@ class RGNN(LightningModule):
 
     def training_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
-
-        #CHINA-DEBUG
-        #print(f"Training step - y_hat, batch.y : {y_hat}, {batch.y}")
-        #print(f"Sizes - y_hat, batch.y : {y_hat.shape}, {batch.y.shape}")
-
         train_loss = F.cross_entropy(y_hat, batch.y)
         tmp_acc=self.train_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
         self.train_acc_sum+=batch.x.shape[0]*tmp_acc
         self.train_cnt+=batch.x.shape[0]
-        # What side effect previous code has??
-        # I think train_acc is just Accuracy type. But how logger detect its class and print meaningful information automatically?
-        #self.log('train_acc', self.train_acc, prog_bar=True, on_step=False, on_epoch=True)
         self.log('train_acc', tmp_acc, prog_bar=True, on_step=False, on_epoch=True)
         if(batch_idx%100==0):
-            print(f"{name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}")
-            f_log.write(f"{name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}\n")
+            print(f"{self.current_epoch} epoch ; {name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}")
+            f_log.write(f"{self.current_epoch} epoch ; {name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}\n")
             f_log.flush()
         return train_loss
 
@@ -331,8 +404,8 @@ class RGNN(LightningModule):
         self.batch_idx=batch_idx
         self.log('val_acc', tmp_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         if(batch_idx%50==0):
-            print(f"{name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}")
-            f_log.write(f"{name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}\n")
+            print(f"{self.current_epoch} epoch ; {name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}")
+            f_log.write(f"{self.current_epoch} epoch ; {name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}\n")
             f_log.flush()
 
     def test_step(self, batch, batch_idx: int):
@@ -396,37 +469,40 @@ if __name__ == '__main__':
     parser.add_argument('--ver', type=int, default=0) # Used in ensemble step.
     parser.add_argument('--bit', type=int, default=10) # Used in ensemble step.
     parser.add_argument('--debug', action='store_true')
+    parser.add_argument('--link', type=str, default='toggle',
+                        choices=['full', 'mono', 'toggle'])
     # Must specify seed everytime.
     # Batchsize, N_source need to be precisely selected, but don't change it for now.
 
-    # DEBUG
-    # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=1024 --debug
 
+    # Debug - debug results are recorded in 
+    # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=full --debug
     # MAIN
-    # BEST # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/time-NS_p=0.1_batch=1024/lightning_logs/version_13020204/checkpoints/epoch=19-step=20754.ckpt
-    # Recorded 0.72202!
+    # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=toggle
+    # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=mono
+    # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=full
 
-    # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=1024 --ckpt /users/PAS1289/oiocha/logs/New-time-NS_p=0.1_batch=1024/lightning_logs/version_13022251/checkpoints/epoch=15-step=16334.ckpt
-    # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=512 --ckpt=/users/PAS1289/oiocha/logs/New-time-NS_p=0.1_batch=512/lightning_logs/version_13015175/checkpoints/epoch=10-step=23902.ckpt
-    # python OGB-NeurIPS-Team-Park/time_NS.py --label_disturb_p=0.1 --batch_size=1024 --hidden_channels=2048 --ckpt=/users/PAS1289/oiocha/logs/New-time-NS_p=0.1_batch=1024_hidden=2048/lightning_logs/version_13013238/checkpoints/epoch=4-step=5434.ckpt
-
+    
     t0=time.time()
     args = parser.parse_args()
-    #args.sizes = [int(i) for i in args.sizes.split('-')]
-    sizes=[[40,10,0],[15,10,5]] # Default behavior
+    sizes=[[40,10,5],[15,10,5]] # Default behavior
     print(args)
     print(f"Sizes : {sizes}")
+
+    import pytorch_lightning as pl
+    if args.debug:
+        print(f"pytorch_lightning.__version__ : {pl.__version__}")
 
     seed_everything(42)
 
 
     # Initialize log directory
     if args.debug:
-        name=f'/toggle-NS_DEBUG'
+        name=f'/meta-'+args.link+'-NS_DEBUG'
     elif args.hidden_channels==1024:
-        name=f'/New-time-NS_p={args.label_disturb_p}_batch={args.batch_size}'
+        name=f'/meta-'+args.link+'-NS_p={args.label_disturb_p}_batch={args.batch_size}'
     else:
-        name=f'/New-time-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
+        name=f'/meta-'+args.link+'-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
 
     NROOT='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/txtlog' # log file's root.
     path_log = NROOT+name+'.txt'
@@ -444,19 +520,19 @@ if __name__ == '__main__':
     if not args.evaluate:
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         print("Device :",device)
-        model = RGNN(args.model, datamodule.num_features+153+args.bit,
+        
+        if args.ckpt != None:
+            model=RGNN.load_from_checkpoint(args.ckpt)
+
+        else:
+            model = RGNN(args.model, datamodule.num_features+153+args.bit,
                     datamodule.num_classes, args.hidden_channels,
                     datamodule.num_relations, num_layers=len(sizes),
                     dropout=args.dropout)
-        if args.ckpt != None:
-            checkpoint = torch.load(args.ckpt)
-            model.load_state_dict(checkpoint['state_dict'])
-
         print(f'#Params {sum([p.numel() for p in model.parameters()])}')
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max',
                                            save_top_k=3)
-        # tensorboard --logdir=/users/PAS1289/oiocha/logs/rgat/lightning_logs
-        # About 1000s... (Without data copying, which consume 2400s)  
+        
         if args.ckpt != None:
             trainer = Trainer(max_epochs=args.epochs,
                             callbacks=[checkpoint_callback],
@@ -470,17 +546,16 @@ if __name__ == '__main__':
         
         trainer.fit(model, datamodule=datamodule)
         
-
     # Evaluate
     if args.evaluate:
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         # Ignore previous code
-        ckpt='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365/checkpoints/epoch=2-step=3260.ckpt'
         logdir='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365'
-        trainer = Trainer(resume_from_checkpoint=ckpt,
+        trainer = Trainer(resume_from_checkpoint=args.ckpt,
                           progress_bar_refresh_rate=0) # gpus=args.device,
+        
         model = RGNN.load_from_checkpoint(
-            checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
+            checkpoint_path=args.ckpt, hparams_file=f'{logdir}/hparams.yaml')
 
         datamodule.batch_size = 16*8 # initially 16
         datamodule.sizes = [[100,100,100],[100,100,100]] * len(sizes)  # (Almost) no sampling...

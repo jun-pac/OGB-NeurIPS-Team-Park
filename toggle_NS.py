@@ -1,5 +1,4 @@
-# Experiment needed : --batch_size (as we don't use GPU), --label_disturb_p, sample_size
-# For sample_size : just follow 
+# mono_NS -> bidirectional sampling in 2nd step
 
 import argparse
 import glob
@@ -23,7 +22,7 @@ from torch.optim.lr_scheduler import StepLR
 from torch_geometric.nn import GATConv, SAGEConv
 from torch_sparse import SparseTensor
 from tqdm import tqdm
-from sampler.sample_china import NeighborSampler
+from sampler.sample_toggle import NeighborSampler
 # Must be always in_memory setup
 
 ROOT='/fs/ess/PAS1289'
@@ -88,21 +87,30 @@ class MAG240M(LightningDataModule):
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
                       mode='r', shape=(N, self.num_features))
         self.x = np.empty((N, self.num_features), dtype=np.float16)
-        self.x[:] = x
-        self.x = torch.from_numpy(self.x).share_memory_()
+        
+        if args.debug:
+            print("Mingi debug activate")
+            self.x = torch.from_numpy(self.x)
+        else:
+            self.x[:] = x
+            self.x = torch.from_numpy(self.x).share_memory_()
+        
         print(f"full_feat loading time : {time.time()-t1:.2f}")
         
         self.y = torch.from_numpy(dataset.all_paper_label)
 
-        #path = f'{dataset.dir}/asym_adj_t.pt'
-        path='/fs/ess/PAS1289/mag240m_kddcup2021/asym_adj_t.pt'
-        self.adj_t = torch.load(path)
+        path_mono='/fs/ess/PAS1289/mag240m_kddcup2021/asym_adj_t.pt'
+        self.mono_adj_t = torch.load(path_mono)
+        path_full='/fs/ess/PAS1289/mag240m_kddcup2021/full_adj_t.pt'
+        self.adj_t = torch.load(path_full)
+
         one_hot_encoding = np.eye(153)[[int(x) for x in self.train_label]].astype(np.float16)
         self.one_hot_dict={}
         for i in range(len(self.train_idx)):
             self.one_hot_dict[int(self.train_idx[i])]=one_hot_encoding[i]
 
-        self.relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/mono_relation_ptr.pt")
+        self.mono_relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/mono_relation_ptr.pt")
+        self.relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/relation_ptr.pt")
         self.arxiv_idx=set()
         for i in self.train_idx:
             self.arxiv_idx.add(int(i))
@@ -115,7 +123,7 @@ class MAG240M(LightningDataModule):
 
         # Build positional encoding
         self.num_papers=dataset.num_papers
-        self.paper_year=dataset.paper_year[:] # load years to memory!
+        self.paper_year=dataset.paper_year # load years to memory!
         _idx=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,4,4,5,5,6,7,8,9,9]
         self.year_to_idx=[0]*1985+_idx
         self.positional_encoding=[]
@@ -123,42 +131,43 @@ class MAG240M(LightningDataModule):
             wave=np.arange(self.bit)
             wave=np.cos((wave-i)*np.pi/10)
             pos_row=torch.from_numpy(wave)
-            #print(f"{i}th encoding : {pos_row}")
             self.positional_encoding.append(pos_row)
 
-
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
+        if args.debug:
+            f_log.write(f'Done! [{time.perf_counter() - t:.2f}s]\n')
+            f_log.flush()
 
     def train_dataloader(self):
-        print("call_train_dataloader")
-        return NeighborSampler(self.adj_t, node_idx=self.train_idx,
+        if args.debug:
+            print("call_train_dataloader")
+        return NeighborSampler(self.mono_adj_t, self.adj_t, node_idx=self.train_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_train,
                                batch_size=self.batch_size, shuffle=True,
-                               num_workers=10, relation_ptr=self.relation_ptr)
+                               num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
 
     def val_dataloader(self):
-        print("call_val_dataloader")
-        return NeighborSampler(self.adj_t, node_idx=self.val_idx,
+        if args.debug:
+            print("call_val_dataloader")
+        return NeighborSampler(self.mono_adj_t, self.adj_t, node_idx=self.val_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
-                               batch_size=self.batch_size, num_workers=10, relation_ptr=self.relation_ptr)
+                               batch_size=self.batch_size, num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
 
     def test_dataloader(self):  # Node_idx=self.val_idx??
-        return NeighborSampler(self.adj_t, node_idx=self.val_idx,
+        return NeighborSampler(self.mono_adj_t, self.adj_t, node_idx=self.val_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
-                               batch_size=self.batch_size, num_workers=2, relation_ptr=self.relation_ptr)
+                               batch_size=self.batch_size, num_workers=2, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
 
     def hidden_test_dataloader(self): # This is test-dev. Not test-challenge
-        return NeighborSampler(self.adj_t, node_idx=self.test_idx,
+        return NeighborSampler(self.mono_adj_t, self.adj_t, node_idx=self.test_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
-                               batch_size=self.batch_size, num_workers=3, relation_ptr=self.relation_ptr)
+                               batch_size=self.batch_size, num_workers=3, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
 
     def convert_batch_train(self, batch_size, n_id, adjs):
-        #t0=time.time()
         x = self.x[n_id]
         append_feat = np.zeros((len(n_id), 153),dtype=np.float16)
         append_time = np.zeros((len(n_id), self.bit),dtype=np.float16)
@@ -180,23 +189,6 @@ class MAG240M(LightningDataModule):
                 append_time[i]=self.positional_encoding[self.year_to_idx[year]]
         x=torch.from_numpy(np.concatenate((x, append_feat, append_time), axis=1)).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
-
-        adj_t,_a,_b=adjs[0]
-        row,col,_=adj_t.coo()
-        print(f"total length : {len(row)}")
-        cnt1=0
-        cnt2=0
-        for i in range(len(row)):
-            if(n_id[row[i]]>=self.num_papers or n_id[col[i]]>=self.num_papers):
-                continue
-            if(self.paper_year[n_id[row[i]]] < self.paper_year[n_id[col[i]]]):
-                cnt1+=1
-            else:
-                cnt2+=1
-        print(f"row<col : {cnt1}, row>=col : {cnt2}")
-        f_log.write(f"total length : {len(row)}\n")
-        f_log.write(f"row<col : {cnt1}, row>=col : {cnt2}\n")
-        f_log.flush()
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
@@ -216,22 +208,39 @@ class MAG240M(LightningDataModule):
         x=torch.from_numpy(np.concatenate((x, append_feat, append_time), axis=1)).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
 
-        adj_t,_a,_b=adjs[0]
-        row,col,_=adj_t.coo()
-        print(f"total length : {len(row)}")
-        cnt1=0
-        cnt2=0
-        for i in range(len(row)):
-            if(n_id[row[i]]>=self.num_papers or n_id[col[i]]>=self.num_papers):
-                continue
-            if(self.paper_year[n_id[row[i]]] < self.paper_year[n_id[col[i]]]):
-                cnt1+=1
-            else:
-                cnt2+=1
-        print(f"row<col : {cnt1}, row>=col : {cnt2}")
-        f_log.write(f"total length : {len(row)}\n")
-        f_log.write(f"row<col : {cnt1}, row>=col : {cnt2}\n")
-        f_log.flush()
+
+        # sejun debug
+        if(args.debug):
+            adj_t,_a,_b=adjs[0]
+            row,col,_=adj_t.coo()
+            cnt1=0
+            cnt2=0
+            for i in range(len(row)):
+                if(n_id[row[i]]>=self.num_papers or n_id[col[i]]>=self.num_papers):
+                    continue
+                if(self.paper_year[n_id[row[i]]] < self.paper_year[n_id[col[i]]]):
+                    cnt1+=1
+                else:
+                    cnt2+=1
+            print(f"2nd sample | row<col : {cnt1}, row>=col : {cnt2} | sample size : {adj_t.sizes()}")
+            f_log.write(f"2nd sample | row<col : {cnt1}, row>=col : {cnt2} | sample size : {adj_t.sizes()}\n")
+            f_log.flush()
+
+            adj_t,_a,_b=adjs[1]
+            row,col,_=adj_t.coo()
+            cnt1=0
+            cnt2=0
+            for i in range(len(row)):
+                if(n_id[row[i]]>=self.num_papers or n_id[col[i]]>=self.num_papers):
+                    continue
+                if(self.paper_year[n_id[row[i]]] < self.paper_year[n_id[col[i]]]):
+                    cnt1+=1
+                else:
+                    cnt2+=1
+            print(f"1st sample | row<col : {cnt1}, row>=col : {cnt2} | sample size : {adj_t.sizes()}")
+            f_log.write(f"1st sample | row<col : {cnt1}, row>=col : {cnt2} | sample size : {adj_t.sizes()}\n")
+            f_log.flush()
+        
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
@@ -310,10 +319,6 @@ class RGNN(LightningModule):
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
         for i, adj_t in enumerate(adjs_t):
-
-            #CHINA-DEBUG
-            #print(f"Forward i, adj_t : {i}, {adj_t}")
-
             x_target = x[:adj_t.size(0)]
             out = self.skips[i](x_target)
             # out tensor is initialized as skip connection of prev. layer(Just Linear layer)
@@ -338,9 +343,8 @@ class RGNN(LightningModule):
         self.train_cnt+=batch.x.shape[0]
         self.log('train_acc', tmp_acc, prog_bar=True, on_step=False, on_epoch=True)
         if(batch_idx%100==0):
-            print('train_acc : '+str(tmp_acc)+' | loss : '+str(train_loss)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(1112392//args.batch_size))
-            f_log.write('train_acc : '+str(tmp_acc)+' | loss : '+str(train_loss)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(1112392//args.batch_size))
-            f_log.write('\n')
+            print(f"{self.current_epoch} epoch ; {name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}")
+            f_log.write(f"{self.current_epoch} epoch ; {name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}\n")
             f_log.flush()
         return train_loss
 
@@ -355,9 +359,8 @@ class RGNN(LightningModule):
         self.batch_idx=batch_idx
         self.log('val_acc', tmp_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         if(batch_idx%50==0):
-            print('val_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(138949//args.batch_size))
-            f_log.write('val_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(138949//args.batch_size))
-            f_log.write('\n')
+            print(f"{self.current_epoch} epoch ; {name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}")
+            f_log.write(f"{self.current_epoch} epoch ; {name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}\n")
             f_log.flush()
 
     def test_step(self, batch, batch_idx: int):
@@ -367,12 +370,12 @@ class RGNN(LightningModule):
         self.test_cnt+=batch.x.shape[0]
         self.test_res.append(y_hat.softmax(dim=-1).cpu().numpy())
 
+        #self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         self.log('test_acc', tmp_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         if(batch_idx%50==0):
-            print('test_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
-            f_log.write('test_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
-            f_log.write('\n')
-            #f_log.flush()
+            print(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{88092//128}")
+            f_log.write(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{88092//128}\n")
+            f_log.flush()
     
     def training_epoch_end(self, outputs) -> None:
         print("Train Epoch end... Accuracy : "+str(self.train_acc_sum/self.train_cnt))
@@ -390,8 +393,8 @@ class RGNN(LightningModule):
             self.max_val_acc=self.val_acc_sum/self.val_cnt
             self.val_res=np.concatenate(self.val_res)
             np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation'+name, self.val_res)
-            print("Succesfully saved!")
-            f_log.write("Succesfully saved!\n")
+            print("Successfully saved!")
+            f_log.write("Successfully saved!\n")
         f_log.flush()
         self.val_res=[]
         self.val_acc_sum=0
@@ -420,8 +423,16 @@ if __name__ == '__main__':
     parser.add_argument('--time_disturb_p', type=float, default=0.2)
     parser.add_argument('--ver', type=int, default=0) # Used in ensemble step.
     parser.add_argument('--bit', type=int, default=10) # Used in ensemble step.
+    parser.add_argument('--debug', action='store_true')
+    # Must specify seed everytime.
+    # Batchsize, N_source need to be precisely selected, but don't change it for now.
 
-    # python OGB-NeurIPS-Team-Park/monotonic_NS_debug.py --label_disturb_p=0.2 --batch_size=1024
+
+    # Debug - debug results are recorded in 
+    # python OGB-NeurIPS-Team-Park/toggle_NS.py --label_disturb_p=0.1 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt --debug
+    # MAIN
+    # python OGB-NeurIPS-Team-Park/toggle_NS.py --label_disturb_p=0.1 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13082877/checkpoints/epoch=40-step=44566.ckpt
+
     
     t0=time.time()
     args = parser.parse_args()
@@ -430,14 +441,23 @@ if __name__ == '__main__':
     print(args)
     print(f"Sizes : {sizes}")
 
+    import pytorch_lightning as pl
+    if args.debug:
+        print(f"pytorch_lightning.__version__ : {pl.__version__}")
+
     seed_everything(42)
 
 
     # Initialize log directory
-    if args.hidden_channels==1024:
-        name=f'/mono-NS_p={args.label_disturb_p}_batch={args.batch_size}'
+    if args.debug:
+        name=f'/toggle-NS_DEBUG'
+    elif args.ckpt!=None:
+        name='/'+args.ckpt.split('/')[5]
+    elif args.hidden_channels==1024:
+        name=f'/toggle-NS_p={args.label_disturb_p}_batch={args.batch_size}'
     else:
-        name=f'/mono-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
+        name=f'/toggle-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
+
 
     NROOT='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/txtlog' # log file's root.
     path_log = NROOT+name+'.txt'
@@ -455,37 +475,54 @@ if __name__ == '__main__':
     if not args.evaluate:
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         print("Device :",device)
-        model = RGNN(args.model, datamodule.num_features+153+args.bit,
+        
+        if args.ckpt != None:
+            checkpoint = torch.load(args.ckpt)
+            model=RGNN.load_from_checkpoint(args.ckpt)
+
+            if (args.debug):
+                # dict_keys(['epoch', 'global_step', 'pytorch-lightning_version', 'state_dict', 'callbacks', 'optimizer_states', 'lr_schedulers', 'hparams_name', 'hyper_parameters'])
+                print(f"checkpoint['epoch'] : {checkpoint['epoch']}")
+                print(f"checkpoint['global_step'] : {checkpoint['global_step']}")
+                print(f"checkpoint.keys() : {checkpoint.keys()}")
+                #print(f"BEFORE model.optimizers() : {model.optimizers()}")
+
+        else:
+            model = RGNN(args.model, datamodule.num_features+153+args.bit,
                     datamodule.num_classes, args.hidden_channels,
                     datamodule.num_relations, num_layers=len(sizes),
                     dropout=args.dropout)
-        if args.ckpt != None:
-            checkpoint = torch.load(args.ckpt)
-            model.load_state_dict(checkpoint['state_dict'])
 
         print(f'#Params {sum([p.numel() for p in model.parameters()])}')
-        checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max',
-                                           save_top_k=3)
+        checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max',save_top_k=3)
         # tensorboard --logdir=/users/PAS1289/oiocha/logs/rgat/lightning_logs
-        # About 1000s... (Without data copying, which consume 2400s)  
-        trainer = Trainer(max_epochs=args.epochs,
-                          callbacks=[checkpoint_callback],
-                          default_root_dir='logs'+name,
-                          progress_bar_refresh_rate=0) # gpus=args.device,
-        
+        if args.ckpt != None:
+            trainer = Trainer(max_epochs=args.epochs,
+                            callbacks=[checkpoint_callback],
+                            default_root_dir='logs'+name,
+                            progress_bar_refresh_rate=0, resume_from_checkpoint=args.ckpt)
+        else:
+            trainer = Trainer(max_epochs=args.epochs,
+                            callbacks=[checkpoint_callback],
+                            default_root_dir='logs'+name,
+                            progress_bar_refresh_rate=0)
+        if args.debug:
+            print(f"AFTER model.optimizers() : {trainer.optimizers}")
+            print(f"model.global_step : {model.global_step}")
+            print(f"model.current_epoch : {model.current_epoch}")
+
         trainer.fit(model, datamodule=datamodule)
         
-
     # Evaluate
     if args.evaluate:
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         # Ignore previous code
-        ckpt='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365/checkpoints/epoch=2-step=3260.ckpt'
-        logdir='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365'
+        ckpt=args.ckpt
         trainer = Trainer(resume_from_checkpoint=ckpt,
                           progress_bar_refresh_rate=0) # gpus=args.device,
+        
         model = RGNN.load_from_checkpoint(
-            checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
+            checkpoint_path=ckpt)
 
         datamodule.batch_size = 16*8 # initially 16
         datamodule.sizes = [[100,100,100],[100,100,100]] * len(sizes)  # (Almost) no sampling...
@@ -506,31 +543,3 @@ if __name__ == '__main__':
                 y_preds.append(out)
         res = {'y_pred': torch.cat(y_preds, dim=0)}
         evaluator.save_test_submission(res, 'results'+name, mode='test-dev')
-
-'''
-row<col : 1808, row>=col : 123859
-total length : 198645
-row<col : 1633, row>=col : 133328
-total length : 199155
-row<col : 1819, row>=col : 118958
-row<col : 1677, row>=col : 121219
-total length : 218986
-total length : 207850
-row<col : 1891, row>=col : 134574
-total length : 196435
-row<col : 1766, row>=col : 123232
-row<col : 1712, row>=col : 117430
-total length : 209759
-total length : 208876
-row<col : 1722, row>=col : 126553
-total length : 214203
-row<col : 2071, row>=col : 127752
-total length : 191754
-row<col : 1839, row>=col : 127362
-row<col : 1625, row>=col : 112083
-total length : 202369
-total length : 207571
-row<col : 1645, row>=col : 121222
-total length : 205028
-row<col : 1846, row>=col : 126259
-'''

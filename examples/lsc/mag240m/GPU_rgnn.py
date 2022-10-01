@@ -87,7 +87,6 @@ class MAG240M(LightningDataModule):
 
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
                       mode='r', shape=(N, self.num_features))
-
         if self.in_memory:
             self.x = np.empty((N, self.num_features), dtype=np.float16)
             self.x[:] = x
@@ -95,6 +94,7 @@ class MAG240M(LightningDataModule):
         else:
             self.x = x
 
+        print("asdf")
         self.y = torch.from_numpy(dataset.all_paper_label)
 
         #path = f'{dataset.dir}/full_adj_t.pt'
@@ -346,7 +346,7 @@ if __name__ == '__main__':
     
     # Use multicore
     # Observe some efficiency?
-    torch.set_num_threads(8)
+    # torch.set_num_threads(8)
     #torch.set_num_interop_threads(8) # Difference?
 
     if not args.evaluate:

@@ -88,8 +88,14 @@ class MAG240M(LightningDataModule):
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
                       mode='r', shape=(N, self.num_features))
         self.x = np.empty((N, self.num_features), dtype=np.float16)
-        self.x[:] = x
-        self.x = torch.from_numpy(self.x).share_memory_()
+        
+        if args.debug:
+            print("Mingi debug activate")
+            self.x = torch.from_numpy(self.x)
+        else:
+            self.x[:] = x
+            self.x = torch.from_numpy(self.x).share_memory_()
+
         print(f"full_feat loading time : {time.time()-t1:.2f}")
         
         self.y = torch.from_numpy(dataset.all_paper_label)
@@ -312,9 +318,8 @@ class RGNN(LightningModule):
         #self.log('train_acc', self.train_acc, prog_bar=True, on_step=False, on_epoch=True)
         self.log('train_acc', tmp_acc, prog_bar=True, on_step=False, on_epoch=True)
         if(batch_idx%100==0):
-            print('train_acc : '+str(tmp_acc)+' | loss : '+str(train_loss)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(1112392//args.batch_size))
-            f_log.write('train_acc : '+str(tmp_acc)+' | loss : '+str(train_loss)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(1112392//args.batch_size))
-            f_log.write('\n')
+            print(f"{name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}")
+            f_log.write(f"{name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}\n")
             f_log.flush()
         return train_loss
 
@@ -329,9 +334,8 @@ class RGNN(LightningModule):
         self.batch_idx=batch_idx
         self.log('val_acc', tmp_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         if(batch_idx%50==0):
-            print('val_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(138949//args.batch_size))
-            f_log.write('val_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(138949//args.batch_size))
-            f_log.write('\n')
+            print(f"{name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}")
+            f_log.write(f"{name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}\n")
             f_log.flush()
 
     def test_step(self, batch, batch_idx: int):
@@ -344,10 +348,9 @@ class RGNN(LightningModule):
         #self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         self.log('test_acc', tmp_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         if(batch_idx%50==0):
-            print('test_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
-            f_log.write('test_acc : '+str(tmp_acc)+' | time : '+str(time.time()-t0)+" | batch : "+str(batch_idx)+'/'+str(88092//128))
-            f_log.write('\n')
-            #f_log.flush()
+            print(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{88092//128}")
+            f_log.write(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{88092//128}\n")
+            f_log.flush()
     
     def training_epoch_end(self, outputs) -> None:
         print("Train Epoch end... Accuracy : "+str(self.train_acc_sum/self.train_cnt))
@@ -365,8 +368,8 @@ class RGNN(LightningModule):
             self.max_val_acc=self.val_acc_sum/self.val_cnt
             self.val_res=np.concatenate(self.val_res)
             np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation'+name, self.val_res)
-            print("Succesfully saved!")
-            f_log.write("Succesfully saved!\n")
+            print("Successfully saved!")
+            f_log.write("Successfully saved!\n")
         f_log.flush()
         self.val_res=[]
         self.val_acc_sum=0
@@ -395,11 +398,15 @@ if __name__ == '__main__':
     parser.add_argument('--time_disturb_p', type=float, default=0.2)
     parser.add_argument('--ver', type=int, default=0) # Used in ensemble step.
     parser.add_argument('--bit', type=int, default=10) # Used in ensemble step.
+    parser.add_argument('--debug', action='store_true')
     # Must specify seed everytime.
     # Batchsize, N_source need to be precisely selected, but don't change it for now.
 
+    # DEBUG
+    # python OGB-NeurIPS-Team-Park/monotonic_NS.py --label_disturb_p=0.1 --batch_size=1024 --debug
+    
     # MAIN
-    # python OGB-NeurIPS-Team-Park/monotonic_NS.py --label_disturb_p=0.1 --batch_size=1024
+    # python OGB-NeurIPS-Team-Park/monotonic_NS.py --label_disturb_p=0.1 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/mono-NS_p=0.1_batch=1024/lightning_logs/version_13028665/checkpoints/epoch=25-step=28261.ckpt
     # python OGB-NeurIPS-Team-Park/monotonic_NS.py --label_disturb_p=0.1 --batch_size=512
     # python OGB-NeurIPS-Team-Park/monotonic_NS.py --label_disturb_p=0.1 --batch_size=1024 --hidden_channels=2048
 
@@ -414,7 +421,9 @@ if __name__ == '__main__':
 
 
     # Initialize log directory
-    if args.hidden_channels==1024:
+    if args.debug:
+        name=f'/toggle-NS_DEBUG'
+    elif args.hidden_channels==1024:
         name=f'/mono-NS_p={args.label_disturb_p}_batch={args.batch_size}'
     else:
         name=f'/mono-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
@@ -448,10 +457,16 @@ if __name__ == '__main__':
                                            save_top_k=3)
         # tensorboard --logdir=/users/PAS1289/oiocha/logs/rgat/lightning_logs
         # About 1000s... (Without data copying, which consume 2400s)  
-        trainer = Trainer(max_epochs=args.epochs,
-                          callbacks=[checkpoint_callback],
-                          default_root_dir='logs'+name,
-                          progress_bar_refresh_rate=0) # gpus=args.device,
+        if args.ckpt != None:
+            trainer = Trainer(max_epochs=args.epochs,
+                            callbacks=[checkpoint_callback],
+                            default_root_dir='logs'+name,
+                            progress_bar_refresh_rate=0, resume_from_checkpoint=args.ckpt)
+        else:
+            trainer = Trainer(max_epochs=args.epochs,
+                            callbacks=[checkpoint_callback],
+                            default_root_dir='logs'+name,
+                            progress_bar_refresh_rate=0)
         
         trainer.fit(model, datamodule=datamodule)
         
