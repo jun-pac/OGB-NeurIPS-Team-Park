@@ -38,6 +38,7 @@ def calculate_val_acc(y_preds):
             acc_cnt+=1
     return acc_cnt/cnt
 
+'''
 dir_list=["/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_0.npy",
 "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_1.npy",
 "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_1.npy",
@@ -49,9 +50,25 @@ dir_list=["/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label
 "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_6.npy",
 "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_6.npy",
 "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/rgat_label_7.npy"]
+'''
+'''
+dir_list=["/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/New-time-NS_p=0.1_batch=1024.npy",
+        "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/mono-NS_p=0.1_batch=1024.npy",
+        "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/toggle-NS_p=0.1_batch=1024.npy",
+        "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/meta-toggle-NS_p=0.1_batch=1024.npy",
+        "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/meta-full-NS_p=0.1_batch=1024.npy"
+        ]
+'''
+dir_list=["/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/test_activation/New-time-NS_p=0.1_batch=1024.npy",
+        "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/test_activation/mono-NS_p=0.1_batch=1024.npy",
+        "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/test_activation/toggle-NS_p=0.1_batch=1024.npy",
+        "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/test_activation/meta-toggle-NS_p=0.1_batch=1024.npy",
+        ]
+dir_list2=["/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/meta-toggle-NS_p=0.1_batch=1024.npy",
+        "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation/meta-full-NS_p=0.1_batch=1024.npy"]
 
 num_ensemble=len(dir_list)
-f_log=open('/fs/scratch/PAS1289/result/rgat_label_ensemble.txt','w+')
+f_log=open('/fs/scratch/PAS1289/result/time_NS_ensemble.txt','w+')
 
 summed_activation=np.zeros((138949,153)).astype(np.float16)
 

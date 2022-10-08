@@ -1,0 +1,51 @@
+Continue from.../users/PAS1289/oiocha/logs/mono-NS_p=0.1_batch=1024/lightning_logs/version_13046213/checkpoints/epoch=14-step=16304.ckpt
+Original : [[40,10,0],[20,10,5]]
+mono-NS_p=0.0_batch=1024 | test_acc : 0.75000 | time : 982.19 | batch : 0/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.69531 | time : 1030.19 | batch : 50/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.67969 | time : 1079.17 | batch : 100/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.71094 | time : 1130.79 | batch : 150/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.76562 | time : 1187.09 | batch : 200/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.72656 | time : 1245.67 | batch : 250/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.78125 | time : 1292.25 | batch : 300/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.79688 | time : 1352.44 | batch : 350/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.73438 | time : 1410.75 | batch : 400/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.72656 | time : 1476.12 | batch : 450/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.79688 | time : 1530.72 | batch : 500/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.67969 | time : 1581.90 | batch : 550/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.75000 | time : 1636.76 | batch : 600/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.73438 | time : 1698.11 | batch : 650/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.81250 | time : 1748.96 | batch : 700/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.70312 | time : 1799.03 | batch : 750/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.75781 | time : 1852.34 | batch : 800/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.70312 | time : 1908.74 | batch : 850/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.78125 | time : 1958.12 | batch : 900/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.71875 | time : 2024.78 | batch : 950/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.82031 | time : 2072.06 | batch : 1000/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.74219 | time : 2127.32 | batch : 1050/688
+Test Epoch end... Accuracy : 0.7244771295507026
+Successfully saved!
+X5 : [[200,50,0],[100,60,25]]
+mono-NS_p=0.0_batch=1024 | test_acc : 0.75781 | time : 2173.10 | batch : 0/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.69531 | time : 2271.68 | batch : 50/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.68750 | time : 2369.30 | batch : 100/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.71094 | time : 2473.74 | batch : 150/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.75781 | time : 2573.44 | batch : 200/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.75781 | time : 2682.70 | batch : 250/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.76562 | time : 2780.87 | batch : 300/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.76562 | time : 2899.50 | batch : 350/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.76562 | time : 2993.88 | batch : 400/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.76562 | time : 3101.49 | batch : 450/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.80469 | time : 3199.47 | batch : 500/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.67188 | time : 3309.64 | batch : 550/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.75781 | time : 3414.11 | batch : 600/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.75781 | time : 3522.52 | batch : 650/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.81250 | time : 3626.34 | batch : 700/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.68750 | time : 3740.32 | batch : 750/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.75000 | time : 3841.29 | batch : 800/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.71875 | time : 3949.44 | batch : 850/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.78906 | time : 4047.12 | batch : 900/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.73438 | time : 4150.87 | batch : 950/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.82812 | time : 4262.86 | batch : 1000/688
+mono-NS_p=0.0_batch=1024 | test_acc : 0.72656 | time : 4374.03 | batch : 1050/688
+Test Epoch end... Accuracy : 0.7287284812354449
+Successfully saved!

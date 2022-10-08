@@ -31,7 +31,7 @@ N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
 nums=[dataset.num_papers, dataset.num_papers + dataset.num_authors, N]
 
 print("Loading data...")
-path='/fs/ess/PAS1289/mag240m_kddcup2021/full_adj_t.pt'
+path='/fs/ess/PAS1289/mag240m_kddcup2021/bi_adj_t.pt'
 adj_t = torch.load(path)
 rowptr,col,_=adj_t.csr()
 print(f"Done! {time.time()-t0}")
@@ -69,7 +69,7 @@ pool.map(task, range(N)) # This would take 2120s
 
 print(f"first ten relation_ptr(before save) : {relation_ptr[:10]}")
 
-torch.save(relation_ptr, "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/relation_ptr.pt")
+torch.save(relation_ptr, "/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/bi_relation_ptr.pt")
 
 
 '''

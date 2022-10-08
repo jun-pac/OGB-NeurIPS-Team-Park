@@ -1,0 +1,82 @@
+Done! [68.11s]
+Test visit flag update. Current non-zero entries : 0
+Test visit flag 0th batch | time : 97.62 | Nonzero : 0
+Test visit flag 10th batch | time : 111.86 | Nonzero : 0
+Test visit flag 20th batch | time : 126.22 | Nonzero : 0
+Test visit flag 30th batch | time : 141.02 | Nonzero : 0
+Test visit flag 40th batch | time : 155.20 | Nonzero : 0
+Test visit flag 50th batch | time : 169.11 | Nonzero : 0
+Test visit flag 60th batch | time : 183.70 | Nonzero : 0
+Test visit flag 70th batch | time : 197.88 | Nonzero : 0
+Test visit flag 80th batch | time : 211.99 | Nonzero : 0
+Test visit flag 90th batch | time : 226.39 | Nonzero : 0
+Test visit flag 100th batch | time : 239.97 | Nonzero : 0
+Test visit flag 110th batch | time : 254.10 | Nonzero : 0
+Test visit flag 120th batch | time : 268.24 | Nonzero : 0
+Test visit flag 130th batch | time : 284.67 | Nonzero : 0
+Test visit flag 140th batch | time : 299.06 | Nonzero : 0
+Done! ... 316.82
+Visit flag saved.
+0 epoch ; bi-toggle_DEBUG | valid_acc : 0.00293 | time : 350.19 | batch : 0/135
+Validation Epoch end... Accuracy : 0.0019291940642120896
+Visit flag saved.
+0 epoch ; bi-toggle_DEBUG | train_acc : 0.00684 | time : 395.68 | batch : 0/1086
+Done! [65.69s]
+Test visit flag update. Current non-zero entries : 0
+Test visit flag 0th batch | time : 99.87 | Nonzero : 0
+Test visit flag 10th batch | time : 103.37 | Nonzero : 0
+Test visit flag 20th batch | time : 105.71 | Nonzero : 0
+Done! [45.70s]
+Test visit flag update. Current non-zero entries : 0
+Test visit flag 0th batch | time : 77.37 | Nonzero : 0
+Test visit flag 10th batch | time : 80.95 | Nonzero : 0
+Test visit flag 20th batch | time : 83.41 | Nonzero : 0
+Test visit flag 30th batch | time : 92.97 | Nonzero : 0
+Test visit flag 40th batch | time : 102.13 | Nonzero : 0
+Test visit flag 50th batch | time : 104.41 | Nonzero : 0
+Test visit flag 60th batch | time : 109.03 | Nonzero : 0
+Test visit flag 70th batch | time : 117.90 | Nonzero : 0
+Test visit flag 80th batch | time : 119.99 | Nonzero : 0
+Test visit flag 90th batch | time : 124.46 | Nonzero : 0
+Test visit flag 100th batch | time : 133.32 | Nonzero : 0
+Test visit flag 110th batch | time : 135.43 | Nonzero : 0
+Test visit flag 120th batch | time : 139.93 | Nonzero : 0
+Test visit flag 130th batch | time : 147.89 | Nonzero : 0
+Test visit flag 140th batch | time : 149.92 | Nonzero : 0
+Done! ... 151.60
+Visit flag saved.
+0 epoch ; bi-toggle_DEBUG | valid_acc : 0.00293 | time : 185.19 | batch : 0/135
+Validation Epoch end... Accuracy : 0.0019291940642120896
+Visit flag saved.
+0 epoch ; bi-toggle_DEBUG | train_acc : 0.00684 | time : 235.55 | batch : 0/1086
+0 epoch ; bi-toggle_DEBUG | train_acc : 0.18457 | time : 285.17 | batch : 10/1086
+0 epoch ; bi-toggle_DEBUG | train_acc : 0.31152 | time : 330.81 | batch : 20/1086
+0 epoch ; bi-toggle_DEBUG | train_acc : 0.38770 | time : 378.79 | batch : 30/1086
+Done! [65.36s]
+Test visit flag update. Current non-zero entries : 0
+Test visit flag 0th batch | time : 100.36 | Nonzero : 0
+Test visit flag 10th batch | time : 102.65 | Nonzero : 0
+Test visit flag 20th batch | time : 105.52 | Nonzero : 0
+Test visit flag 30th batch | time : 108.05 | Nonzero : 0
+Test visit flag 40th batch | time : 117.18 | Nonzero : 0
+Test visit flag 50th batch | time : 119.59 | Nonzero : 0
+Test visit flag 60th batch | time : 124.30 | Nonzero : 0
+Test visit flag 70th batch | time : 126.61 | Nonzero : 0
+Test visit flag 80th batch | time : 132.09 | Nonzero : 0
+Test visit flag 90th batch | time : 134.78 | Nonzero : 0
+Test visit flag 100th batch | time : 137.01 | Nonzero : 0
+Test visit flag 110th batch | time : 139.35 | Nonzero : 0
+Test visit flag 120th batch | time : 147.07 | Nonzero : 0
+Test visit flag 130th batch | time : 149.63 | Nonzero : 0
+Test visit flag 140th batch | time : 152.00 | Nonzero : 0
+Done! ... 154.60
+Visit flag saved.
+0 epoch ; bi-toggle_DEBUG | valid_acc : 0.00293 | time : 191.58 | batch : 0/135
+Validation Epoch end... Accuracy : 0.0019291940642120896
+Visit flag saved.
+0 epoch ; bi-toggle_DEBUG | train_acc : 0.00684 | time : 239.62 | batch : 0/1086
+0 epoch ; bi-toggle_DEBUG | train_acc : 0.18457 | time : 291.04 | batch : 10/1086
+Done! [73.45s]
+Done! ... 170.35
+Visit flag saved.
+0 epoch ; bi-toggle_DEBUG | valid_acc : 0.00293 | time : 203.91 | batch : 0/135

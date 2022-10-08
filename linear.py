@@ -55,7 +55,6 @@ class ArxivSet(Dataset):
             return self.paper_feat[0],np.nan # Error occur. Do not use Test mode for now. Can we use 0 instead?
         
 
-
 class LinearModel(LightningModule):
     def __init__(self, input=768, hidden_layer=2048, output=153):
         super().__init__()

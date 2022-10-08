@@ -1,0 +1,1 @@
+best valid acc : 80.07914066314697 best valid std : 0.8084641659628252 best test acc : 78.38207602500916 best test std : 0.45139681661125286 

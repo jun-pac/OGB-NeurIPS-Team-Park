@@ -1,0 +1,40 @@
+Continue from.../users/PAS1289/oiocha/logs/New-time-NS_p=0.1_batch=1024/lightning_logs/version_13033021/checkpoints/epoch=18-step=20652.ckpt
+X3 : [[120,30,0],[60,30,15]]
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.73438 | time : 1090.33 | batch : 0/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.74219 | time : 1259.31 | batch : 50/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.70312 | time : 1425.53 | batch : 100/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.69531 | time : 1601.90 | batch : 150/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.74219 | time : 1767.96 | batch : 200/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.70312 | time : 1937.79 | batch : 250/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.71094 | time : 2086.40 | batch : 300/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.78906 | time : 2255.41 | batch : 350/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.76562 | time : 2433.27 | batch : 400/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.76562 | time : 2619.61 | batch : 450/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.80469 | time : 2785.79 | batch : 500/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.67969 | time : 2951.29 | batch : 550/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.75781 | time : 3113.02 | batch : 600/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.76562 | time : 3285.27 | batch : 650/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.77344 | time : 3447.40 | batch : 700/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.67188 | time : 3615.24 | batch : 750/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.75781 | time : 3772.68 | batch : 800/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.74219 | time : 3933.53 | batch : 850/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.77344 | time : 4091.11 | batch : 900/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.75000 | time : 4243.97 | batch : 950/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.82812 | time : 4414.14 | batch : 1000/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.75000 | time : 4577.97 | batch : 1050/688
+Test Epoch end... Accuracy : 0.7275114250555179
+Successfully saved!
+X4 : [[160,40,0],[80,40,20]]
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.73438 | time : 4701.19 | batch : 0/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.74219 | time : 4893.68 | batch : 50/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.70312 | time : 5083.39 | batch : 100/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.69531 | time : 5279.12 | batch : 150/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.74219 | time : 5478.09 | batch : 200/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.71094 | time : 5684.07 | batch : 250/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.71875 | time : 5883.13 | batch : 300/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.80469 | time : 6097.12 | batch : 350/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.76562 | time : 6301.40 | batch : 400/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.75781 | time : 6486.58 | batch : 450/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.81250 | time : 6686.39 | batch : 500/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.68750 | time : 6880.38 | batch : 550/688
+New-time-NS_p=0.0_batch=1024 | test_acc : 0.75000 | time : 7071.32 | batch : 600/688

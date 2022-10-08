@@ -1,0 +1,4 @@
+0 epoch ; toggle-NS_mingi_p=0.0_batch=512 | valid_acc : 0.00195 | time : 1308.27 | batch : 0/271
+Validation Epoch end... Accuracy : 0.001953125
+0 epoch ; toggle-NS_mingi_p=0.0_batch=512 | train_acc : 0.00391 | time : 1372.33 | batch : 0/2172
+0 epoch ; toggle-NS_mingi_p=0.0_batch=512 | train_acc : 0.51758 | time : 1906.64 | batch : 100/2172

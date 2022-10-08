@@ -101,11 +101,11 @@ class MAG240M(LightningDataModule):
         self.y = torch.from_numpy(dataset.all_paper_label)
 
         path_mono='/fs/ess/PAS1289/mag240m_kddcup2021/meta_mono_adj_t.pt'
+        path_full='/fs/ess/PAS1289/mag240m_kddcup2021/meta_symm_adj_t.pt'
         if(args.link!='full'):
             self.mono_adj_t = torch.load(path_mono)
         if(args.link!='mono'):
-            path_full='/fs/ess/PAS1289/mag240m_kddcup2021/meta_symm_adj_t.pt'
-        self.adj_t = torch.load(path_full)
+            self.adj_t = torch.load(path_full)
 
         one_hot_encoding = np.eye(153)[[int(x) for x in self.train_label]].astype(np.float16)
         self.one_hot_dict={}
@@ -374,7 +374,7 @@ class RGNN(LightningModule):
                 subadj_t = subadj_t.set_value(None, layout=None)
                 if subadj_t.nnz() > 0:
                     out += self.convs[i][j]((x, x_target), subadj_t)
-
+            
             x = self.norms[i](out)
             x = F.elu(x) if self.model == 'rgat' else F.relu(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
@@ -387,7 +387,7 @@ class RGNN(LightningModule):
         self.train_acc_sum+=batch.x.shape[0]*tmp_acc
         self.train_cnt+=batch.x.shape[0]
         self.log('train_acc', tmp_acc, prog_bar=True, on_step=False, on_epoch=True)
-        if(batch_idx%100==0):
+        if((args.debug and batch_idx%10==0) or batch_idx%100==0):
             print(f"{self.current_epoch} epoch ; {name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}")
             f_log.write(f"{self.current_epoch} epoch ; {name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}\n")
             f_log.flush()
@@ -403,7 +403,7 @@ class RGNN(LightningModule):
         #self.log('val_acc', self.val_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         self.batch_idx=batch_idx
         self.log('val_acc', tmp_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
-        if(batch_idx%50==0):
+        if((args.debug and batch_idx%10==0) or batch_idx%50==0):
             print(f"{self.current_epoch} epoch ; {name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}")
             f_log.write(f"{self.current_epoch} epoch ; {name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}\n")
             f_log.flush()
@@ -417,7 +417,7 @@ class RGNN(LightningModule):
 
         #self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         self.log('test_acc', tmp_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
-        if(batch_idx%50==0):
+        if((args.debug and batch_idx%10==0) or batch_idx%50==0):
             print(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{88092//128}")
             f_log.write(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{88092//128}\n")
             f_log.flush()
@@ -445,6 +445,21 @@ class RGNN(LightningModule):
         self.val_acc_sum=0
         self.val_cnt=0
         self.batch_idx=0
+
+    def test_epoch_end(self, outputs) -> None:
+        print("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
+        f_log.write("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
+        f_log.write('\n')
+        if self.test_acc_sum/self.test_cnt>self.max_val_acc:
+            self.max_val_acc=self.test_acc_sum/self.test_cnt
+            self.test_res=np.concatenate(self.test_res)
+            np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/test_activation'+name, self.test_res)
+            print("Successfully saved!")
+            f_log.write("Successfully saved!\n")
+        f_log.flush()
+        self.test_res=[]
+        self.test_acc_sum=0
+        self.test_cnt=0
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
@@ -478,10 +493,12 @@ if __name__ == '__main__':
     # Debug - debug results are recorded in 
     # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=full --debug
     # MAIN
-    # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=toggle
-    # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=mono
-    # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=full
+    # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=toggle --ckpt=//users/PAS1289/oiocha/logs/meta-toggle-NS_p=0.1_batch=1024/lightning_logs/version_13139091/checkpoints/epoch=33-step=35783.ckpt
+    # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=mono --ckpt=/users/PAS1289/oiocha/logs/meta-mono-NS_p=0.1_batch=1024/lightning_logs/version_13144579/checkpoints/epoch=16-step=18478.ckpt
+    # python OGB-NeurIPS-Team-Park/meta_NS.py --label_disturb_p=0.1 --batch_size=1024 --link=full --ckpt=/users/PAS1289/oiocha/logs/meta-full-NS_p=0.1_batch=1024/lightning_logs/version_13109923/checkpoints/epoch=24-step=26431.ckpt
 
+    # TEST
+    # python OGB-NeurIPS-Team-Park/meta_NS.py --evaluate --label_disturb_p=0.1 --batch_size=1024 --link=toggle --ckpt=/users/PAS1289/oiocha/logs/meta-toggle-NS_p=0.1_batch=1024/lightning_logs/version_13139091/checkpoints/epoch=33-step=35783.ckpt
     
     t0=time.time()
     args = parser.parse_args()
@@ -498,11 +515,11 @@ if __name__ == '__main__':
 
     # Initialize log directory
     if args.debug:
-        name=f'/meta-'+args.link+'-NS_DEBUG'
+        name=f'/meta-{args.link}-NS_DEBUG'
     elif args.hidden_channels==1024:
-        name=f'/meta-'+args.link+'-NS_p={args.label_disturb_p}_batch={args.batch_size}'
+        name=f'/meta-{args.link}-NS_p={args.label_disturb_p}_batch={args.batch_size}'
     else:
-        name=f'/meta-'+args.link+'-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
+        name=f'/meta-{args.link}-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
 
     NROOT='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/txtlog' # log file's root.
     path_log = NROOT+name+'.txt'
@@ -548,18 +565,32 @@ if __name__ == '__main__':
         
     # Evaluate
     if args.evaluate:
-        device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
-        # Ignore previous code
-        logdir='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365'
-        trainer = Trainer(resume_from_checkpoint=args.ckpt,
+        ckpt=args.ckpt
+        trainer = Trainer(resume_from_checkpoint=ckpt,
                           progress_bar_refresh_rate=0) # gpus=args.device,
         
-        model = RGNN.load_from_checkpoint(
-            checkpoint_path=args.ckpt, hparams_file=f'{logdir}/hparams.yaml')
+        model = RGNN.load_from_checkpoint(args.ckpt)
 
         datamodule.batch_size = 16*8 # initially 16
-        datamodule.sizes = [[100,100,100],[100,100,100]] * len(sizes)  # (Almost) no sampling...
+        
+        f_log.write("Original : [[40,10,0],[20,10,5]]\n")
+        f_log.flush()
+        datamodule.sizes = [[40,10,0],[20,10,5]] 
+        trainer.test(model=model, datamodule=datamodule)
 
+        f_log.write("X3 : [[120,30,0],[60,30,15]]\n")
+        f_log.flush()
+        datamodule.sizes = [[120,30,0],[60,30,15]] 
+        trainer.test(model=model, datamodule=datamodule)
+
+        f_log.write("X4 : [[160,40,0],[80,40,20]]\n")
+        f_log.flush()
+        datamodule.sizes = [[160,40,0],[80,40,20]] 
+        trainer.test(model=model, datamodule=datamodule)
+
+        f_log.write("X5 : [[200,50,0],[100,60,25]]\n")
+        f_log.flush()
+        datamodule.sizes = [[200,50,0],[100,60,25]]  # (Almost) no sampling...
         trainer.test(model=model, datamodule=datamodule)
 
         evaluator = MAG240MEvaluator()

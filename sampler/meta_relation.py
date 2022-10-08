@@ -18,7 +18,7 @@ from tqdm import tqdm
 from multiprocessing import Pool, Process, Array
 import random
 
-t0=time.time() # All process would take ~13404s
+t0=time.time() # All process would take 1700+1600s
 ROOT='/fs/ess/PAS1289'
 dataset = MAG240MDataset(ROOT)
 print(f"dataset.dir : {dataset.dir}")
@@ -48,6 +48,8 @@ print(f"N : {N}")
 
 chunk=100
 
+
+# Building meta_relation_ptr : This would take 1800s
 meta_relation_ptr.share_memory_()
 meta_relation_ptr[0]=0
 print(f"meta_relation_ptr[0] : {meta_relation_ptr[0].dtype}")
@@ -72,7 +74,7 @@ def full_task(i):
 
 num = 48
 pool = Pool(num)
-pool.map(full_task, range(N)) # This would take 2120s
+pool.map(full_task, range(N))
 print(f"first ten meta_relation_ptr(before save) : {meta_relation_ptr[:10]}")
 f_log.write(f"first ten meta_relation_ptr(before save) : {meta_relation_ptr[:10]}\n")
 f_log.flush()
@@ -82,6 +84,7 @@ print(f"Done! {time.time()-t0:.2f}")
 
 
 
+# Building meta_mono relation_ptr : This would take 1700s
 print(f"Build meta-mono relation ptr...")
 f_log.write(f"Build meta-mono relation ptr...\n")
 f_log.flush()

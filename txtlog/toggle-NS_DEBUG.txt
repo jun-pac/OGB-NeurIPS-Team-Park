@@ -1,123 +1,240 @@
-Done! [66.19s]2nd sample | row<col : 183516, row>=col : 105820 | sample size : [23597, 321155]2nd sample | row<col : 179074, row>=col : 101997 | sample size : [22948, 310408]2nd sample | row<col : 185009, row>=col : 107195 | sample size : [23942, 321220]2nd sample | row<col : 182074, row>=col : 104840 | sample size : [23347, 314289]1st sample | row<col : 173, row>=col : 20273 | sample size : [1024, 23597]1st sample | row<col : 158, row>=col : 19742 | sample size : [1024, 22948]1st sample | row<col : 172, row>=col : 20485 | sample size : [1024, 23942]2nd sample | row<col : 179998, row>=col : 103333 | sample size : [23189, 313275]2nd sample | row<col : 192642, row>=col : 112055 | sample size : [24540, 333194]1st sample | row<col : 182, row>=col : 20032 | sample size : [1024, 23347]2nd sample | row<col : 185015, row>=col : 109561 | sample size : [23855, 322162]2nd sample | row<col : 194931, row>=col : 113856 | sample size : [24901, 337208]2nd sample | row<col : 186732, row>=col : 110754 | sample size : [24162, 327445]1st sample | row<col : 187, row>=col : 19735 | sample size : [1024, 23189]1st sample | row<col : 171, row>=col : 20983 | sample size : [1024, 24540]2nd sample | row<col : 188404, row>=col : 111061 | sample size : [24275, 330413]1st sample | row<col : 188, row>=col : 20566 | sample size : [1024, 23855]1st sample | row<col : 198, row>=col : 21665 | sample size : [1024, 24901]1st sample | row<col : 180, row>=col : 20677 | sample size : [1024, 24162]1st sample | row<col : 173, row>=col : 20691 | sample size : [1024, 24275]toggle-NS_DEBUG | valid_acc : 0.00879 | time : 101.69 | batch : 0/135
-2nd sample | row<col : 176778, row>=col : 103537 | sample size : [23051, 311751]2nd sample | row<col : 185173, row>=col : 104215 | sample size : [23616, 321240]1st sample | row<col : 161, row>=col : 19470 | sample size : [1024, 23051]2nd sample | row<col : 182723, row>=col : 105462 | sample size : [23425, 316914]1st sample | row<col : 143, row>=col : 20367 | sample size : [1024, 23616]2nd sample | row<col : 182753, row>=col : 107999 | sample size : [23732, 322314]2nd sample | row<col : 183291, row>=col : 106654 | sample size : [23645, 319006]1st sample | row<col : 147, row>=col : 20093 | sample size : [1024, 23425]2nd sample | row<col : 182271, row>=col : 104114 | sample size : [23328, 316505]1st sample | row<col : 189, row>=col : 20202 | sample size : [1024, 23732]1st sample | row<col : 200, row>=col : 20226 | sample size : [1024, 23645]1st sample | row<col : 162, row>=col : 20011 | sample size : [1024, 23328]2nd sample | row<col : 188419, row>=col : 110774 | sample size : [24201, 327579]1st sample | row<col : 176, row>=col : 20688 | sample size : [1024, 24201]2nd sample | row<col : 191649, row>=col : 111073 | sample size : [24392, 329950]2nd sample | row<col : 183784, row>=col : 104618 | sample size : [23541, 319070]1st sample | row<col : 213, row>=col : 20904 | sample size : [1024, 24392]1st sample | row<col : 149, row>=col : 20015 | sample size : [1024, 23541]2nd sample | row<col : 190233, row>=col : 110371 | sample size : [24475, 334509]1st sample | row<col : 178, row>=col : 20723 | sample size : [1024, 24475]Validation Epoch end... Accuracy : 0.006788511566564606
-toggle-NS_DEBUG | train_acc : 0.00391 | time : 154.13 | batch : 0/1086
-toggle-NS_DEBUG | train_acc : 0.57715 | time : 571.54 | batch : 100/1086
-Done! [73.84s]
-2nd sample | row<col : 179074, row>=col : 101997 | sample size : [22948, 310408]
-1st sample | row<col : 158, row>=col : 19742 | sample size : [1024, 22948]
-2nd sample | row<col : 192642, row>=col : 112055 | sample size : [24540, 333194]
-2nd sample | row<col : 179998, row>=col : 103333 | sample size : [23189, 313275]
-2nd sample | row<col : 185015, row>=col : 109561 | sample size : [23855, 322162]
-2nd sample | row<col : 182074, row>=col : 104840 | sample size : [23347, 314289]
-1st sample | row<col : 171, row>=col : 20983 | sample size : [1024, 24540]
-1st sample | row<col : 187, row>=col : 19735 | sample size : [1024, 23189]
-1st sample | row<col : 188, row>=col : 20566 | sample size : [1024, 23855]
-1st sample | row<col : 182, row>=col : 20032 | sample size : [1024, 23347]
-2nd sample | row<col : 183516, row>=col : 105820 | sample size : [23597, 321155]
-2nd sample | row<col : 186732, row>=col : 110754 | sample size : [24162, 327445]
-2nd sample | row<col : 188404, row>=col : 111061 | sample size : [24275, 330413]
-2nd sample | row<col : 185009, row>=col : 107195 | sample size : [23942, 321220]
-1st sample | row<col : 173, row>=col : 20273 | sample size : [1024, 23597]
-1st sample | row<col : 173, row>=col : 20691 | sample size : [1024, 24275]
-1st sample | row<col : 180, row>=col : 20677 | sample size : [1024, 24162]
-1st sample | row<col : 172, row>=col : 20485 | sample size : [1024, 23942]
-2nd sample | row<col : 194931, row>=col : 113856 | sample size : [24901, 337208]
-1st sample | row<col : 198, row>=col : 21665 | sample size : [1024, 24901]
-toggle-NS_DEBUG | valid_acc : 0.00879 | time : 109.97 | batch : 0/135
-2nd sample | row<col : 182723, row>=col : 105462 | sample size : [23425, 316914]
-1st sample | row<col : 147, row>=col : 20093 | sample size : [1024, 23425]
-2nd sample | row<col : 183784, row>=col : 104618 | sample size : [23541, 319070]
-1st sample | row<col : 149, row>=col : 20015 | sample size : [1024, 23541]
-2nd sample | row<col : 176778, row>=col : 103537 | sample size : [23051, 311751]
-2nd sample | row<col : 182753, row>=col : 107999 | sample size : [23732, 322314]
-1st sample | row<col : 161, row>=col : 19470 | sample size : [1024, 23051]
-2nd sample | row<col : 185173, row>=col : 104215 | sample size : [23616, 321240]
-1st sample | row<col : 189, row>=col : 20202 | sample size : [1024, 23732]
-2nd sample | row<col : 190233, row>=col : 110371 | sample size : [24475, 334509]
-2nd sample | row<col : 188419, row>=col : 110774 | sample size : [24201, 327579]
-1st sample | row<col : 143, row>=col : 20367 | sample size : [1024, 23616]
-2nd sample | row<col : 182271, row>=col : 104114 | sample size : [23328, 316505]
-1st sample | row<col : 178, row>=col : 20723 | sample size : [1024, 24475]
-1st sample | row<col : 176, row>=col : 20688 | sample size : [1024, 24201]
-1st sample | row<col : 162, row>=col : 20011 | sample size : [1024, 23328]
-2nd sample | row<col : 191649, row>=col : 111073 | sample size : [24392, 329950]
-1st sample | row<col : 213, row>=col : 20904 | sample size : [1024, 24392]
-2nd sample | row<col : 183291, row>=col : 106654 | sample size : [23645, 319006]
-1st sample | row<col : 200, row>=col : 20226 | sample size : [1024, 23645]
-Validation Epoch end... Accuracy : 0.006788511566564606
-toggle-NS_DEBUG | train_acc : 0.00391 | time : 160.63 | batch : 0/1086
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Done! [98.16s]
-2nd sample | row<col : 179074, row>=col : 101997 | sample size : [22948, 310408]
-2nd sample | row<col : 182074, row>=col : 104840 | sample size : [23347, 314289]
-2nd sample | row<col : 179998, row>=col : 103333 | sample size : [23189, 313275]
-1st sample | row<col : 158, row>=col : 19742 | sample size : [1024, 22948]
-2nd sample | row<col : 185009, row>=col : 107195 | sample size : [23942, 321220]
-1st sample | row<col : 182, row>=col : 20032 | sample size : [1024, 23347]
-1st sample | row<col : 187, row>=col : 19735 | sample size : [1024, 23189]
-1st sample | row<col : 172, row>=col : 20485 | sample size : [1024, 23942]
-2nd sample | row<col : 183516, row>=col : 105820 | sample size : [23597, 321155]
-2nd sample | row<col : 185015, row>=col : 109561 | sample size : [23855, 322162]
-2nd sample | row<col : 186732, row>=col : 110754 | sample size : [24162, 327445]
-1st sample | row<col : 173, row>=col : 20273 | sample size : [1024, 23597]
-2nd sample | row<col : 188404, row>=col : 111061 | sample size : [24275, 330413]
-1st sample | row<col : 188, row>=col : 20566 | sample size : [1024, 23855]
-1st sample | row<col : 180, row>=col : 20677 | sample size : [1024, 24162]
-2nd sample | row<col : 192642, row>=col : 112055 | sample size : [24540, 333194]
-1st sample | row<col : 173, row>=col : 20691 | sample size : [1024, 24275]
-1st sample | row<col : 171, row>=col : 20983 | sample size : [1024, 24540]
-0epoch ; toggle-NS_DEBUG | valid_acc : 0.07422 | time : 134.77 | batch : 0/135
-2nd sample | row<col : 194931, row>=col : 113856 | sample size : [24901, 337208]
-1st sample | row<col : 198, row>=col : 21665 | sample size : [1024, 24901]
-2nd sample | row<col : 182723, row>=col : 105462 | sample size : [23425, 316914]
-1st sample | row<col : 147, row>=col : 20093 | sample size : [1024, 23425]
-2nd sample | row<col : 176778, row>=col : 103537 | sample size : [23051, 311751]
-1st sample | row<col : 161, row>=col : 19470 | sample size : [1024, 23051]
-2nd sample | row<col : 183784, row>=col : 104618 | sample size : [23541, 319070]
-2nd sample | row<col : 185173, row>=col : 104215 | sample size : [23616, 321240]
-2nd sample | row<col : 190233, row>=col : 110371 | sample size : [24475, 334509]
-1st sample | row<col : 149, row>=col : 20015 | sample size : [1024, 23541]
-2nd sample | row<col : 182753, row>=col : 107999 | sample size : [23732, 322314]
-1st sample | row<col : 143, row>=col : 20367 | sample size : [1024, 23616]
-1st sample | row<col : 178, row>=col : 20723 | sample size : [1024, 24475]
-2nd sample | row<col : 182271, row>=col : 104114 | sample size : [23328, 316505]
-1st sample | row<col : 189, row>=col : 20202 | sample size : [1024, 23732]
-1st sample | row<col : 162, row>=col : 20011 | sample size : [1024, 23328]
-2nd sample | row<col : 188419, row>=col : 110774 | sample size : [24201, 327579]
-1st sample | row<col : 176, row>=col : 20688 | sample size : [1024, 24201]
-2nd sample | row<col : 183291, row>=col : 106654 | sample size : [23645, 319006]
-1st sample | row<col : 200, row>=col : 20226 | sample size : [1024, 23645]
-Validation Epoch end... Accuracy : 0.06921737266641151
-0epoch ; toggle-NS_DEBUG | train_acc : 0.66699 | time : 185.47 | batch : 0/1086
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
-Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13032104/checkpoints/epoch=17-step=19565.ckpt
+Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13082877/checkpoints/epoch=34-step=38044.ckpt
+Done! [125.14s]
+Continue from.../users/PAS1289/oiocha/logs/toggle-NS_p=0.1_batch=1024/lightning_logs/version_13082877/checkpoints/epoch=34-step=38044.ckpt
+Done! [73.53s]
+2nd sample | row<col : 41456, row>=col : 21307 | sample size : [2742, 63703]
+1st sample | row<col : 20, row>=col : 2183 | sample size : [128, 2742]
+2nd sample | row<col : 48249, row>=col : 24091 | sample size : [3156, 74269]
+1st sample | row<col : 13, row>=col : 2614 | sample size : [128, 3156]
+2nd sample | row<col : 52942, row>=col : 26578 | sample size : [3374, 78308]
+2nd sample | row<col : 42879, row>=col : 22819 | sample size : [2969, 68081]
+1st sample | row<col : 14, row>=col : 2834 | sample size : [128, 3374]
+1st sample | row<col : 25, row>=col : 2335 | sample size : [128, 2969]
+2nd sample | row<col : 58762, row>=col : 28726 | sample size : [3626, 84670]
+1st sample | row<col : 33, row>=col : 3045 | sample size : [128, 3626]
+2nd sample | row<col : 55172, row>=col : 29061 | sample size : [3559, 82073]
+1st sample | row<col : 35, row>=col : 2967 | sample size : [128, 3559]
+toggle-NS_DEBUG | test_acc : 0.05469 | time : 91.42 | batch : 0/688
+2nd sample | row<col : 58901, row>=col : 29618 | sample size : [3648, 86676]
+1st sample | row<col : 23, row>=col : 3152 | sample size : [128, 3648]
+2nd sample | row<col : 47718, row>=col : 24706 | sample size : [3065, 72018]
+1st sample | row<col : 25, row>=col : 2523 | sample size : [128, 3065]
+2nd sample | row<col : 69001, row>=col : 38537 | sample size : [4338, 100098]
+1st sample | row<col : 27, row>=col : 3725 | sample size : [128, 4338]
+2nd sample | row<col : 77216, row>=col : 46660 | sample size : [4888, 117047]
+2nd sample | row<col : 47115, row>=col : 23139 | sample size : [3025, 72993]
+1st sample | row<col : 39, row>=col : 4239 | sample size : [128, 4888]
+1st sample | row<col : 18, row>=col : 2451 | sample size : [128, 3025]
+2nd sample | row<col : 49514, row>=col : 25755 | sample size : [3240, 75898]
+1st sample | row<col : 40, row>=col : 2630 | sample size : [128, 3240]
+2nd sample | row<col : 69223, row>=col : 37484 | sample size : [4283, 104398]
+2nd sample | row<col : 65924, row>=col : 32452 | sample size : [4053, 98093]
+1st sample | row<col : 8, row>=col : 3502 | sample size : [128, 4053]
+1st sample | row<col : 39, row>=col : 3666 | sample size : [128, 4283]
+2nd sample | row<col : 38500, row>=col : 19545 | sample size : [2589, 59705]
+2nd sample | row<col : 60804, row>=col : 33194 | sample size : [3825, 89656]
+1st sample | row<col : 19, row>=col : 2051 | sample size : [128, 2589]
+1st sample | row<col : 23, row>=col : 3248 | sample size : [128, 3825]
+2nd sample | row<col : 52099, row>=col : 25561 | sample size : [3304, 79088]
+1st sample | row<col : 15, row>=col : 2808 | sample size : [128, 3304]
+2nd sample | row<col : 74327, row>=col : 41856 | sample size : [4575, 107608]
+1st sample | row<col : 32, row>=col : 4041 | sample size : [128, 4575]
+2nd sample | row<col : 52272, row>=col : 26352 | sample size : [3297, 79824]
+1st sample | row<col : 34, row>=col : 2738 | sample size : [128, 3297]
+2nd sample | row<col : 73824, row>=col : 40802 | sample size : [4514, 107639]
+1st sample | row<col : 15, row>=col : 3954 | sample size : [128, 4514]
+toggle-NS_DEBUG | test_acc : 0.11719 | time : 101.65 | batch : 10/688
+2nd sample | row<col : 39100, row>=col : 19701 | sample size : [2644, 61776]
+1st sample | row<col : 17, row>=col : 2060 | sample size : [128, 2644]
+2nd sample | row<col : 52185, row>=col : 28072 | sample size : [3387, 81708]
+1st sample | row<col : 18, row>=col : 2839 | sample size : [128, 3387]
+2nd sample | row<col : 44829, row>=col : 22876 | sample size : [2942, 67982]
+1st sample | row<col : 30, row>=col : 2392 | sample size : [128, 2942]
+2nd sample | row<col : 61013, row>=col : 34150 | sample size : [3893, 92263]
+2nd sample | row<col : 69112, row>=col : 36460 | sample size : [4269, 99679]
+2nd sample | row<col : 61693, row>=col : 29956 | sample size : [3746, 89905]
+1st sample | row<col : 34, row>=col : 3376 | sample size : [128, 3893]
+2nd sample | row<col : 51441, row>=col : 25266 | sample size : [3214, 76237]
+1st sample | row<col : 21, row>=col : 2676 | sample size : [128, 3214]
+1st sample | row<col : 40, row>=col : 3652 | sample size : [128, 4269]
+1st sample | row<col : 26, row>=col : 3253 | sample size : [128, 3746]
+2nd sample | row<col : 62977, row>=col : 32684 | sample size : [3898, 94065]
+1st sample | row<col : 19, row>=col : 3299 | sample size : [128, 3898]
+2nd sample | row<col : 59458, row>=col : 34199 | sample size : [3864, 92083]
+1st sample | row<col : 35, row>=col : 3280 | sample size : [128, 3864]
+2nd sample | row<col : 46623, row>=col : 25879 | sample size : [3133, 71471]
+1st sample | row<col : 16, row>=col : 2572 | sample size : [128, 3133]
+2nd sample | row<col : 49862, row>=col : 23745 | sample size : [3095, 76331]
+1st sample | row<col : 22, row>=col : 2554 | sample size : [128, 3095]
+toggle-NS_DEBUG | test_acc : 0.14062 | time : 110.09 | batch : 20/688
+2nd sample | row<col : 47882, row>=col : 24730 | sample size : [3066, 72918]
+1st sample | row<col : 21, row>=col : 2527 | sample size : [128, 3066]
+2nd sample | row<col : 73824, row>=col : 41872 | sample size : [4598, 109000]
+1st sample | row<col : 34, row>=col : 3970 | sample size : [128, 4598]
+2nd sample | row<col : 60464, row>=col : 32015 | sample size : [3774, 92378]
+2nd sample | row<col : 55184, row>=col : 31020 | sample size : [3543, 82744]
+1st sample | row<col : 35, row>=col : 3204 | sample size : [128, 3774]
+1st sample | row<col : 31, row>=col : 2996 | sample size : [128, 3543]
+2nd sample | row<col : 44769, row>=col : 22431 | sample size : [2923, 68961]
+1st sample | row<col : 10, row>=col : 2366 | sample size : [128, 2923]
+2nd sample | row<col : 55560, row>=col : 30071 | sample size : [3522, 83391]
+1st sample | row<col : 15, row>=col : 3020 | sample size : [128, 3522]
+2nd sample | row<col : 50564, row>=col : 27504 | sample size : [3249, 77388]
+1st sample | row<col : 28, row>=col : 2695 | sample size : [128, 3249]
+2nd sample | row<col : 76275, row>=col : 43675 | sample size : [4768, 110814]
+1st sample | row<col : 40, row>=col : 4140 | sample size : [128, 4768]
+2nd sample | row<col : 61283, row>=col : 29694 | sample size : [3744, 90614]
+1st sample | row<col : 28, row>=col : 3179 | sample size : [128, 3744]
+2nd sample | row<col : 63443, row>=col : 35040 | sample size : [4025, 97171]
+1st sample | row<col : 43, row>=col : 3437 | sample size : [128, 4025]
+2nd sample | row<col : 45801, row>=col : 25138 | sample size : [3008, 68729]
+1st sample | row<col : 20, row>=col : 2528 | sample size : [128, 3008]
+2nd sample | row<col : 44381, row>=col : 25150 | sample size : [3009, 69300]
+1st sample | row<col : 25, row>=col : 2406 | sample size : [128, 3009]
+toggle-NS_DEBUG | test_acc : 0.08594 | time : 118.61 | batch : 30/688
+2nd sample | row<col : 55656, row>=col : 28439 | sample size : [3522, 83462]
+2nd sample | row<col : 58232, row>=col : 31209 | sample size : [3661, 87057]
+1st sample | row<col : 14, row>=col : 3005 | sample size : [128, 3522]
+1st sample | row<col : 27, row>=col : 3064 | sample size : [128, 3661]
+2nd sample | row<col : 49247, row>=col : 25796 | sample size : [3188, 74155]
+1st sample | row<col : 28, row>=col : 2645 | sample size : [128, 3188]
+2nd sample | row<col : 46080, row>=col : 25398 | sample size : [3018, 71606]
+1st sample | row<col : 24, row>=col : 2491 | sample size : [128, 3018]
+2nd sample | row<col : 75468, row>=col : 43574 | sample size : [4700, 113038]
+1st sample | row<col : 33, row>=col : 4116 | sample size : [128, 4700]
+2nd sample | row<col : 61278, row>=col : 29961 | sample size : [3836, 90937]
+1st sample | row<col : 12, row>=col : 3247 | sample size : [128, 3836]
+2nd sample | row<col : 57263, row>=col : 34013 | sample size : [3753, 88516]
+1st sample | row<col : 42, row>=col : 3123 | sample size : [128, 3753]
+2nd sample | row<col : 57384, row>=col : 32664 | sample size : [3713, 90626]
+1st sample | row<col : 26, row>=col : 3100 | sample size : [128, 3713]
+2nd sample | row<col : 45397, row>=col : 24828 | sample size : [3056, 72089]
+1st sample | row<col : 9, row>=col : 2484 | sample size : [128, 3056]
+2nd sample | row<col : 51939, row>=col : 27546 | sample size : [3378, 80487]
+1st sample | row<col : 24, row>=col : 2747 | sample size : [128, 3378]
+toggle-NS_DEBUG | test_acc : 0.09375 | time : 127.01 | batch : 40/688
+2nd sample | row<col : 55915, row>=col : 30106 | sample size : [3577, 86632]
+1st sample | row<col : 19, row>=col : 2994 | sample size : [128, 3577]
+2nd sample | row<col : 51221, row>=col : 24915 | sample size : [3248, 76444]
+1st sample | row<col : 12, row>=col : 2702 | sample size : [128, 3248]
+2nd sample | row<col : 51418, row>=col : 26874 | sample size : [3309, 76656]
+1st sample | row<col : 30, row>=col : 2780 | sample size : [128, 3309]
+2nd sample | row<col : 63973, row>=col : 36747 | sample size : [4080, 95352]
+1st sample | row<col : 37, row>=col : 3483 | sample size : [128, 4080]
+2nd sample | row<col : 55191, row>=col : 29909 | sample size : [3548, 83767]
+1st sample | row<col : 34, row>=col : 2948 | sample size : [128, 3548]
+2nd sample | row<col : 51862, row>=col : 29522 | sample size : [3486, 80791]
+1st sample | row<col : 21, row>=col : 2886 | sample size : [128, 3486]
+2nd sample | row<col : 42827, row>=col : 23130 | sample size : [2868, 67098]
+1st sample | row<col : 34, row>=col : 2313 | sample size : [128, 2868]
+2nd sample | row<col : 64623, row>=col : 38068 | sample size : [4176, 98563]
+1st sample | row<col : 46, row>=col : 3525 | sample size : [128, 4176]
+2nd sample | row<col : 55653, row>=col : 27596 | sample size : [3499, 87802]
+1st sample | row<col : 14, row>=col : 2950 | sample size : [128, 3499]
+2nd sample | row<col : 47189, row>=col : 25746 | sample size : [3127, 72879]
+1st sample | row<col : 17, row>=col : 2539 | sample size : [128, 3127]
+2nd sample | row<col : 45190, row>=col : 24515 | sample size : [3081, 68700]
+1st sample | row<col : 36, row>=col : 2469 | sample size : [128, 3081]
+2nd sample | row<col : 47883, row>=col : 24392 | sample size : [3126, 73236]
+1st sample | row<col : 15, row>=col : 2575 | sample size : [128, 3126]
+toggle-NS_DEBUG | test_acc : 0.10156 | time : 135.50 | batch : 50/688
+2nd sample | row<col : 73884, row>=col : 39409 | sample size : [4461, 107040]
+1st sample | row<col : 31, row>=col : 3928 | sample size : [128, 4461]
+2nd sample | row<col : 46466, row>=col : 24086 | sample size : [3001, 70380]
+2nd sample | row<col : 47312, row>=col : 26354 | sample size : [3160, 72650]
+1st sample | row<col : 35, row>=col : 2443 | sample size : [128, 3001]
+1st sample | row<col : 30, row>=col : 2590 | sample size : [128, 3160]
+2nd sample | row<col : 65239, row>=col : 35620 | sample size : [4087, 95549]
+1st sample | row<col : 40, row>=col : 3503 | sample size : [128, 4087]
+2nd sample | row<col : 51667, row>=col : 23732 | sample size : [3243, 79531]
+1st sample | row<col : 10, row>=col : 2675 | sample size : [128, 3243]
+2nd sample | row<col : 52845, row>=col : 29439 | sample size : [3442, 81744]
+1st sample | row<col : 41, row>=col : 2906 | sample size : [128, 3442]
+2nd sample | row<col : 46925, row>=col : 24797 | sample size : [3067, 71717]
+1st sample | row<col : 30, row>=col : 2507 | sample size : [128, 3067]
+2nd sample | row<col : 66501, row>=col : 34590 | sample size : [4085, 98052]
+1st sample | row<col : 16, row>=col : 3537 | sample size : [128, 4085]
+2nd sample | row<col : 50958, row>=col : 24445 | sample size : [3224, 74460]
+1st sample | row<col : 20, row>=col : 2671 | sample size : [128, 3224]
+2nd sample | row<col : 54470, row>=col : 29225 | sample size : [3595, 85926]
+toggle-NS_DEBUG | test_acc : 0.13281 | time : 143.58 | batch : 60/688
+1st sample | row<col : 8, row>=col : 2954 | sample size : [128, 3595]
+2nd sample | row<col : 41787, row>=col : 21570 | sample size : [2809, 64669]
+1st sample | row<col : 19, row>=col : 2216 | sample size : [128, 2809]
+2nd sample | row<col : 49950, row>=col : 28821 | sample size : [3302, 76422]
+1st sample | row<col : 27, row>=col : 2757 | sample size : [128, 3302]
+2nd sample | row<col : 70725, row>=col : 39318 | sample size : [4361, 105141]
+1st sample | row<col : 48, row>=col : 3787 | sample size : [128, 4361]
+2nd sample | row<col : 57339, row>=col : 26082 | sample size : [3442, 83776]
+1st sample | row<col : 10, row>=col : 2979 | sample size : [128, 3442]
+2nd sample | row<col : 52092, row>=col : 29010 | sample size : [3404, 78715]
+1st sample | row<col : 29, row>=col : 2836 | sample size : [128, 3404]
+2nd sample | row<col : 62882, row>=col : 33809 | sample size : [3854, 89283]
+1st sample | row<col : 45, row>=col : 3311 | sample size : [128, 3854]
+2nd sample | row<col : 46855, row>=col : 25514 | sample size : [3138, 72200]
+1st sample | row<col : 33, row>=col : 2533 | sample size : [128, 3138]
+2nd sample | row<col : 56954, row>=col : 28516 | sample size : [3560, 85714]
+1st sample | row<col : 14, row>=col : 3033 | sample size : [128, 3560]
+2nd sample | row<col : 55728, row>=col : 31958 | sample size : [3692, 85828]
+1st sample | row<col : 28, row>=col : 3079 | sample size : [128, 3692]
+toggle-NS_DEBUG | test_acc : 0.07031 | time : 151.73 | batch : 70/688
+2nd sample | row<col : 39799, row>=col : 20200 | sample size : [2719, 62001]
+1st sample | row<col : 12, row>=col : 2141 | sample size : [128, 2719]
+2nd sample | row<col : 45145, row>=col : 25796 | sample size : [3092, 74731]
+1st sample | row<col : 20, row>=col : 2456 | sample size : [128, 3092]
+2nd sample | row<col : 67118, row>=col : 36846 | sample size : [4218, 100571]
+2nd sample | row<col : 53718, row>=col : 26932 | sample size : [3387, 80434]
+1st sample | row<col : 31, row>=col : 3614 | sample size : [128, 4218]
+1st sample | row<col : 15, row>=col : 2875 | sample size : [128, 3387]
+2nd sample | row<col : 51273, row>=col : 27423 | sample size : [3368, 78237]
+1st sample | row<col : 31, row>=col : 2756 | sample size : [128, 3368]
+2nd sample | row<col : 43891, row>=col : 22406 | sample size : [2854, 65422]
+1st sample | row<col : 22, row>=col : 2339 | sample size : [128, 2854]
+2nd sample | row<col : 78652, row>=col : 43183 | sample size : [4799, 114253]
+1st sample | row<col : 35, row>=col : 4223 | sample size : [128, 4799]
+2nd sample | row<col : 53644, row>=col : 29444 | sample size : [3483, 79734]
+2nd sample | row<col : 57553, row>=col : 27673 | sample size : [3562, 87324]
+1st sample | row<col : 30, row>=col : 2992 | sample size : [128, 3562]
+1st sample | row<col : 41, row>=col : 2922 | sample size : [128, 3483]
+toggle-NS_DEBUG | test_acc : 0.14062 | time : 159.58 | batch : 80/688
+2nd sample | row<col : 65978, row>=col : 36913 | sample size : [4179, 96835]
+2nd sample | row<col : 49315, row>=col : 27460 | sample size : [3198, 75289]
+1st sample | row<col : 34, row>=col : 3558 | sample size : [128, 4179]
+1st sample | row<col : 35, row>=col : 2687 | sample size : [128, 3198]
+2nd sample | row<col : 51582, row>=col : 26102 | sample size : [3250, 77941]
+1st sample | row<col : 29, row>=col : 2700 | sample size : [128, 3250]
+2nd sample | row<col : 52628, row>=col : 26111 | sample size : [3333, 80395]
+1st sample | row<col : 8, row>=col : 2830 | sample size : [128, 3333]
+2nd sample | row<col : 43044, row>=col : 22118 | sample size : [2880, 64774]
+1st sample | row<col : 18, row>=col : 2282 | sample size : [128, 2880]
+2nd sample | row<col : 63003, row>=col : 35502 | sample size : [3957, 93938]
+1st sample | row<col : 27, row>=col : 3393 | sample size : [128, 3957]
+Continue from.../users/PAS1289/oiocha/logs/mono-NS_p=0.1_batch=1024/lightning_logs/version_13046213/checkpoints/epoch=14-step=16304.ckpt
+Original : [[40,10,0],[20,10,5]]
+toggle-NS_DEBUG | test_acc : 0.00781 | time : 39.24 | batch : 0/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 49.72 | batch : 10/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 59.28 | batch : 20/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 68.93 | batch : 30/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 80.68 | batch : 40/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 89.26 | batch : 50/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 100.53 | batch : 60/688
+toggle-NS_DEBUG | test_acc : 0.00781 | time : 109.74 | batch : 70/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 118.88 | batch : 80/688
+toggle-NS_DEBUG | test_acc : 0.01562 | time : 128.16 | batch : 90/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 137.54 | batch : 100/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 146.54 | batch : 110/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 155.77 | batch : 120/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 164.16 | batch : 130/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 172.60 | batch : 140/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 182.75 | batch : 150/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 192.77 | batch : 160/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 203.79 | batch : 170/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 213.19 | batch : 180/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 223.65 | batch : 190/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 234.09 | batch : 200/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 243.11 | batch : 210/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 252.34 | batch : 220/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 262.94 | batch : 230/688
+toggle-NS_DEBUG | test_acc : 0.00000 | time : 274.16 | batch : 240/688
+toggle-NS_DEBUG | test_acc : 0.00781 | time : 284.00 | batch : 250/688
+toggle-NS_DEBUG | test_acc : 0.00781 | time : 293.22 | batch : 260/688

@@ -317,7 +317,7 @@ class RGNN(LightningModule):
         # I think train_acc is just Accuracy type. But how logger detect its class and print meaningful information automatically?
         #self.log('train_acc', self.train_acc, prog_bar=True, on_step=False, on_epoch=True)
         self.log('train_acc', tmp_acc, prog_bar=True, on_step=False, on_epoch=True)
-        if(batch_idx%100==0):
+        if((args.debug and batch_idx%10==0) or batch_idx%100==0):
             print(f"{name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}")
             f_log.write(f"{name[1:]} | train_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{1112392//args.batch_size}\n")
             f_log.flush()
@@ -333,7 +333,7 @@ class RGNN(LightningModule):
         #self.log('val_acc', self.val_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         self.batch_idx=batch_idx
         self.log('val_acc', tmp_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
-        if(batch_idx%50==0):
+        if((args.debug and batch_idx%10==0) or batch_idx%50==0):
             print(f"{name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}")
             f_log.write(f"{name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.batch_size}\n")
             f_log.flush()
@@ -347,7 +347,7 @@ class RGNN(LightningModule):
 
         #self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         self.log('test_acc', tmp_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
-        if(batch_idx%50==0):
+        if((args.debug and batch_idx%10==0) or batch_idx%50==0):
             print(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{88092//128}")
             f_log.write(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{88092//128}\n")
             f_log.flush()
@@ -376,6 +376,21 @@ class RGNN(LightningModule):
         self.val_cnt=0
         self.batch_idx=0
 
+    def test_epoch_end(self, outputs) -> None:
+        print("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
+        f_log.write("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
+        f_log.write('\n')
+        if self.test_acc_sum/self.test_cnt>self.max_val_acc:
+            self.max_val_acc=self.test_acc_sum/self.test_cnt
+            self.test_res=np.concatenate(self.test_res)
+            np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/test_activation'+name, self.test_res)
+            print("Successfully saved!")
+            f_log.write("Successfully saved!\n")
+        f_log.flush()
+        self.test_res=[]
+        self.test_acc_sum=0
+        self.test_cnt=0
+        
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
         scheduler = StepLR(optimizer, step_size=25, gamma=0.25)
@@ -410,6 +425,9 @@ if __name__ == '__main__':
     # python OGB-NeurIPS-Team-Park/monotonic_NS.py --label_disturb_p=0.1 --batch_size=512
     # python OGB-NeurIPS-Team-Park/monotonic_NS.py --label_disturb_p=0.1 --batch_size=1024 --hidden_channels=2048
 
+    # TEST
+    # python OGB-NeurIPS-Team-Park/monotonic_NS.py --evaluate --label_disturb_p=0.0 --time_disturb_p=0.0 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/mono-NS_p=0.1_batch=1024/lightning_logs/version_13046213/checkpoints/epoch=14-step=16304.ckpt
+    
     t0=time.time()
     args = parser.parse_args()
     #args.sizes = [int(i) for i in args.sizes.split('-')]
@@ -422,7 +440,7 @@ if __name__ == '__main__':
 
     # Initialize log directory
     if args.debug:
-        name=f'/toggle-NS_DEBUG'
+        name=f'/mono-NS_DEBUG'
     elif args.hidden_channels==1024:
         name=f'/mono-NS_p={args.label_disturb_p}_batch={args.batch_size}'
     else:
@@ -475,16 +493,30 @@ if __name__ == '__main__':
     if args.evaluate:
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         # Ignore previous code
-        ckpt='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365/checkpoints/epoch=2-step=3260.ckpt'
-        logdir='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365'
-        trainer = Trainer(resume_from_checkpoint=ckpt,
+        trainer = Trainer(resume_from_checkpoint=args.ckpt,
                           progress_bar_refresh_rate=0) # gpus=args.device,
-        model = RGNN.load_from_checkpoint(
-            checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
+        model = RGNN.load_from_checkpoint(args.ckpt)
 
         datamodule.batch_size = 16*8 # initially 16
-        datamodule.sizes = [[100,100,100],[100,100,100]] * len(sizes)  # (Almost) no sampling...
-
+        
+        f_log.write("Original : [[40,10,0],[20,10,5]]\n")
+        f_log.flush()
+        datamodule.sizes = [[40,10,0],[20,10,5]] 
+        trainer.test(model=model, datamodule=datamodule)
+        '''
+        f_log.write("X3 : [[120,30,0],[60,30,15]]\n")
+        f_log.flush()
+        datamodule.sizes = [[120,30,0],[60,30,15]] 
+        trainer.test(model=model, datamodule=datamodule)
+        
+        f_log.write("X4 : [[160,40,0],[80,40,20]]\n")
+        f_log.flush()
+        datamodule.sizes = [[160,40,0],[80,40,20]] 
+        trainer.test(model=model, datamodule=datamodule)
+        '''
+        f_log.write("X5 : [[200,50,0],[100,60,25]]\n")
+        f_log.flush()
+        datamodule.sizes = [[200,50,0],[100,60,25]]  # (Almost) no sampling...
         trainer.test(model=model, datamodule=datamodule)
 
         evaluator = MAG240MEvaluator()
