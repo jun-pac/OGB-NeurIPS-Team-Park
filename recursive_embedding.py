@@ -22,7 +22,8 @@ from torch.optim.lr_scheduler import StepLR
 from torch_geometric.nn import GATConv, SAGEConv
 from torch_sparse import SparseTensor
 from tqdm import tqdm
-from sampler.sample_toggle import NeighborSampler
+from sampler.sample_china import NeighborSampler as NS_china
+from sampler.sample_toggle import NeighborSampler as NS_toggle
 # Must be always in_memory setup
 
 ROOT='/fs/ess/PAS1289'
@@ -51,7 +52,6 @@ class MAG240M(LightningDataModule):
         self.label_disturb_p=label_disturb_p
         self.time_disturb_p=time_disturb_p
         self.bit=bit
-        self.visit_flag=visit_flag
 
     @property
     def num_features(self) -> int:
@@ -82,7 +82,10 @@ class MAG240M(LightningDataModule):
         self.test_idx.share_memory_()
         self.test_challenge_idx = torch.from_numpy(dataset.get_idx_split('test-challenge'))
         self.test_challenge_idx.share_memory_()
-        if args.embedding:
+        N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
+        self.N=N
+
+        if args.embedding or args.embedding_as_input:
             print(f"Load visit flag...")
             t_=time.time()
             if os.path.isfile(visit_idx_path):
@@ -92,26 +95,31 @@ class MAG240M(LightningDataModule):
                 self.visit_idx = torch.squeeze(torch.nonzero(self.loaded_visit_flag))
                 torch.save(self.visit_idx, visit_idx_path)
 
+            global total_embedding
+            total_embedding=len(self.visit_idx)
+            self.embedding_idx=torch.zeros(N).to(dtype=torch.int64)
+            self.embedding_idx[self.visit_idx]=torch.arange(len(self.visit_idx))+1
+            if args.debug:
+                print(f"args.embedding_idx.dtype : {self.embedding_idx.dtype}")
+        
+        if args.embedding:
             # Continue from last file
             global embedding_number
             global embedding_file_number
             embedding_file_number=args.embedding_file_start
             embedding_number = len(self.visit_idx) - 1280000*args.embedding_file_start
-            for i in range(41228674//1280000+1):
+            for i in range(total_embedding//1280000+1):
                 if not os.path.isfile(embedding_path+str(embedding_file_number)+'.pt'):
                     break
                 embedding_file_number+=1
-                if i != 41228674//1280000:
+                if i != total_embedding//1280000:
                     embedding_number-=1280000
                 else:
-                    embedding_number-=41228674%1280000
+                    embedding_number-=total_embedding%1280000
             assert embedding_number>0
             self.visit_idx=self.visit_idx[-embedding_number:]
             print(f"Done! {time.time()-t_:.2f}, Start forward {embedding_file_number}th file, {embedding_number} nodes left.")
             
-
-        N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
-        self.N=N
         t1=time.time()
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
                       mode='r', shape=(N, self.num_features))
@@ -131,22 +139,26 @@ class MAG240M(LightningDataModule):
             self.y = torch.from_numpy(dataset.all_paper_label)
         else :
             self.y=torch.from_numpy(np.empty(N))
-            print(f"self.y.shape : {self.y.shape}")
         if args.debug:
             print(f"self.y.shape : {self.y.shape}")
         
-        path_mono='/fs/ess/PAS1289/mag240m_kddcup2021/asym_adj_t.pt'
-        self.mono_adj_t = torch.load(path_mono)
-        path_full='/fs/ess/PAS1289/mag240m_kddcup2021/bi_adj_t.pt'
-        self.adj_t = torch.load(path_full)
+        path_mono='/fs/ess/PAS1289/mag240m_kddcup2021/meta_mono_adj_t.pt'
+        path_full='/fs/ess/PAS1289/mag240m_kddcup2021/meta_symm_adj_t.pt'
+        if(args.link!='full'):
+            self.mono_adj_t = torch.load(path_mono)
+        if(args.link!='mono'):
+            self.adj_t = torch.load(path_full)
+
+        if(args.link!='full'):
+            self.mono_relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/mono_relation_ptr.pt")
+        if(args.link!='mono'):
+            self.relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/bi_relation_ptr.pt")
 
         one_hot_encoding = np.eye(153)[[int(x) for x in self.train_label]].astype(np.float16)
         self.one_hot_dict={}
         for i in range(len(self.train_idx)):
             self.one_hot_dict[int(self.train_idx[i])]=one_hot_encoding[i]
 
-        self.mono_relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/mono_relation_ptr.pt")
-        self.relation_ptr=torch.load("/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/sampler/bi_relation_ptr.pt")
         self.arxiv_idx=set()
         for i in self.train_idx:
             self.arxiv_idx.add(int(i))
@@ -157,6 +169,17 @@ class MAG240M(LightningDataModule):
         for i in self.test_challenge_idx:
             self.arxiv_idx.add(int(i))
 
+        if args.embedding_as_input:
+            self.embedding=torch.empty((total_embedding+1, 153), dtype=torch.float16)
+            self.embedding[0]=torch.zeros(153,dtype=torch.float16)
+            for i in range(total_embedding//1280000+1):
+                assert os.path.isfile(args.embedding_dir+str(i)+'.pt')
+                temp=torch.load(args.embedding_dir+str(i)+'.pt')
+                if i!=total_embedding//1280000:
+                    assert len(temp)==1280000
+                self.embedding[i*1280000+1:min((i+1)*1280000,total_embedding)+1]=temp[:]
+            
+            
         # Build positional encoding
         self.num_papers=dataset.num_papers
         self.paper_year=dataset.paper_year # load years to memory!
@@ -175,54 +198,88 @@ class MAG240M(LightningDataModule):
             f_log.flush()
 
     def train_dataloader(self):
-        if args.debug:
-            print("call_train_dataloader")
-        return NeighborSampler(self.mono_adj_t, self.adj_t, node_idx=self.train_idx,
+        if args.link=='toggle':
+            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.train_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_train,
                                batch_size=self.batch_size, shuffle=True,
                                num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+        else:
+            relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
+            adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
+            return NS_china(adj_t, node_idx=self.train_idx,
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch_train,
+                               batch_size=self.batch_size, shuffle=True,
+                               num_workers=10, relation_ptr=relation_ptr)
 
     def val_dataloader(self):
-        if args.debug:
-            print("call_val_dataloader")
-        return NeighborSampler(self.mono_adj_t, self.adj_t, node_idx=self.val_idx,
+        if args.link=='toggle':
+            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.val_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
-                               batch_size=self.batch_size, num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+                               batch_size=self.batch_size,
+                               num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+        else:
+            relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
+            adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
+            return NS_china(adj_t, node_idx=self.val_idx,
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch_test,
+                               batch_size=self.batch_size, 
+                               num_workers=10, relation_ptr=relation_ptr)
 
-    def test_dataloader(self): 
+    def test_dataloader(self):
         node_idx=self.val_idx if not args.embedding else self.visit_idx
-        return NeighborSampler(self.mono_adj_t, self.adj_t, node_idx=node_idx,
+        if args.link=='toggle':
+            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=node_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
-                               batch_size=self.batch_size, num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+                               batch_size=self.batch_size,
+                               num_workers=2, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+        else:
+            relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
+            adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
+            return NS_china(adj_t, node_idx=self.val_idx,
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch_test,
+                               batch_size=self.batch_size, 
+                               num_workers=2, relation_ptr=relation_ptr)
 
     def hidden_test_dataloader(self): # This is test-dev. Not test-challenge
-        return NeighborSampler(self.mono_adj_t, self.adj_t, node_idx=self.test_idx,
+        if args.link=='toggle':
+            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.test_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
-                               batch_size=self.batch_size, num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
-
-    def test_visit_dataloader(self):
-        return NeighborSampler(self.mono_adj_t, self.adj_t, node_idx=torch.cat((self.test_idx, self.test_challenge_idx), dim=0),
+                               batch_size=self.batch_size,
+                               num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+        else:
+            relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
+            adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
+            return NS_china(adj_t, node_idx=self.test_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
-                               batch_size=self.batch_size, num_workers=5, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
-
+                               batch_size=self.batch_size, 
+                               num_workers=10, relation_ptr=relation_ptr)
+    
     def convert_batch_train(self, batch_size, n_id, adjs):
         x = self.x[n_id]
-        append_feat = np.zeros((len(n_id), 153),dtype=np.float16)
+        append_label = np.zeros((len(n_id), 153),dtype=np.float16)
         append_time = np.zeros((len(n_id), self.bit),dtype=np.float16)
         
         for i in range(batch_size, len(n_id)):
+            append_label[i]=self.embedding[self.embedding_idx[n_id[i]]]
+            '''
             if (int(n_id[i]) in self.one_hot_dict):
-                append_feat[i]=self.one_hot_dict[int(n_id[i])]
+                append_label[i]=self.one_hot_dict[int(n_id[i])]
                 # Random perturb.
                 if(torch.rand(1)<self.label_disturb_p):
                     # Should be same label distribution
-                    append_feat[i]=self.one_hot_dict[int(self.train_idx[int(torch.rand(1)*len(self.train_idx))])]
-        
+                    append_label[i]=self.one_hot_dict[int(self.train_idx[int(torch.rand(1)*len(self.train_idx))])]
+            else:
+                append_label[i]=self.embedding[self.embedding_idx[n_id[i]]]
+            '''
+
         for i in range(len(n_id)):
             if (n_id[i] < self.num_papers):
                 year=self.paper_year[n_id[i]]
@@ -230,7 +287,7 @@ class MAG240M(LightningDataModule):
                 if(torch.rand(1)<self.time_disturb_p):
                     year=max(min(year+int(torch.randn(1)*3),2021),0)
                 append_time[i]=self.positional_encoding[self.year_to_idx[year]]
-        x=torch.from_numpy(np.concatenate((x, append_feat, append_time), axis=1)).to(torch.float)
+        x=torch.from_numpy(np.concatenate((x, append_label, append_time), axis=1)).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
 
         if args.visit_check:
@@ -238,21 +295,28 @@ class MAG240M(LightningDataModule):
         
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
-
+        
     def convert_batch_test(self, batch_size, n_id, adjs):
         #t0=time.time()
         x = self.x[n_id]
-        append_feat = np.zeros((len(n_id), 153),dtype=np.float16)
+        append_label = np.zeros((len(n_id), 153),dtype=np.float16)
         append_time = np.zeros((len(n_id), self.bit),dtype=np.float16)
+        
         for i in range(batch_size, len(n_id)):
+            append_label[i]=self.embedding[self.embedding_idx[n_id[i]]]
+            '''
             if (int(n_id[i]) in self.one_hot_dict):
-                append_feat[i]=self.one_hot_dict[int(n_id[i])]
+                append_label[i]=self.one_hot_dict[int(n_id[i])]
+            else:
+                append_label[i]=self.embedding[self.embedding_idx[n_id[i]]]
+            '''
+
         for i in range(len(n_id)):
             if (n_id[i] < self.num_papers):
                 year=self.paper_year[n_id[i]]
                 append_time[i]=self.positional_encoding[self.year_to_idx[year]]
             
-        x=torch.from_numpy(np.concatenate((x, append_feat, append_time), axis=1)).to(torch.float)
+        x=torch.from_numpy(np.concatenate((x, append_label, append_time), axis=1)).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
 
         if args.visit_check:
@@ -278,35 +342,22 @@ class RGNN(LightningModule):
         self.norms = ModuleList()
         self.skips = ModuleList()
 
-        if self.model == 'rgat':
-            self.convs.append(
-                ModuleList([
-                    GATConv(in_channels, hidden_channels // heads, heads,
-                            add_self_loops=False) for _ in range(num_relations)
-                ]))
- 
-            for _ in range(num_layers - 1):
-                self.convs.append(
-                    ModuleList([
-                        GATConv(hidden_channels, hidden_channels // heads,
-                                heads, add_self_loops=False)
-                        for _ in range(num_relations)
-                    ]))
+        if args.debug:
+            print(f"RGNN in_channels : {in_channels}")
 
-        elif self.model == 'rgraphsage':
+        self.convs.append(
+            ModuleList([
+                GATConv(in_channels, hidden_channels // heads, heads,
+                        add_self_loops=False) for _ in range(num_relations)
+            ]))
+
+        for _ in range(num_layers - 1):
             self.convs.append(
                 ModuleList([
-                    SAGEConv(in_channels, hidden_channels, root_weight=False)
+                    GATConv(hidden_channels, hidden_channels // heads,
+                            heads, add_self_loops=False)
                     for _ in range(num_relations)
                 ]))
-
-            for _ in range(num_layers - 1):
-                self.convs.append(
-                    ModuleList([
-                        SAGEConv(hidden_channels, hidden_channels,
-                                 root_weight=False)
-                        for _ in range(num_relations)
-                    ]))
 
         for _ in range(num_layers):
             self.norms.append(BatchNorm1d(hidden_channels))
@@ -479,7 +530,7 @@ class RGNN(LightningModule):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--hidden_channels', type=int, default=1024)
-    parser.add_argument('--batch_size', type=int, default=512)
+    parser.add_argument('--batch_size', type=int, default=1024)
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=50)
     parser.add_argument('--model', type=str, default='rgat',
@@ -488,34 +539,38 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--evaluate', action='store_true')
     parser.add_argument('--ckpt', type=str, default=None)
-    parser.add_argument('--label_disturb_p', type=float, default=0.0)
+    parser.add_argument('--label_disturb_p', type=float, default=0.1)
     parser.add_argument('--time_disturb_p', type=float, default=0.2)
     parser.add_argument('--ver', type=int, default=0) # Used in ensemble step.
     parser.add_argument('--bit', type=int, default=10) # Used in ensemble step.
     parser.add_argument('--debug', action='store_true')
+    parser.add_argument('--link', type=str, default='toggle', choices=['full', 'mono', 'toggle'])
     parser.add_argument('--embedding', action='store_true')
     parser.add_argument('--visit_check', action='store_true')
     parser.add_argument('--visit_test', action='store_true')
     parser.add_argument('--embedding_file_start', type=int, default=0)
+    parser.add_argument('--embedding_as_input', action='store_true')
+    parser.add_argument('--embedding_dir', type=str, default=None)
+
     # Must specify seed everytime.
     # Batchsize, N_source need to be precisely selected, but don't change it for now.
 
 
     # DEBUG
-    # python OGB-NeurIPS-Team-Park/bi_toggle.py --label_disturb_p=0.1 --batch_size=1024 --visit_check --visit_test --debug
+    # python OGB-NeurIPS-Team-Park/recursive_embedding.py --link=toggle --embedding_as_input --embedding_dir=/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/embedding/bi-toggle_p=0.1_batch=1024 --debug
     
     # MAIN
-    # python OGB-NeurIPS-Team-Park/bi_toggle.py --label_disturb_p=0.1 --batch_size=1024 --visit_check --ckpt=/users/PAS1289/oiocha/logs/bi-toggle_p=0.1_batch=1024/lightning_logs/version_13168996/checkpoints/epoch=30-step=33696.ckpt
+    # python OGB-NeurIPS-Team-Park/recursive_embedding.py --link=toggle --embedding_as_input --embedding_dir=/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/embedding/bi-toggle_p=0.1_batch=1024 
 
     # TEST
-    # python OGB-NeurIPS-Team-Park/bi_toggle.py --evaluate --label_disturb_p=0.0 --time_disturb_p=0.0 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/bi-toggle_p=0.1_batch=1024/lightning_logs/version_13082877/checkpoints/epoch=34-step=38044.ckpt
+    # python OGB-NeurIPS-Team-Park/recursive_embedding.py --evaluate --label_disturb_p=0.0 --time_disturb_p=0.0 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/recursive_p=0.1_batch=1024/lightning_logs/version_13082877/checkpoints/epoch=34-step=38044.ckpt
     
     # Evaluate
-    # python OGB-NeurIPS-Team-Park/bi_toggle.py --embedding --label_disturb_p=0.0 --time_disturb_p=0.0 --batch_size=1024 --evaluate --ckpt=/users/PAS1289/oiocha/logs/bi-toggle_p=0.1_batch=1024/lightning_logs/version_13082877/checkpoints/epoch=34-step=38044.ckpt
+    # python OGB-NeurIPS-Team-Park/recursive_embedding.py --embedding --label_disturb_p=0.0 --time_disturb_p=0.0 --batch_size=1024 --evaluate --ckpt=/users/PAS1289/oiocha/logs/recursive_p=0.1_batch=1024/lightning_logs/version_13082877/checkpoints/epoch=34-step=38044.ckpt
     
     # Embedding
-    # python OGB-NeurIPS-Team-Park/bi_toggle.py --embedding --debug --ckpt=/users/PAS1289/oiocha/logs/bi-toggle_p=0.1_batch=1024/lightning_logs/version_13196432/checkpoints/epoch=39-step=43479.ckpt
-    # python OGB-NeurIPS-Team-Park/bi_toggle.py --embedding --embedding_file_start=15 --ckpt=/users/PAS1289/oiocha/logs/bi-toggle_p=0.1_batch=1024/lightning_logs/version_13196432/checkpoints/epoch=39-step=43479.ckpt
+    # python OGB-NeurIPS-Team-Park/recursive_embedding.py --embedding --debug --ckpt=/users/PAS1289/oiocha/logs/recursive_p=0.1_batch=1024/lightning_logs/version_13196432/checkpoints/epoch=39-step=43479.ckpt
+    # python OGB-NeurIPS-Team-Park/recursive_embedding.py --embedding --embedding_file_start=15 --ckpt=/users/PAS1289/oiocha/logs/recursive_p=0.1_batch=1024/lightning_logs/version_13196432/checkpoints/epoch=39-step=43479.ckpt
 
     seed_everything(42)
     t0=time.time()
@@ -532,13 +587,13 @@ if __name__ == '__main__':
 
     # Initialize log directory
     if args.debug:
-        name=f'/bi-toggle_DEBUG'
+        name=f'/recursive_DEBUG'
     elif args.ckpt!=None:
         name='/'+args.ckpt.split('/')[5]
     elif args.hidden_channels==1024:
-        name=f'/bi-toggle_p={args.label_disturb_p}_batch={args.batch_size}'
+        name=f'/recursive_p={args.label_disturb_p}_batch={args.batch_size}'
     else:
-        name=f'/bi-toggle_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
+        name=f'/recursive_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
 
 
     NROOT='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/txtlog' # log file's root.
@@ -550,13 +605,12 @@ if __name__ == '__main__':
 
     # Visit checker
     # Solve test visit flag issue
-    if args.visit_check or args.embedding:
-        if args.debug:
-            visit_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/visit_flag'+'/'+args.ckpt.split('/')[5]+'.pt'
-        else:
-            visit_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/visit_flag'+name+'.pt'
-        visit_idx_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/visit_idx_flag'+name+'.pt'
+    if args.visit_check or args.embedding or args.embedding_as_input:
+        past_path=f'/bi-{args.link}_p={args.label_disturb_p}_batch={args.batch_size}'
+        visit_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/visit_flag'+past_path+'.pt'
+        visit_idx_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/visit_idx_flag'+past_path+'.pt'
         embedding_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/embedding'+name
+
         if os.path.isfile(visit_path):
             visit_flag=torch.load(visit_path)
         else:
@@ -565,6 +619,11 @@ if __name__ == '__main__':
 
         embedding_number=0
         embedding_file_number=0
+        total_embedding=0
+
+    # Using embedding as input
+    if args.embedding_as_input:
+        assert args.embedding_dir is not None
 
     # Dataloader
     datamodule = MAG240M(ROOT, args.batch_size, sizes, args.in_memory, args.label_disturb_p, args.time_disturb_p, args.bit)
@@ -576,12 +635,16 @@ if __name__ == '__main__':
         f_log.write(f"Test visit flag update. Current non-zero entries : {np.count_nonzero(visit_flag)}\n")
         f_log.flush()
         testloader=datamodule.test_visit_dataloader()
-        for i,batch in enumerate(testloader):
-            if(i%10==0):
-                print(f"Test visit flag {i}/{(88092+58726)//args.batch_size}th batch | time : {time.time()-t0:.2f} | Nonzero : {torch.count_nonzero(visit_flag)}")
-                f_log.write(f"Test visit flag {i}/{(88092+58726)//args.batch_size}th batch | time : {time.time()-t0:.2f} | Nonzero : {np.count_nonzero(visit_flag)}\n")
-                f_log.flush()
-        print(f"Done! ... {time.time()-t0:.2f}")
+        for test_epoch in range(30):
+            print(f"Test visit eopch{test_epoch}, time : {time.time()-t0}")
+            f_log.write(f"Test visit eopch{test_epoch}, time : {time.time()-t0}\n")
+            f_log.flush()
+            for i,batch in enumerate(testloader):
+                if(i%10==0):
+                    print(f"Test visit flag {i}/{(88092+58726)//args.batch_size}th batch | time : {time.time()-t0:.2f} | Nonzero : {torch.count_nonzero(visit_flag)}")
+                    f_log.write(f"Test visit flag {i}/{(88092+58726)//args.batch_size}th batch | time : {time.time()-t0:.2f} | Nonzero : {np.count_nonzero(visit_flag)}\n")
+                    f_log.flush()
+            print(f"Done! ... {time.time()-t0:.2f}")
         f_log.write(f"Done! ... {time.time()-t0:.2f}\n")
         
         torch.save(visit_flag,visit_path)
@@ -606,7 +669,9 @@ if __name__ == '__main__':
                     datamodule.num_classes, args.hidden_channels,
                     datamodule.num_relations, num_layers=len(sizes),
                     dropout=args.dropout)
-
+        if args.debug:
+            print(f"Input size : {datamodule.num_features+153+args.bit}")
+        
         print(f'#Params {sum([p.numel() for p in model.parameters()])}')
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max',save_top_k=3)
         # tensorboard --logdir=/users/PAS1289/oiocha/logs/rgat/lightning_logs
@@ -687,6 +752,4 @@ if __name__ == '__main__':
                 y_preds.append(out)
         res = {'y_pred': torch.cat(y_preds, dim=0)}
         evaluator.save_test_submission(res, 'results'+name, mode='test-dev')
-
-
 

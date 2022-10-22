@@ -1,0 +1,8 @@
+Done! [61.90s]
+0 epoch ; acua_DEBUG | valid_acc : 0.00586 | time : 101.08 | batch : 0/135
+Validation Epoch end... Accuracy : 0.005859375
+Done! [65.85s]
+0 epoch ; acua_DEBUG | valid_acc : 0.00586 | time : 96.60 | batch : 0/135
+Validation Epoch end... Accuracy : 0.005859375
+0 epoch ; acua_DEBUG | train_acc : 0.00488 | time : 139.79 | batch : 0/1086
+0 epoch ; acua_DEBUG | train_acc : 0.15137 | time : 194.31 | batch : 10/1086

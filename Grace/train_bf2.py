@@ -337,7 +337,7 @@ class GRACE(LightningModule):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--hidden_channels', type=int, default=1024)
-    parser.add_argument('--out_channels', type=int, default=512)
+    parser.add_argument('--out_channels', type=int, default=1024)
     parser.add_argument('--batch_size', type=int, default=512)
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=50)
@@ -386,7 +386,7 @@ if __name__ == '__main__':
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         print("Device :",device)
         model = GRACE(args.model, datamodule.num_features+153,
-                    args.out_channels, args.hidden_channels, args.hidden_channels,
+                    datamodule.num_classes, args.hidden_channels, args.out_channels,
                     datamodule.num_relations, num_layers=len(sizes),
                     dropout=args.dropout,tau=args.tau)
         if args.ckpt != None:

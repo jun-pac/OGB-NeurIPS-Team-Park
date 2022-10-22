@@ -22,7 +22,7 @@ from torch.optim.lr_scheduler import StepLR
 from torch_geometric.nn import GATConv, SAGEConv
 from torch_sparse import SparseTensor
 from tqdm import tqdm
-from sampler.sample_toggle_mingi import NeighborSampler
+from sampler.sample_toggle import NeighborSampler
 # Must be always in_memory setup
 
 ROOT='/fs/ess/PAS1289'
@@ -124,15 +124,24 @@ class MAG240M(LightningDataModule):
         # Build positional encoding
         self.num_papers=dataset.num_papers
         self.paper_year=dataset.paper_year # load years to memory!
-        _idx=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,4,4,5,5,6,7,8,9,9]
-        self.year_to_idx=[0]*1985+_idx
-        self.positional_encoding=[]
+        start_year = 1985
+        end_year = 2025
+
+        #_idx=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,4,4,5,5,6,7,8,9,9]
+        self.year_to_idx=[(0 if i <start_year else i-start_year+1) for i in range(end_year)]
+        self.positional_encoding=np.zeros((end_year-start_year+1,self.bit),dtype=np.float)
+        _2i =  np.arange(0,self.bit,2)
+        pos = np.expand_dims(np.arange(0,end_year-start_year+1),1)
+        """
         for i in range(self.bit):
             wave=np.arange(self.bit)
             wave=np.cos((wave-i)*np.pi/10)
             pos_row=torch.from_numpy(wave)
             self.positional_encoding.append(pos_row)
-
+        """
+        self.positional_encoding[:,0::2] = np.sin(pos/(1000**(_2i/self.bit)))
+        self.positional_encoding[:,1::2] = np.cos(pos/(1000**(_2i/self.bit)))
+        
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
         if args.debug:
             f_log.write(f'Done! [{time.perf_counter() - t:.2f}s]\n')
@@ -426,7 +435,7 @@ class RGNN(LightningModule):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--hidden_channels', type=int, default=1024)
-    parser.add_argument('--batch_size', type=int, default=512)
+    parser.add_argument('--batch_size', type=int, default=1024)
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=50)
     parser.add_argument('--model', type=str, default='rgat',
@@ -435,7 +444,7 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--evaluate', action='store_true')
     parser.add_argument('--ckpt', type=str, default=None)
-    parser.add_argument('--label_disturb_p', type=float, default=0.0)
+    parser.add_argument('--label_disturb_p', type=float, default=0.1)
     parser.add_argument('--time_disturb_p', type=float, default=0.2)
     parser.add_argument('--ver', type=int, default=0) # Used in ensemble step.
     parser.add_argument('--bit', type=int, default=10) # Used in ensemble step.
@@ -467,13 +476,13 @@ if __name__ == '__main__':
 
     # Initialize log directory
     if args.debug:
-        name=f'/toggle-NS_DEBUG_mingi'
+        name=f'/toggle-NS_DEBUG'
     elif args.ckpt!=None:
         name='/'+args.ckpt.split('/')[5]
     elif args.hidden_channels==1024:
-        name=f'/toggle-NS_mingi_p={args.label_disturb_p}_batch={args.batch_size}'
+        name=f'/toggle-NS_newpos_p={args.label_disturb_p}_batch={args.batch_size}'
     else:
-        name=f'/toggle-NS_mingi_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
+        name=f'/toggle-NS_newpos_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
 
 
     NROOT='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/txtlog' # log file's root.

@@ -82,9 +82,37 @@ class MAG240M(LightningDataModule):
         self.test_idx.share_memory_()
         self.test_challenge_idx = torch.from_numpy(dataset.get_idx_split('test-challenge'))
         self.test_challenge_idx.share_memory_()
-        
-        N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
 
+        if args.embedding:
+            print(f"Load visit flag...")
+            t_=time.time()
+            if os.path.isfile(visit_idx_path):
+                self.visit_idx=torch.load(visit_idx_path)
+            else:
+                self.loaded_visit_flag = torch.load(visit_path)
+                self.visit_idx = torch.squeeze(torch.nonzero(self.loaded_visit_flag))
+                torch.save(self.visit_idx, visit_idx_path)
+            # Continue from last file
+            
+            global embedding_number
+            global embedding_file_number
+            embedding_file_number=args.embedding_file_start
+            embedding_number = len(self.visit_idx) - 1280000*args.embedding_file_start
+            for i in range(42539880//1280000+1):
+                if not os.path.isfile(embedding_path+str(embedding_file_number)+'.pt'):
+                    break
+                embedding_file_number+=1
+                if i != 42539880//1280000:
+                    embedding_number-=1280000
+                else:
+                    embedding_number-=42539880%1280000
+            assert embedding_number>0
+            self.visit_idx=self.visit_idx[-embedding_number:]
+            print(f"Done! {time.time()-t_:.2f}, Start forward {embedding_file_number}th file, {embedding_number} nodes left.")
+
+        N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
+        self.N=N 
+        
         t1=time.time()
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
                       mode='r', shape=(N, self.num_features))
@@ -97,7 +125,11 @@ class MAG240M(LightningDataModule):
             self.x = torch.from_numpy(self.x).share_memory_()
         print(f"full_feat loading time : {time.time()-t1:.2f}")
         
-        self.y = torch.from_numpy(dataset.all_paper_label)
+        if not args.embedding:
+            self.y = torch.from_numpy(dataset.all_paper_label)
+        else :
+            self.y=torch.from_numpy(np.empty(N))
+            print(f"self.y.shape : {self.y.shape}")
 
         path='/fs/ess/PAS1289/mag240m_kddcup2021/full_adj_t.pt'
         self.adj_t = torch.load(path)
@@ -150,7 +182,7 @@ class MAG240M(LightningDataModule):
                                batch_size=self.batch_size, num_workers=10, relation_ptr=self.relation_ptr)
 
     def test_dataloader(self):  
-        node_idx=self.val_idx if not args.embedding else torch.arange(self.N)
+        node_idx=self.val_idx if not args.embedding else self.visit_idx
         return NeighborSampler(self.adj_t, node_idx=node_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
@@ -327,6 +359,23 @@ class RGNN(LightningModule):
         self.max_val_acc=0.
         self.batch_idx=0
         self.test_num=0
+        self.embedding_list=[]
+
+    def save_embedding(self):
+        global embedding_file_number
+        print(f"{embedding_file_number}th result saving... {time.time()-t0}")
+        f_log.write(f"{embedding_file_number}th result saving... {time.time()-t0}\n")
+        f_log.flush()
+        result=torch.cat(self.embedding_list, dim=0)
+        if args.debug:
+            print(f"shape of reduced embedding_list : {result.shape}")
+            f_log.write(f"shape of reduced embedding_list : {result.shape}")
+            f_log.flush()
+        torch.save(result, embedding_path+str(embedding_file_number)+'.pt')
+        f_log.flush()
+        self.embedding_list=[]
+        embedding_file_number+=1
+        assert not os.path.isfile(embedding_path+str(embedding_file_number)+'.pt')
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
         for i, adj_t in enumerate(adjs_t):
@@ -376,17 +425,24 @@ class RGNN(LightningModule):
 
     def test_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
-        tmp_acc=self.test_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
-        self.test_acc_sum+=batch.x.shape[0]*tmp_acc
-        self.test_cnt+=batch.x.shape[0]
-        self.test_res.append(y_hat.softmax(dim=-1).cpu().numpy())
-
-        #self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
-        self.log('test_acc', tmp_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
-        if((args.debug and batch_idx%10==0) or batch_idx%50==0):
-            print(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//128}")
-            f_log.write(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//128}\n")
-            f_log.flush()
+        if not args.embedding:
+            tmp_acc=self.test_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
+            self.test_acc_sum+=batch.x.shape[0]*tmp_acc
+            self.test_cnt+=batch.x.shape[0]
+            self.test_res.append(y_hat.softmax(dim=-1).cpu().numpy())
+            self.log('test_acc', tmp_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
+            if((args.debug and batch_idx%10==0) or batch_idx%50==0):
+                print(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//128}")
+                f_log.write(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//128}\n")
+                f_log.flush()
+        else:
+            self.embedding_list.append(y_hat)
+            if((args.debug and batch_idx%10==0) or batch_idx%1000==999):
+                print(f"{name[1:]} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{embedding_number//128}")
+                f_log.write(f"{name[1:]} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{embedding_number//128}\n")
+                f_log.flush()
+            if((args.debug and batch_idx%10==0) or batch_idx%10000==9999):
+                self.save_embedding()
     
     def training_epoch_end(self, outputs) -> None:
         print("Train Epoch end... Accuracy : "+str(self.train_acc_sum/self.train_cnt))
@@ -417,19 +473,24 @@ class RGNN(LightningModule):
         self.batch_idx=0
 
     def test_epoch_end(self, outputs) -> None:
-        print("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
-        f_log.write("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
-        f_log.write('\n')
-        if self.test_acc_sum/self.test_cnt>self.max_val_acc:
-            self.max_val_acc=self.test_acc_sum/self.test_cnt
-            self.test_res=np.concatenate(self.test_res)
-            np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/test_activation'+name, self.test_res)
-            print("Successfully saved!")
-            f_log.write("Successfully saved!\n")
-        f_log.flush()
-        self.test_res=[]
-        self.test_acc_sum=0
-        self.test_cnt=0
+        if not args.embedding:
+            print("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
+            f_log.write("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
+            f_log.write('\n')
+            if self.test_acc_sum/self.test_cnt>self.max_val_acc:
+                self.max_val_acc=self.test_acc_sum/self.test_cnt
+                self.test_res=np.concatenate(self.test_res)
+                np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/test_activation'+name, self.test_res)
+                print("Successfully saved!")
+                f_log.write("Successfully saved!\n")
+            f_log.flush()
+            self.test_res=[]
+            self.test_acc_sum=0
+            self.test_cnt=0
+        else:
+            self.save_embedding()
+            global embedding_file_number
+            embedding_file_number=0
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
@@ -457,6 +518,7 @@ if __name__ == '__main__':
     parser.add_argument('--embedding', action='store_true')
     parser.add_argument('--visit_check', action='store_true')
     parser.add_argument('--visit_test', action='store_true')
+    parser.add_argument('--embedding_file_start', type=int, default=0)
     # Must specify seed everytime.
     # Batchsize, N_source need to be precisely selected, but don't change it for now.
 
@@ -465,13 +527,18 @@ if __name__ == '__main__':
     # python OGB-NeurIPS-Team-Park/bi_full.py --label_disturb_p=0.1 --batch_size=1024 --visit_check --visit_test --debug
     
     # MAIN
-    # python OGB-NeurIPS-Team-Park/bi_full.py --label_disturb_p=0.1 --batch_size=1024 --visit_check --ckpt=/users/PAS1289/oiocha/logs/bi-full_p=0.1_batch=1024/lightning_logs/version_13184131/checkpoints/epoch=0-step=1086.ckpt 
+    # python OGB-NeurIPS-Team-Park/bi_full.py --label_disturb_p=0.1 --batch_size=1024 --visit_check --ckpt=/users/PAS1289/oiocha/logs/bi-full_p=0.1_batch=1024/lightning_logs/version_13185592/checkpoints/epoch=32-step=35198.ckpt
 
     # TEST
     # python OGB-NeurIPS-Team-Park/bi_full.py --evaluate --label_disturb_p=0.0 --time_disturb_p=0.0 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/bi-full_p=0.1_batch=1024/lightning_logs/version_13082877/checkpoints/epoch=34-step=38044.ckpt
     
     # Evaluate
     # python OGB-NeurIPS-Team-Park/bi_full.py --embedding --label_disturb_p=0.0 --time_disturb_p=0.0 --batch_size=1024 --evaluate --ckpt=/users/PAS1289/oiocha/logs/bi-full_p=0.1_batch=1024/lightning_logs/version_13082877/checkpoints/epoch=34-step=38044.ckpt
+    
+    # Embedding
+    # python OGB-NeurIPS-Team-Park/bi_full.py --embedding --debug --ckpt=/users/PAS1289/oiocha/logs/bi-full_p=0.1_batch=1024/lightning_logs/version_13217996/checkpoints/epoch=42-step=46068.ckpt
+    # python OGB-NeurIPS-Team-Park/bi_full.py --embedding --embedding_file_start=0 --ckpt=/users/PAS1289/oiocha/logs/bi-full_p=0.1_batch=1024/lightning_logs/version_13217996/checkpoints/epoch=42-step=46068.ckpt
+    # python OGB-NeurIPS-Team-Park/bi_full.py --embedding --embedding_file_start=16 --ckpt=/users/PAS1289/oiocha/logs/bi-full_p=0.1_batch=1024/lightning_logs/version_13217996/checkpoints/epoch=42-step=46068.ckpt
     
     seed_everything(42)
     t0=time.time()
@@ -506,13 +573,19 @@ if __name__ == '__main__':
 
     # Visit checker
     # Solve test visit flag issue
-    if args.visit_check:
-        visit_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/visit_flag'+name+'.pt'
+    if args.visit_check or args.embedding:
+        if args.debug:
+            visit_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/visit_flag'+'/'+args.ckpt.split('/')[5]+'.pt'
+        else:
+            visit_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/visit_flag'+name+'.pt'
+        visit_idx_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/visit_idx_flag'+name+'.pt'
+        embedding_path='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/embedding'+name
         if os.path.isfile(visit_path):
             visit_flag=torch.load(visit_path)
         else:
             visit_flag=torch.zeros(244160500) # 244160499 + 1
         visit_flag.share_memory_()
+        embedding_number=0
 
     # Dataloader
     datamodule = MAG240M(ROOT, args.batch_size, sizes, args.in_memory, args.label_disturb_p, args.time_disturb_p, args.bit)
@@ -541,7 +614,7 @@ if __name__ == '__main__':
         print(f"Visit flag nonzero : {torch.count_nonzero(visit_flag)}")
 
     # Training
-    if not args.evaluate:
+    if not (args.evaluate or args.embedding):
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         print("Device :",device)
         
@@ -582,8 +655,20 @@ if __name__ == '__main__':
 
         trainer.fit(model, datamodule=datamodule)
         
+    if args.embedding:
+        assert args.ckpt!=None
+        device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
+        ckpt=args.ckpt
+        trainer = Trainer(resume_from_checkpoint=ckpt,
+                          progress_bar_refresh_rate=0) # gpus=args.device,
+        model = RGNN.load_from_checkpoint(args.ckpt)
+
+        datamodule.batch_size = 128 # initially 16
+        datamodule.sizes = [[80,20,0],[30,20,10]] 
+        trainer.test(model=model, datamodule=datamodule)
+    
     # Evaluate
-    if args.evaluate:
+    elif args.evaluate:
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         # Ignore previous code
         ckpt=args.ckpt
@@ -621,37 +706,6 @@ if __name__ == '__main__':
 
         model.eval()
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
-        model.to(device)
-        y_preds = []
-        for batch in tqdm(loader):
-            batch = batch.to(device)
-            with torch.no_grad():
-                out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
-                y_preds.append(out)
-        res = {'y_pred': torch.cat(y_preds, dim=0)}
-        evaluator.save_test_submission(res, 'results'+name, mode='test-dev')
-
-
-    if args.embedding:
-        # Solve test visit flag issue
-        device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
-        # Ignore previous code
-        ckpt=args.ckpt
-        trainer = Trainer(resume_from_checkpoint=ckpt,
-                          progress_bar_refresh_rate=0) # gpus=args.device,
-        
-        model = RGNN.load_from_checkpoint(args.ckpt)
-
-        datamodule.batch_size = 16*8 # initially 16
-        
-        datamodule.sizes = [[40,10,0],[20,10,5]] 
-        trainer.test(model=model, datamodule=datamodule)
-
-
-        evaluator = MAG240MEvaluator()
-        loader = datamodule.hidden_test_dataloader()
-
-        model.eval()
         model.to(device)
         y_preds = []
         for batch in tqdm(loader):

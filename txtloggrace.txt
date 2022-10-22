@@ -1,0 +1,3 @@
+val_loss : 1009.2716674804688 | time : 7.103525876998901 | batch : 0
+Validation Epoch end... Loss : 0.0017376993242157065
+train_loss : 979.0530395507812 | time : 9.106574773788452 | batch : 0

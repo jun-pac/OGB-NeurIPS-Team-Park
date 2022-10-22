@@ -71,12 +71,12 @@ class MAG240M(LightningDataModule):
         dataset = MAG240MDataset(self.data_dir)
         print('load dataset',time.time()-t)
         self.train_idx = torch.from_numpy(dataset.get_idx_split('train'))
-        self.train_idx.share_memory_()
+        #self.train_idx.share_memory_()
         self.train_label=dataset.paper_label[self.train_idx]
         self.val_idx = torch.from_numpy(dataset.get_idx_split('valid'))
-        self.val_idx.share_memory_()
+        #self.val_idx.share_memory_()
         self.test_idx = torch.from_numpy(dataset.get_idx_split('test-dev'))
-        self.test_idx.share_memory_()
+        #self.test_idx.share_memory_()
 
         N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
 
@@ -84,6 +84,7 @@ class MAG240M(LightningDataModule):
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,      ############## full_feat.npy
                       mode='r', shape=(N, self.num_features))
         self.x = np.empty((N, self.num_features), dtype=np.float16)
+        #self.x = np.zeros((N, self.num_features), dtype=np.float16)
         self.x[:] = x
         self.x = torch.from_numpy(self.x).share_memory_()
         print(f"full_feat loading time : {time.time()-t1:.2f}")
@@ -111,7 +112,7 @@ class MAG240M(LightningDataModule):
         return NeighborSampler(self.adj_t, node_idx=self.train_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_train,
-                               batch_size=self.batch_size, shuffle=True,
+                               batch_size=self.batch_size, shuffle=False,
                                num_workers=4, relation_ptr=self.relation_ptr)
 
     def val_dataloader(self):
@@ -337,8 +338,8 @@ class GRACE(LightningModule):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--hidden_channels', type=int, default=1024)
-    parser.add_argument('--out_channels', type=int, default=512)
-    parser.add_argument('--batch_size', type=int, default=512)
+    parser.add_argument('--out_channels', type=int, default=1024)
+    parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=50)
     parser.add_argument('--model', type=str, default='rgat',
@@ -360,13 +361,13 @@ if __name__ == '__main__':
 
     t0=time.time()
     args = parser.parse_args()
-    
     #args.sizes = [int(i) for i in args.sizes.split('-')]
     sizes=[[80,20,0],[80,20,10]] # Default behavior
     print(args)
     print(f"Sizes : {sizes}")
 
     seed_everything(42)
+    OROOT = '/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/Grace'
     NROOT='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/txtlog' # log file's root.
     name=f'/grace_outsize={args.out_channels}'
     path_log = NROOT+name+'.txt'
@@ -379,60 +380,37 @@ if __name__ == '__main__':
 
     # Dataloader
     datamodule = MAG240M(ROOT, args.batch_size, sizes, args.in_memory, args.label_disturb_p)
-
-
-    # Training
-    if not args.evaluate:
-        device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
-        print("Device :",device)
-        model = GRACE(args.model, datamodule.num_features+153,
-                    args.out_channels, args.hidden_channels, args.hidden_channels,
-                    datamodule.num_relations, num_layers=len(sizes),
-                    dropout=args.dropout,tau=args.tau)
-        if args.ckpt != None:
-            checkpoint = torch.load(args.ckpt)
-            model.load_state_dict(checkpoint['state_dict'])
-
-        print(f'#Params {sum([p.numel() for p in model.parameters()])}')
-        checkpoint_callback = ModelCheckpoint(monitor='val_loss', mode='min',
-                                           save_top_k=3)
-        # tensorboard --logdir=/users/PAS1289/oiocha/logs/rgat/lightning_logs
-        # About 1000s... (Without data copying, which consume 2400s)  
-        trainer = Trainer(max_epochs=args.epochs,
-                          callbacks=[checkpoint_callback],
-                          default_root_dir=f'logs/Grace',
-                          progress_bar_refresh_rate=0) # gpus=args.device,
-        
-        trainer.fit(model, datamodule=datamodule)
-        
+    datamodule.setup()   
 
     # Evaluate
-    if args.evaluate:
+    if True:
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         # Ignore previous code
-        ckpt='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365/checkpoints/epoch=2-step=3260.ckpt'
-        logdir='/users/PAS1289/oiocha/logs/rgat/lightning_logs/version_12845365'
+        num = 1
+        ckpt='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/Grace/logs/Grace/lightning_logs/'+str(num)+'/checkpoints/epoch=0-step=2172.ckpt'
+        logdir='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/Grace/logs/Grace/lightning_logs/'+str(num)
+
         trainer = Trainer(resume_from_checkpoint=ckpt,
                           progress_bar_refresh_rate=0) # gpus=args.device,
+        
         model = GRACE.load_from_checkpoint(
             checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
 
         datamodule.batch_size = 16*8 # initially 16
         datamodule.sizes = [[80,20,0],[80,20,10]] * len(sizes)  # (Almost) no sampling...
 
-        trainer.test(model=model, datamodule=datamodule)
-
-        evaluator = MAG240MEvaluator()
-        loader = datamodule.hidden_test_dataloader()
+        loaders = {"train":datamodule.train_dataloader() , "val":datamodule.val_dataloader()}
 
         model.eval()
         device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
         model.to(device)
-        y_preds = []
-        for batch in tqdm(loader):
-            batch = batch.to(device)
-            with torch.no_grad():
-                out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
-                y_preds.append(out)
-        res = {'y_pred': torch.cat(y_preds, dim=0)}
-        evaluator.save_test_submission(res, f'results/relation-NS_p={args.label_disturb_p}_batch={args.batch_size}',mode='test-dev')
+        
+        for name, loader in loaders.items():
+            y_infer = []
+            for batch in tqdm(loader):
+                batch = batch.to(device)
+                with torch.no_grad():
+                    out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
+                    y_infer.append(out)
+            y_infer = torch.cat(y_infer, dim=0)
+            torch.save(y_infer,os.path.join(OROOT,name))

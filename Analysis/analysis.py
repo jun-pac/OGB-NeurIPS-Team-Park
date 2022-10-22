@@ -30,7 +30,7 @@ print("num classes :",dataset.num_classes) # number of subject area classes
 print()
 
 # Distribution of label
-print("Train label distribution")
+pnt("Train label distribution")
 train_idx=dataset.get_idx_split('train')
 valid_idx=dataset.get_idx_split('valid')
 test_idx=dataset.get_idx_split('test-dev')

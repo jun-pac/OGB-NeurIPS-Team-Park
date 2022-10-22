@@ -57,6 +57,8 @@ rowptr, col, val = spt.csr()
 for i in range(100):
     print(rowptr[i])
 """
+
+"""
 pc = np.load('/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/mingi/pdist.npy')
 ac = np.load('/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/mingi/adist.npy')
 
@@ -78,3 +80,19 @@ plt.savefig('/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/mingi/adist')
 
 for i in range(100):
     print(pcv[i], pcc[i], acv[i], acc[i])
+"""
+ROOT = '/fs/ess/PAS1289/mag240m_kddcup2021'
+__split__ = torch.load(osp.join(ROOT, 'split_dict.pt'))
+
+def get_idx_split(split: Optional[str] = None) -> Union[Dict[str, np.ndarray], np.ndarray]:
+    return __split__ if split is None else __split__[split]
+
+path = osp.join(ROOT, 'processed', 'paper', 'node_label.npy')
+label =  np.load(path)
+
+train_idx = get_idx_split('train')
+valid_idx = get_idx_split('valid')
+test_idx = get_idx_split('test')
+
+print(len(label), len(train_idx), len(valid_idx),len(test_idx))
+print(label[train_idx[0]])

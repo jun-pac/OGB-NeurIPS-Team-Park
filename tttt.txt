@@ -1,0 +1,19 @@
+Plasma is a hidden 4th state of matter. 
+Plasma occurs when gas has a very high temperature and low density, causing avalanche discharge, where (electrons escaping from the atom) ionize surrounding atoms, occurring secondary electrons, making other ionized atoms, then exponentially multiplying electrons and atoms. 
+Plasma is composed of neutral particles, ions, and electrons. 
+Among them, electrons and ions have reverse charges that attract each other. 
+Electrons are lighter than ions, so electrons are trapped in a virtual sphere defined as the Lamor sphere formed around ions. 
+The density of electrons and ions becomes equal and charge density is conserved neutrally, which is called quasi-neutrality. 
+Electrons and ions move together in space, which is called collective behavior. 
+Also, plasma is bound to the magnetic field line, showing gyro motion by a Lorentz force acting along the magnetic field. 
+When excited neutral particles in plasma transfer back to the lower state, they emit bright colorful light, called glow discharge. 
+These plasma-generated phenomena are observed in our nature. 
+The Aurora is glowing plasma in the northern hemisphere's atmosphere that moves along the magnetosphere, earth's magnetic field by gyro motion. 
+lightning is a phenomenon in which plasma, created by the ionization of atmospheric gases, is discharged by potential differences inside the atmosphere. 
+90% of interstellar matter, which is composed of stars, nebula, clusters, etc, exists in the plasma state. 
+Plasma is also widely used in engineering. 
+Plasma air purifiers attract dust through ions present in the dust collector by attaching electrons. 
+Nuclear fusion reactors use trapping thermal plasma in a donut-shaped torus tokamak. 
+Fluorescent Lamps use the glow discharge of plasma. 
+Plasma cutters are used in surgery and semiconductor etching. 
+Consequently, we can find many plasma-related phenomena in our life. (Word Count: 287)

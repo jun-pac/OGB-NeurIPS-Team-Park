@@ -1,0 +1,48 @@
+Done! [185.66s]
+Done! [78.97s]
+0 epoch ; recursive_DEBUG | valid_acc : 0.00781 | time : 120.27 | batch : 0/135
+Validation Epoch end... Accuracy : 0.0078125
+0 epoch ; recursive_DEBUG | train_acc : 0.01172 | time : 166.18 | batch : 0/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.16113 | time : 222.44 | batch : 10/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.23926 | time : 273.46 | batch : 20/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.32812 | time : 323.61 | batch : 30/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.39160 | time : 373.72 | batch : 40/1086
+Done! [85.84s]
+0 epoch ; recursive_DEBUG | valid_acc : 0.00488 | time : 120.28 | batch : 0/135
+Validation Epoch end... Accuracy : 0.003384069957649262
+0 epoch ; recursive_DEBUG | train_acc : 0.00977 | time : 169.09 | batch : 0/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.36426 | time : 224.98 | batch : 10/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.50293 | time : 276.17 | batch : 20/1086
+Done! [211.69s]
+0 epoch ; recursive_DEBUG | valid_acc : 0.00488 | time : 250.88 | batch : 0/135
+Validation Epoch end... Accuracy : 0.003384069957649262
+0 epoch ; recursive_DEBUG | train_acc : 0.00977 | time : 302.62 | batch : 0/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.36426 | time : 357.14 | batch : 10/1086
+Done! [65.45s]
+0 epoch ; recursive_DEBUG | valid_acc : 0.03809 | time : 100.23 | batch : 0/135
+Validation Epoch end... Accuracy : 0.042582165127052214
+0 epoch ; recursive_DEBUG | train_acc : 0.00586 | time : 145.60 | batch : 0/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.34961 | time : 200.34 | batch : 10/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.46875 | time : 249.91 | batch : 20/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.55273 | time : 297.30 | batch : 30/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.59570 | time : 344.99 | batch : 40/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.59473 | time : 393.46 | batch : 50/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.58496 | time : 441.21 | batch : 60/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.59570 | time : 488.52 | batch : 70/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.63184 | time : 536.41 | batch : 80/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.62402 | time : 584.35 | batch : 90/1086
+Done! [63.47s]
+0 epoch ; recursive_DEBUG | valid_acc : 0.03418 | time : 98.15 | batch : 0/135
+Validation Epoch end... Accuracy : 0.037177172584701476
+0 epoch ; recursive_DEBUG | train_acc : 0.00586 | time : 148.61 | batch : 0/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.33008 | time : 203.91 | batch : 10/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.43945 | time : 254.14 | batch : 20/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.52051 | time : 303.24 | batch : 30/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.54785 | time : 353.32 | batch : 40/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.57910 | time : 404.93 | batch : 50/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.58984 | time : 453.52 | batch : 60/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.57520 | time : 503.57 | batch : 70/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.60742 | time : 552.81 | batch : 80/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.60156 | time : 601.49 | batch : 90/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.63574 | time : 652.24 | batch : 100/1086
+0 epoch ; recursive_DEBUG | train_acc : 0.62695 | time : 700.17 | batch : 110/1086

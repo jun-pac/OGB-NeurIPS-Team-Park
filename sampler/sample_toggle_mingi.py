@@ -228,12 +228,12 @@ class NeighborSampler(torch.utils.data.DataLoader):
 
             row, col, val = cur_adj_t.coo()
 
-            cur_adj_t_t = SparseTensor(row = col, col = row, val = val)
+            cur_adj_t_t = SparseTensor(row = col, col = row, value = val)
             size_t = cur_adj_t.sparse_sizes()
 
 
-            adjs[-1-i] = Adj(cur_adj_t, size)
-            adjs[i] = Adj(cur_adj_t_t, size_t)
+            adjs[-1-i] = Adj(cur_adj_t, (0,0))
+            adjs[i] = Adj(cur_adj_t_t, (1,1))
 
         #adjs = adjs[0] if len(adjs) == 1 else adjs[::-1]
         out = (batch_size, n_id, adjs)        

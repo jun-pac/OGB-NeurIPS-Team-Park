@@ -471,9 +471,9 @@ if __name__ == '__main__':
     elif args.ckpt!=None:
         name='/'+args.ckpt.split('/')[5]
     elif args.hidden_channels==1024:
-        name=f'/toggle-NS_p={args.label_disturb_p}_batch={args.batch_size}'
+        name=f'/toggle-NS_p={args.label_disturb_p}_batch={args.batch_size}_newposembed'
     else:
-        name=f'/toggle-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}'
+        name=f'/toggle-NS_p={args.label_disturb_p}_batch={args.batch_size}_hidden={args.hidden_channels}_newposembed'
 
 
     NROOT='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/txtlog' # log file's root.
