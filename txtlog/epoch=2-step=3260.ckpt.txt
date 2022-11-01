@@ -1,0 +1,14 @@
+Continue from...logs/toggle-NS_mingi_rev_p=0.0_batch=1024_hidden=1025/lightning_logs/version_13326014/checkpoints/epoch=2-step=3260.ckpt
+3 epoch ; epoch=2-step=3260.ckpt | valid_acc : 0.68750 | time : 1222.08 | batch : 0/135
+Validation Epoch end... Accuracy : 0.6995033056006124
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.71191 | time : 1331.87 | batch : 0/1086
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.72363 | time : 8575.91 | batch : 100/1086
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.75195 | time : 15635.76 | batch : 200/1086
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.76465 | time : 22696.10 | batch : 300/1086
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.76953 | time : 29829.86 | batch : 400/1086
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.76562 | time : 36912.09 | batch : 500/1086
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.75098 | time : 44037.86 | batch : 600/1086
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.75684 | time : 51146.67 | batch : 700/1086
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.74316 | time : 58290.07 | batch : 800/1086
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.76758 | time : 65489.59 | batch : 900/1086
+3 epoch ; epoch=2-step=3260.ckpt | train_acc : 0.74609 | time : 72615.47 | batch : 1000/1086

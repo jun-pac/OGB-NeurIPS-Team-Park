@@ -16,6 +16,7 @@ from pytorch_lightning import (LightningDataModule, LightningModule, Trainer,
                                seed_everything)
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.metrics import Accuracy
+
 from torch import Tensor
 from torch.nn import BatchNorm1d, Dropout, Linear, ModuleList, ReLU, Sequential
 from torch.optim.lr_scheduler import StepLR
@@ -76,6 +77,8 @@ class MAG240M(LightningDataModule):
         self.valid_idx = torch.from_numpy(dataset.get_idx_split('valid'))
         self.test_idx = torch.from_numpy(dataset.get_idx_split('test-dev'))
         self.test_challenge_idx = torch.from_numpy(dataset.get_idx_split('test-challenge'))
+        print(f"ORI self.test_idx.shape : {self.test_idx.shape}, self.test_challenge_idx.shape : {self.test_challenge_idx.shape}")
+        
         N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
         self.N=N
         
@@ -89,7 +92,7 @@ class MAG240M(LightningDataModule):
             left_idx=list(range(0,temp_idx[0]))+list(range(temp_idx[-1]+1,L))
             self.train_idx=torch.cat((self.train_idx, self.valid_idx[left_idx]), dim=0)
             self.valid_idx=self.valid_idx[temp_idx]
-            print(f"self.valid_idx.shape : {self.valid_idx.shape}, self.train_idx.shape : {self.train_idx.shape}")
+            print(f"self.valid_idx.shape : {self.valid_idx.shape}")
 
         self.train_label=dataset.paper_label[self.train_idx]
         self.valid_label=dataset.paper_label[self.valid_idx]
@@ -170,6 +173,8 @@ class MAG240M(LightningDataModule):
                                num_workers=10, relation_ptr=relation_ptr)
 
     def val_dataloader(self):
+        if args.debug:
+            print(f"valid dataloader invoked, idx size : {self.valid_idx.shape}")
         if args.link=='toggle':
             return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.valid_idx,
                                sizes=self.sizes, return_e_id=False,
@@ -186,24 +191,10 @@ class MAG240M(LightningDataModule):
                                num_workers=10, relation_ptr=relation_ptr)
 
     def test_dataloader(self):
+        if args.debug:
+            print(f"test dataloader invoked, idx size : {self.test_challenge_idx.shape}")
         if args.link=='toggle':
-            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.valid_idx,
-                               sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch_test,
-                               batch_size=self.batch_size,
-                               num_workers=2, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
-        else:
-            relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
-            adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
-            return NS_china(adj_t, node_idx=self.valid_idx,
-                               sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch_test,
-                               batch_size=self.batch_size, 
-                               num_workers=2, relation_ptr=relation_ptr)
-
-    def hidden_test_dataloader(self): # This is test-dev. Not test-challenge
-        if args.link=='toggle':
-            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.test_idx,
+            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.test_challenge_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
                                batch_size=self.batch_size,
@@ -211,7 +202,23 @@ class MAG240M(LightningDataModule):
         else:
             relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
             adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
-            return NS_china(adj_t, node_idx=self.test_idx,
+            return NS_china(adj_t, node_idx=self.test_challenge_idx,
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch_test,
+                               batch_size=self.batch_size, 
+                               num_workers=10, relation_ptr=relation_ptr)
+
+    def hidden_test_dataloader(self): # This is test-dev. Not test-challenge
+        if args.link=='toggle':
+            return NS_toggle(self.mono_adj_t, self.adj_t, node_idx=self.test_challenge_idx,
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch_test,
+                               batch_size=self.batch_size,
+                               num_workers=10, mono_relation_ptr=self.mono_relation_ptr, relation_ptr=self.relation_ptr)
+        else:
+            relation_ptr = self.mono_relation_ptr if (args.link=='mono') else self.relation_ptr
+            adj_t = self.mono_adj_t if (args.link=='mono') else self.adj_t
+            return NS_china(adj_t, node_idx=self.test_challenge_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch_test,
                                batch_size=self.batch_size, 
@@ -259,7 +266,6 @@ class MAG240M(LightningDataModule):
             
         x=torch.from_numpy(np.concatenate((x, append_label, append_time), axis=1)).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
-
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
@@ -318,11 +324,15 @@ class RGNN(LightningModule):
         self.val_cnt=0
         self.test_acc_sum=0
         self.test_cnt=0
+        self.pseudo_sum=0
+        self.pseudo_cnt=0
         self.val_res=[]
         self.test_res=[]
         self.max_val_acc=0.
         self.batch_idx=0
         self.test_num=0
+        self.sample_num=0
+        self.activation_name=''
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
         for i, adj_t in enumerate(adjs_t):
@@ -366,20 +376,25 @@ class RGNN(LightningModule):
         self.batch_idx=batch_idx
         self.log('val_acc', tmp_acc, on_step=False, on_epoch=True,prog_bar=True, sync_dist=True)
         if((args.debug and batch_idx%10==0) or batch_idx%10==0):
-            print(f"{self.current_epoch} epoch ; {name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.cross_partition_number//args.batch_size}")
-            f_log.write(f"{self.current_epoch} epoch ; {name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//args.cross_partition_number//args.batch_size}\n")
+            print(f"{self.current_epoch} epoch ; {name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{58726//args.cross_partition_number//args.batch_size}")
+            f_log.write(f"{self.current_epoch} epoch ; {name[1:]} | valid_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{58726//args.cross_partition_number//args.batch_size}\n")
             f_log.flush()
 
     def test_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
-        tmp_acc=self.test_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
-        self.test_acc_sum+=batch.x.shape[0]*tmp_acc
-        self.test_cnt+=batch.x.shape[0]
+        if self.activation_name=='val_activation':
+            tmp_acc=self.test_acc(y_hat.softmax(dim=-1), batch.y).item() # What is the type of this value?
+        else:
+            tmp_acc=0
+        self.test_acc_sum+=y_hat.shape[0]*tmp_acc
+        self.test_cnt+=y_hat.shape[0]
+        self.pseudo_sum+=tmp_acc
+        self.pseudo_cnt+=1
         self.test_res.append(y_hat.softmax(dim=-1).cpu().numpy())
         self.log('test_acc', tmp_acc, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         if((args.debug and batch_idx%10==0) or batch_idx%50==0):
-            print(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//128}")
-            f_log.write(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//128}\n")
+            print(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//5//test_batch_size} or {58726//test_batch_size}")
+            f_log.write(f"{name[1:]} | test_acc : {tmp_acc:.5f} | time : {time.time()-t0:.2f} | batch : {batch_idx}/{138949//5//test_batch_size} or {58726//test_batch_size}\n")
             f_log.flush()
         
     
@@ -398,7 +413,7 @@ class RGNN(LightningModule):
         if self.batch_idx>=3 and self.val_acc_sum/self.val_cnt>self.max_val_acc:
             self.max_val_acc=self.val_acc_sum/self.val_cnt
             self.val_res=np.concatenate(self.val_res)
-            np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation'+name, self.val_res)
+            np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/val_activation'+name+'_ver-'+self.sample_num, self.val_res)
             print("Successfully saved!")
             f_log.write("Successfully saved!\n")
         
@@ -409,19 +424,23 @@ class RGNN(LightningModule):
         self.batch_idx=0
 
     def test_epoch_end(self, outputs) -> None:
+        print(f"Test_cnt : {self.test_cnt}, pseudo_cnt : {self.pseudo_cnt}, pseudo_acc : {self.pseudo_sum/self.pseudo_cnt:.5f}")
+        f_log.write(f"Test_cnt : {self.test_cnt}, pseudo_cnt : {self.pseudo_cnt}, pseudo_acc : {self.pseudo_sum/self.pseudo_cnt:.5f}\n")
         print("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
         f_log.write("Test Epoch end... Accuracy : "+str(self.test_acc_sum/self.test_cnt))
         f_log.write('\n')
-        if self.test_acc_sum/self.test_cnt>self.max_val_acc:
-            self.max_val_acc=self.test_acc_sum/self.test_cnt
-            self.test_res=np.concatenate(self.test_res)
-            np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/test_activation'+name, self.test_res)
-            print("Successfully saved!")
-            f_log.write("Successfully saved!\n")
+        
+        self.test_res=np.concatenate(self.test_res)
+        np.save(f'/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/{self.activation_name}'+name+'_ver='+str(self.sample_num)+'_rank='+str(args.rank), self.test_res)
+        print("Successfully saved!")
+        f_log.write("Successfully saved!\n")
         f_log.flush()
+        
         self.test_res=[]
         self.test_acc_sum=0
         self.test_cnt=0
+        self.pseudo_sum=0
+        self.pseudo_cnt=0
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
@@ -439,7 +458,6 @@ if __name__ == '__main__':
                         choices=['rgat', 'rgraphsage'])
     parser.add_argument('--in-memory', default=True) # Always have to be true in this code.
     parser.add_argument('--device', type=str, default='0')
-    parser.add_argument('--evaluate', action='store_true')
     parser.add_argument('--ckpt', type=str, default=None)
     parser.add_argument('--label_disturb_p', type=float, default=0.1)
     parser.add_argument('--time_disturb_p', type=float, default=0.2)
@@ -450,28 +468,34 @@ if __name__ == '__main__':
     parser.add_argument('--cross_partition_number', type=int, default=5)
     parser.add_argument('--cross_partition_idx', type=int, default=-1)
     parser.add_argument('--random_seed', type=int, default=42)
+    parser.add_argument('--rank', type=int, default=1)
     # Must specify seed everytime.
     # Batchsize, N_source need to be precisely selected, but don't change it for now.
 
     # DEBUG
-    # python OGB-NeurIPS-Team-Park/acua.py --link=toggle --cross_partition_number=5 --cross_partition_idx=0 --debug
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=0 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1/lightning_logs/version_13341040/checkpoints/epoch=32-step=39328.ckpt --debug
     
     # MAIN
-    # python OGB-NeurIPS-Team-Park/acua.py --link=toggle --cross_partition_number=5 --cross_partition_idx=0
-    # python OGB-NeurIPS-Team-Park/acua.py --link=full --cross_partition_number=5 --cross_partition_idx=0 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1/lightning_logs/version_13327070/checkpoints/epoch=25-step=30963.ckpt
-    # python OGB-NeurIPS-Team-Park/acua.py --link=full --label_disturb_p=0.2 --cross_partition_number=5 --cross_partition_idx=0 --ckpt=/users/PAS1289/oiocha/logs/acua_p=0.2/lightning_logs/version_13326552/checkpoints/epoch=24-step=29874.ckpt
-    # python OGB-NeurIPS-Team-Park/acua.py --link=full --label_disturb_p=0.05 --cross_partition_number=5 --cross_partition_idx=0  --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.05/lightning_logs/version_13342427/checkpoints/epoch=25-step=30377.ckpt
-    # python OGB-NeurIPS-Team-Park/acua.py --link=full --label_disturb_p=0.0 --cross_partition_number=5 --cross_partition_idx=0
-    
-    # Submission
-    # python OGB-NeurIPS-Team-Park/acua.py --link=full --cross_partition_number=5 --cross_partition_idx=0
-    # python OGB-NeurIPS-Team-Park/acua.py --link=full --cross_partition_number=5 --cross_partition_idx=1 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=1/lightning_logs/version_13373744/checkpoints/epoch=16-step=18779.ckpt
-    # python OGB-NeurIPS-Team-Park/acua.py --link=full --cross_partition_number=5 --cross_partition_idx=2
-    # python OGB-NeurIPS-Team-Park/acua.py --link=full --cross_partition_number=5 --cross_partition_idx=3
-    # python OGB-NeurIPS-Team-Park/acua.py --link=full --cross_partition_number=5 --cross_partition_idx=4
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=0 --rank=1 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=0/lightning_logs/version_13341040/checkpoints/epoch=32-step=39328.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=0 --rank=2 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=0/lightning_logs/version_13341040/checkpoints/epoch=31-step=38133.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=0 --rank=3 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=0/lightning_logs/version_13341040/checkpoints/epoch=33-step=40523.ckpt
 
-    # TEST
-    # python OGB-NeurIPS-Team-Park/acua.py --evaluate --label_disturb_p=0.0 --time_disturb_p=0.0 --batch_size=1024 --ckpt=/users/PAS1289/oiocha/logs/acua_p=0.1_batch=1024/lightning_logs/version_13082877/checkpoints/epoch=34-step=38044.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=1 --rank=1 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=1/lightning_logs/version_13397817/checkpoints/epoch=28-step=33119.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=1 --rank=2 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=1/lightning_logs/version_13397817/checkpoints/epoch=33-step=39094.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=1 --rank=3 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=1/lightning_logs/version_13397817/checkpoints/epoch=35-step=41484.ckpt
+    
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=2 --rank=1 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=2/lightning_logs/version_13364227/checkpoints/epoch=37-step=45409.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=2 --rank=2 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=2/lightning_logs/version_13364227/checkpoints/epoch=31-step=38239.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=2 --rank=3 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=2/lightning_logs/version_13364227/checkpoints/epoch=34-step=41824.ckpt
+
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=3 --rank=1 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=3/lightning_logs/version_13364447/checkpoints/epoch=39-step=47799.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=3 --rank=2 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=3/lightning_logs/version_13364447/checkpoints/epoch=37-step=45409.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=3 --rank=3 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=3/lightning_logs/version_13364447/checkpoints/epoch=35-step=43019.ckpt
+
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=4 --rank=1 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=4/lightning_logs/version_13373155/checkpoints/epoch=28-step=34654.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=4 --rank=2 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=4/lightning_logs/version_13373155/checkpoints/epoch=30-step=37044.ckpt
+    # python OGB-NeurIPS-Team-Park/acuatest.py --cross_partition_idx=4 --rank=3 --ckpt=/users/PAS1289/oiocha/logs/acua_full_p=0.1_block=4/lightning_logs/version_13373155/checkpoints/epoch=32-step=39434.ckpt
+
     
     t0=time.time()
     args = parser.parse_args()
@@ -488,20 +512,19 @@ if __name__ == '__main__':
 
     # Initialize log directory
     if args.debug:
-        name=f'/acua_DEBUG'
+        name=f'/acuatest_DEBUG'
     elif args.ckpt!=None:
-        name='/'+args.ckpt.split('/')[5]
+        name='/'+args.ckpt.split('/')[5]+'_test'
     elif args.hidden_channels==1024 and args.batch_size==1024:
-        name=f'/acua_{args.link}_p={args.label_disturb_p}_block={args.cross_partition_idx}'
+        name=f'/acuatest_{args.link}_p={args.label_disturb_p}_block={args.cross_partition_idx}'
     else:
-        name=f'/acua_{args.link}_p={args.label_disturb_p}_block={args.cross_partition_idx}_batch={args.batch_size}_hidden={args.hidden_channels}'
+        name=f'/acuatest_{args.link}_p={args.label_disturb_p}_block={args.cross_partition_idx}_batch={args.batch_size}_hidden={args.hidden_channels}'
     print(f"Name : {name}")
 
     
-    if args.cross_partition_idx!=-1:
-        print(f"Cross Validation - cross_partition_idx : {args.cross_partition_idx}")
-    else:
-        args.cross_partition_number=5
+    
+    print(f"You must check cross idx - cross_partition_idx : {args.cross_partition_idx}")
+    
     
     NROOT='/users/PAS1289/oiocha/OGB-NeurIPS-Team-Park/txtlog' # log file's root.
     path_log = NROOT+name+'.txt'
@@ -513,89 +536,87 @@ if __name__ == '__main__':
 
     # Dataloader
     datamodule = MAG240M(ROOT, args.batch_size, sizes, args.in_memory, args.label_disturb_p, args.time_disturb_p, args.bit)
+    datamodule.setup()
 
-    if not args.evaluate:
-        device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
-        print("Device :",device)
-        
-        if args.ckpt != None:
-            checkpoint = torch.load(args.ckpt)
-            model=RGNN.load_from_checkpoint(args.ckpt)
-
-        else:
-            model = RGNN(args.model, datamodule.num_features+153+args.bit,
-                    datamodule.num_classes, args.hidden_channels,
-                    datamodule.num_relations, num_layers=len(sizes),
-                    dropout=args.dropout)
-        if args.debug:
-            print(f"Input size : {datamodule.num_features+153+args.bit}")
-        
-        print(f'#Params {sum([p.numel() for p in model.parameters()])}')
-        checkpoint_callback = ModelCheckpoint(monitor='val_acc', mode='max',save_top_k=3)
-        # tensorboard --logdir=/users/PAS1289/oiocha/logs/rgat/lightning_logs
-        if args.ckpt != None:
-            trainer = Trainer(max_epochs=args.epochs,
-                            callbacks=[checkpoint_callback],
-                            default_root_dir='logs'+name,
-                            progress_bar_refresh_rate=0, resume_from_checkpoint=args.ckpt)
-        else:
-            trainer = Trainer(max_epochs=args.epochs,
-                            callbacks=[checkpoint_callback],
-                            default_root_dir='logs'+name,
-                            progress_bar_refresh_rate=0)
-        if args.debug:
-            print(f"AFTER model.optimizers() : {trainer.optimizers}")
-            print(f"model.global_step : {model.global_step}")
-            print(f"model.current_epoch : {model.current_epoch}")
-
-        trainer.fit(model, datamodule=datamodule)
-    
     # Evaluate
-    elif args.evaluate:
-        device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
-        # Ignore previous code
-        ckpt=args.ckpt
-        trainer = Trainer(resume_from_checkpoint=ckpt,
-                          progress_bar_refresh_rate=0) # gpus=args.device,
-        
-        model = RGNN.load_from_checkpoint(args.ckpt)
+    device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
+    # Ignore previous code
+    ckpt=args.ckpt
+    trainer = Trainer(resume_from_checkpoint=ckpt,
+                        progress_bar_refresh_rate=0) # gpus=args.device,
+    
+    model = RGNN.load_from_checkpoint(args.ckpt)
 
-        datamodule.batch_size = 16*8 # initially 16
-        
-        f_log.write("Original : [[40,10,0],[20,10,5]]\n")
-        f_log.flush()
-        datamodule.sizes = [[40,10,0],[20,10,5]] 
-        trainer.test(model=model, datamodule=datamodule)
+    test_batch_size=128
+    datamodule.batch_size = test_batch_size # initially 16
+    
+    print("Original : [[40,10,0],[15,10,5]]\n")
+    f_log.write("Original : [[40,10,0],[15,10,5]]\n")
+    f_log.flush()
+    datamodule.sizes = [[40,10,0],[15,10,5]] 
+    model.sample_num=1 # 0
+    model.activation_name="val_activation"
+    trainer.test(model=model, test_dataloaders=datamodule.val_dataloader())
+    model.activation_name="test_activation"
+    trainer.test(model=model, datamodule=datamodule)
 
-        f_log.write("X3 : [[120,30,0],[60,30,15]]\n")
-        f_log.flush()
-        datamodule.sizes = [[120,30,0],[60,30,15]] 
-        trainer.test(model=model, datamodule=datamodule)
+    print("X2 : [[80,20,0],[30,20,10]]\n")
+    f_log.write("X2 : [[80,20,0],[30,20,10]]\n")
+    f_log.flush()
+    datamodule.sizes = [[80,20,0],[30,20,10]] 
+    model.sample_num=2 # 3
+    model.activation_name="val_activation"
+    trainer.test(model=model, test_dataloaders=datamodule.val_dataloader())
+    model.activation_name="test_activation"
+    trainer.test(model=model, datamodule=datamodule)
 
-        f_log.write("X4 : [[160,40,0],[80,40,20]]\n")
-        f_log.flush()
-        datamodule.sizes = [[160,40,0],[80,40,20]] 
-        trainer.test(model=model, datamodule=datamodule)
+    print("X3 : [[120,30,0],[45,30,15]]\n")
+    f_log.write("X3 : [[120,30,0],[45,30,15]]\n")
+    f_log.flush()
+    datamodule.sizes = [[120,30,0],[45,30,15]]
+    model.sample_num=3 # 1
+    model.activation_name="val_activation"
+    trainer.test(model=model, test_dataloaders=datamodule.val_dataloader())
+    model.activation_name="test_activation"
+    trainer.test(model=model, datamodule=datamodule)
 
-        f_log.write("X5 : [[200,50,0],[100,60,25]]\n")
-        f_log.flush()
-        datamodule.sizes = [[200,50,0],[100,60,25]]  # (Almost) no sampling...
-        trainer.test(model=model, datamodule=datamodule)
+    print("X2.1 : [[80,20,0],[50,30,10]]\n")
+    f_log.write("X2.1 : [[80,20,0],[50,30,10]]\n")
+    f_log.flush()
+    datamodule.sizes = [[80,20,0],[50,30,10]]
+    model.sample_num=2.1
+    model.activation_name="val_activation"
+    trainer.test(model=model, test_dataloaders=datamodule.val_dataloader())
+    model.activation_name="test_activation"
+    trainer.test(model=model, datamodule=datamodule)
+    
+    print("X2.2 : [[80,20,0],[40,20,10]]\n")
+    f_log.write("X2.2 : [[80,20,0],[40,20,10]]\n")
+    f_log.flush()
+    datamodule.sizes = [[80,20,0],[40,20,10]]
+    model.sample_num=2.2
+    model.activation_name="val_activation"
+    trainer.test(model=model, test_dataloaders=datamodule.val_dataloader())
+    model.activation_name="test_activation"
+    trainer.test(model=model, datamodule=datamodule)
+    '''
+    print("X2.3 : [[80,20,0],[40,30,10]]\n")
+    f_log.write("X2.3 : [[80,20,0],[40,30,10]]\n")
+    f_log.flush()
+    datamodule.sizes = [[80,20,0],[40,30,10]]
+    model.sample_num=2.3
+    model.activation_name="val_activation"
+    trainer.test(model=model, test_dataloaders=datamodule.val_dataloader())
+    model.activation_name="test_activation"
+    trainer.test(model=model, datamodule=datamodule)
 
-
-
-        evaluator = MAG240MEvaluator()
-        loader = datamodule.hidden_test_dataloader()
-
-        model.eval()
-        device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
-        model.to(device)
-        y_preds = []
-        for batch in tqdm(loader):
-            batch = batch.to(device)
-            with torch.no_grad():
-                out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
-                y_preds.append(out)
-        res = {'y_pred': torch.cat(y_preds, dim=0)}
-        evaluator.save_test_submission(res, 'results'+name, mode='test-dev')
-
+    print("X2.4 : [[80,20,0],[40,30,10]]\n")
+    f_log.write("X2.4 : [[80,20,0],[40,30,10]]\n")
+    f_log.flush()
+    datamodule.sizes = [[80,20,0],[60,40,10]]
+    model.sample_num=2.4
+    model.activation_name="val_activation"
+    trainer.test(model=model, test_dataloaders=datamodule.val_dataloader())
+    model.activation_name="test_activation"
+    trainer.test(model=model, datamodule=datamodule)
+    '''

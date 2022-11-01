@@ -1,0 +1,351 @@
+Continue from.../users/PAS1289/oiocha/logs/acua_full_p=0.1_block=3/lightning_logs/version_13364447/checkpoints/epoch=39-step=47799.ckpt
+Original : [[40,10,0],[15,10,5]]
+acua_full_p=0.1_block=3_test | test_acc : 0.78125 | time : 1452.74 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.70312 | time : 1488.87 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.75000 | time : 1523.73 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71875 | time : 1556.95 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 1588.72 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72547
+Test Epoch end... Accuracy : 0.7252869840648751
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1617.20 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1652.35 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1686.08 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1720.23 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1754.28 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1787.91 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1821.59 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1855.35 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1889.56 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1920.55 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X2 : [[80,20,0],[30,20,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.80469 | time : 1947.74 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71875 | time : 2005.20 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.76562 | time : 2059.77 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 2113.33 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 2168.84 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72837
+Test Epoch end... Accuracy : 0.7282018064766207
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2207.75 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2268.34 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2327.60 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2384.86 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2439.99 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2499.58 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2557.84 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2615.22 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2674.43 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2730.00 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X3 : [[120,30,0],[45,30,15]]
+acua_full_p=0.1_block=3_test | test_acc : 0.78906 | time : 2760.88 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 2832.76 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.75781 | time : 2900.52 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.69531 | time : 2968.62 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.70312 | time : 3037.78 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72884
+Test Epoch end... Accuracy : 0.728669617480975
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3082.37 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3155.16 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3227.45 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3296.22 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3365.62 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3433.36 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3501.38 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3569.84 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3637.77 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3703.04 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X2.1 : [[80,20,0],[50,30,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.78906 | time : 3736.39 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.68750 | time : 3813.55 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.75000 | time : 3885.04 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 3955.04 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.70312 | time : 4024.93 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72973
+Test Epoch end... Accuracy : 0.72956925402781
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4068.63 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4141.17 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4209.54 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4278.79 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4347.96 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4416.77 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4486.65 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4560.99 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4630.76 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4698.10 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X2.2 : [[80,20,0],[40,20,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.81250 | time : 4731.41 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71875 | time : 4796.74 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.76562 | time : 4861.80 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.70312 | time : 4925.52 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.69531 | time : 4989.58 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72952
+Test Epoch end... Accuracy : 0.7293533412565697
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5031.03 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5101.39 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5169.72 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5234.96 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5299.24 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5363.90 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5427.22 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5490.15 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5551.82 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5610.88 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X2.3 : [[80,20,0],[40,30,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.78906 | time : 5643.23 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 5711.29 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.75781 | time : 5774.74 | batch : 100/217 or 458
+Continue from.../users/PAS1289/oiocha/logs/acua_full_p=0.1_block=3/lightning_logs/version_13364447/checkpoints/epoch=37-step=45409.ckpt
+Original : [[40,10,0],[15,10,5]]
+acua_full_p=0.1_block=3_test | test_acc : 0.78906 | time : 1317.36 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71875 | time : 1346.20 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.74219 | time : 1372.61 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.73438 | time : 1398.63 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 1423.48 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72593
+Test Epoch end... Accuracy : 0.7257547950692294
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1445.84 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1474.24 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1501.45 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1528.74 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1554.86 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1582.51 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1609.08 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1635.50 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1660.76 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1684.34 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X2 : [[80,20,0],[30,20,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.78906 | time : 1706.42 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71875 | time : 1750.01 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.73438 | time : 1791.07 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71875 | time : 1832.11 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 1872.13 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72719
+Test Epoch end... Accuracy : 0.7270142862347985
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1900.70 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1945.90 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1987.96 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2029.45 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2070.40 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2111.56 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2152.72 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2194.28 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2234.44 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2273.19 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X3 : [[120,30,0],[45,30,15]]
+acua_full_p=0.1_block=3_test | test_acc : 0.80469 | time : 2298.09 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.74219 | time : 2352.49 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.75000 | time : 2405.41 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 2455.83 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 2506.92 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72787
+Test Epoch end... Accuracy : 0.7276980100103931
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2539.64 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2596.52 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2651.37 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2704.69 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2757.12 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2811.74 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2865.95 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2920.51 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2972.25 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3021.53 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X2.1 : [[80,20,0],[50,30,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.79688 | time : 3047.81 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.73438 | time : 3108.33 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.73438 | time : 3163.95 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 3217.10 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 3272.07 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72920
+Test Epoch end... Accuracy : 0.729029472099709
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3306.00 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3364.05 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3420.04 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3474.82 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3530.41 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3585.69 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3641.88 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3699.07 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3754.58 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3807.38 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X2.2 : [[80,20,0],[40,20,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.78906 | time : 3833.28 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71875 | time : 3886.45 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.75781 | time : 3936.12 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 3982.25 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.70312 | time : 4029.58 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72791
+Test Epoch end... Accuracy : 0.7277339954722665
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4059.76 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4112.37 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4163.76 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4213.58 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4261.96 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4310.05 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4357.93 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4406.87 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4453.86 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4498.29 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+Continue from.../users/PAS1289/oiocha/logs/acua_full_p=0.1_block=3/lightning_logs/version_13364447/checkpoints/epoch=35-step=43019.ckpt
+Original : [[40,10,0],[15,10,5]]
+acua_full_p=0.1_block=3_test | test_acc : 0.77344 | time : 1271.30 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 1306.78 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.75781 | time : 1340.75 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 1374.15 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71875 | time : 1406.94 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72511
+Test Epoch end... Accuracy : 0.724927129446141
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1455.13 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1500.32 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1534.06 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1567.56 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1602.22 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1635.19 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1668.89 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1704.43 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1739.43 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1772.49 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X2 : [[80,20,0],[30,20,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.76562 | time : 1822.92 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.69531 | time : 1881.07 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.75781 | time : 1940.29 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 1994.71 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 2053.26 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72744
+Test Epoch end... Accuracy : 0.7272661844679122
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2113.79 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2173.93 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2233.29 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2295.44 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2355.78 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2415.83 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2476.03 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2537.92 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2598.50 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2653.32 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X3 : [[120,30,0],[45,30,15]]
+acua_full_p=0.1_block=3_test | test_acc : 0.78125 | time : 2715.52 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 2796.29 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.75781 | time : 2870.05 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.69531 | time : 2942.03 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.72656 | time : 3015.03 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72816
+Test Epoch end... Accuracy : 0.7279858937053804
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3112.36 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3187.52 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3260.24 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3332.27 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3412.11 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3488.70 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3570.20 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3650.84 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3729.66 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 3805.24 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X2.1 : [[80,20,0],[50,30,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.77344 | time : 3860.25 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.70312 | time : 3941.24 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.77344 | time : 4019.95 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71875 | time : 4095.30 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71875 | time : 4175.37 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72834
+Test Epoch end... Accuracy : 0.7281658210147474
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4252.98 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4333.94 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4413.89 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4494.51 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4571.12 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4647.57 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4723.69 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4801.90 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4880.43 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 4959.76 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
+X2.2 : [[80,20,0],[40,20,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.78906 | time : 5019.27 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 5098.70 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.77344 | time : 5169.54 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 5240.32 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.70312 | time : 5311.73 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72626
+Test Epoch end... Accuracy : 0.7260786642260899
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5375.01 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5448.52 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5520.19 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 5592.82 | batch : 150/217 or 458
+Continue from.../users/PAS1289/oiocha/logs/acua_full_p=0.1_block=3/lightning_logs/version_13364447/checkpoints/epoch=35-step=43019.ckpt
+X2.2 : [[80,20,0],[40,20,10]]
+acua_full_p=0.1_block=3_test | test_acc : 0.78906 | time : 1266.97 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 1337.35 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.77344 | time : 1402.41 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.71094 | time : 1470.40 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.70312 | time : 1536.21 | batch : 200/217 or 458
+Test_cnt : 27789, pseudo_cnt : 218, pseudo_acc : 0.72626
+Test Epoch end... Accuracy : 0.7260786642260899
+Successfully saved!
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1588.09 | batch : 0/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1662.28 | batch : 50/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1728.96 | batch : 100/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1795.10 | batch : 150/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1860.83 | batch : 200/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1931.79 | batch : 250/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 1996.82 | batch : 300/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2062.86 | batch : 350/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2126.03 | batch : 400/217 or 458
+acua_full_p=0.1_block=3_test | test_acc : 0.00000 | time : 2190.70 | batch : 450/217 or 458
+Test_cnt : 58726, pseudo_cnt : 459, pseudo_acc : 0.00000
+Test Epoch end... Accuracy : 0.0
+Successfully saved!
