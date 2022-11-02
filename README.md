@@ -3,8 +3,10 @@
 ## Description
 It is multi-label classification of ArXiv papers on transductive knowledge graph(MAG240M).
 
-<img  align="center" width="500" alt="image" src="https://user-images.githubusercontent.com/100084401/199390976-887f7b28-0e51-4044-ad3f-6d39c35a618f.png">
- 
+<p align="center">
+  <img width="500" src="https://user-images.githubusercontent.com/100084401/199390976-887f7b28-0e51-4044-ad3f-6d39c35a618f.png">
+</p>
+
 Since the graph is huge and data is splited by time, three main challenges have appeared.
 
 
@@ -12,6 +14,9 @@ Since the graph is huge and data is splited by time, three main challenges have 
 - Label distributions that vary significantly over time.
 - 170 times as many unlabeled node as labeled node (Computationally very inefficient)
 - Train node / Valid node / Test node all have different nature. (e.g. Test node has little ‘cited’ link)
+<p align="center">
+  <img width="500" src="https://user-images.githubusercontent.com/100084401/199392899-d8fe73b9-f480-4a1c-91ff-9ef924c0fb6f.png">
+</p>
 
 
 
@@ -24,7 +29,7 @@ I have mainly used RGNN, with several modification to deal mentioned problems.
 - bi_toggle.py : Separate paper-cite-paper and paper-cited-paper link, and using previous embedding as new feature.
 - acua.py : Cross-validation version of bi_toggle.py
 
-Additionally, linear.py is linear model that do not exploit graph information, is used as basaline experiment.
+Additionally, t-sne.py and linear.py is linear model that do not exploit graph information, is used as basaline experiment.
 
 As a result of extensive experimentation, the use of embeddings obtained using similar models adversely affected the effectiveness. Also, toggle sampling was more effective when the model complexity was small, but full sampling achieved slightly higher accuracy when constructing a very large model. We reflected the results of these experiments when training the final model(acua.py with 5-cross validation, accuracy = 0.7302)
 
