@@ -1,11 +1,11 @@
 # OGB-NeurIPS challenge 2022
 
 ## Description
-It is multi-label classification of ArXiv papers on MAG240M dataset, which is Transductive Knowledge Graph.
+It is multi-label classification of ArXiv papers on transductive knowledge graph(MAG240M).
+
+<img  align="center" width="500" alt="image" src="https://user-images.githubusercontent.com/100084401/199390976-887f7b28-0e51-4044-ad3f-6d39c35a618f.png">
+ 
 Since the graph is huge and data is splited by time, three main challenges have appeared.
-
-<img width="400" alt="image" src="https://user-images.githubusercontent.com/100084401/199390976-887f7b28-0e51-4044-ad3f-6d39c35a618f.png">
-
 
 
 ### Challenges
@@ -42,6 +42,8 @@ python OGB-NeurIPS-Team-Park/bi_full.py --label_disturb_p=0.0 --time_disturb_p=0
 ```
 I trained 35 epochs, and the model with the highest accuracy among them was used for inference.
 
+
+
 ### Multi model
 Train
 ```
@@ -68,6 +70,7 @@ Inference time for each model takes no longer than 10 minutes.
 
 
 
+
 ## References
 [1] Addanki, Ravichandra et al. “LARGE-SCALE NODE CLASSIFICATION WITH BOOTSTRAPPING.” (2021).
 
@@ -78,4 +81,5 @@ Inference time for each model takes no longer than 10 minutes.
 [4] Preprint, A et al. “R-UNIMP: SOLUTION FOR KDDCUP 2021 MAG240M-LSC.” (2021).
 
 [5] Veličković, Petar, et al. "Graph attention networks." arXiv preprint arXiv:1710.10903 (2017).
+
 [6] Velickovic, Petar, et al. "Deep Graph Infomax." ICLR (Poster) 2.3 (2019): 4.
