@@ -15,7 +15,7 @@ Since the graph is huge and data is splited by time, three main challenges have 
 - 170 times as many unlabeled node as labeled node (Computationally very inefficient)
 - Train node / Valid node / Test node all have different nature. (e.g. Test node has little ‘cited’ link)
 <p align="center">
-  <img width="600" src="https://user-images.githubusercontent.com/100084401/199392899-d8fe73b9-f480-4a1c-91f5-9ef924c0fb6f.png">
+  <img width="650" src="https://user-images.githubusercontent.com/100084401/199393651-12cfb4c1-ee63-489e-80bf-be0c79e2720c.png">
 </p>
 
 
