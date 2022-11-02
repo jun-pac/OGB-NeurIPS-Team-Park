@@ -15,7 +15,7 @@ Since the graph is huge and data is splited by time, three main challenges have 
 - 170 times as many unlabeled node as labeled node (Computationally very inefficient)
 - Train node / Valid node / Test node all have different nature. (e.g. Test node has little ‘cited’ link)
 <p align="center">
-  <img width="500" src="https://user-images.githubusercontent.com/100084401/199392899-d8fe73b9-f480-4a1c-91ff-9ef924c0fb6f.png">
+  <img width="600" src="https://user-images.githubusercontent.com/100084401/199392899-d8fe73b9-f480-4a1c-91f5-9ef924c0fb6f.png">
 </p>
 
 
@@ -23,7 +23,7 @@ Since the graph is huge and data is splited by time, three main challenges have 
 ### Methods
 I have mainly used RGNN, with several modification to deal mentioned problems.
 - relation.py : Sampling by relation, added time positional encoding.
-- baidu.py : Concatenate masked label with input feature. Combine GNN message passing and Label propagation is proposed in Shi et al.(2020)
+- baidu.py : Concatenate masked label with input feature. i.e. combine GNN message passing and Label propagation.
 - toggle.py : Toggle sampling, which sample only ‘cite’ edge in first sampling, after that, sample both direction.
 - meta.py : Meta sampling, which sample only
 - bi_toggle.py : Separate paper-cite-paper and paper-cited-paper link, and using previous embedding as new feature.
@@ -31,7 +31,7 @@ I have mainly used RGNN, with several modification to deal mentioned problems.
 
 Additionally, t-sne.py and linear.py is linear model that do not exploit graph information, is used as basaline experiment.
 <p align="center">
-  <img width="500" src="https://github.com/jun-pac/OGB-NeurIPS-Team-Park/blob/master/Analysis/TSNE-2000_1000.png?raw=true">
+  <img width="400" src="https://github.com/jun-pac/OGB-NeurIPS-Team-Park/blob/master/Analysis/TSNE-2000_1000.png?raw=true">
 </p>
 
 As a result of extensive experimentation, the use of embeddings obtained using similar models adversely affected the effectiveness. Also, toggle sampling was more effective when the model complexity was small, but full sampling achieved slightly higher accuracy when constructing a very large model. We reflected the results of these experiments when training the final model(acua.py with 5-cross validation, accuracy = 0.7302)
