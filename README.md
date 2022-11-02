@@ -30,6 +30,9 @@ I have mainly used RGNN, with several modification to deal mentioned problems.
 - acua.py : Cross-validation version of bi_toggle.py
 
 Additionally, t-sne.py and linear.py is linear model that do not exploit graph information, is used as basaline experiment.
+<p align="center">
+  <img width="500" src="https://github.com/jun-pac/OGB-NeurIPS-Team-Park/blob/master/Analysis/TSNE-2000_1000.png?raw=true">
+</p>
 
 As a result of extensive experimentation, the use of embeddings obtained using similar models adversely affected the effectiveness. Also, toggle sampling was more effective when the model complexity was small, but full sampling achieved slightly higher accuracy when constructing a very large model. We reflected the results of these experiments when training the final model(acua.py with 5-cross validation, accuracy = 0.7302)
 
